@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hasil Pemeriksaan Lowongan — CekLoker</title>
+  <meta name="description" content="Hasil analisis AI terhadap lowongan kerja dengan anotasi bukti visual tanda bahaya (red flag).">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231E3A8A'/%3E%3Cpath d='M9 13V9h4M19 9h4v4M23 19v4h-4M13 23H9v-4' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12.5 16.2l2.4 2.4 4.6-4.6' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Design system: token + komponen (lihat DESAIN.md) -->
+  <style id="ck-design-system">
+    /* =====================================================================
+       CekLoker — design system (token + komponen)
+       Blok ini IDENTIK di seluruh halaman.
+       Harus berada SEBELUM <script src="https://cdn.tailwindcss.com">.
+       ===================================================================== */
+
+    /* ---------- Token ---------- */
+    :root {
+      --ck-navy: #1E3A8A;
+      --ck-navy-hover: #172F70;
+      --ck-navy-tint: #EEF2FB;
+      --ck-navy-soft: #DCE4F5;
+      --ck-bg: #F8FAFC;
+      --ck-surface: #FFFFFF;
+      --ck-ink: #0F172A;
+      --ck-muted: #475569;
+      --ck-line: #E2E8F0;
+      --ck-field: #8792A6;          /* border input, kontras >= 3:1 */
+
+      --ck-aman: #16A34A;    --ck-aman-ink: #15803D;    --ck-aman-tint: #F0FDF4;    --ck-aman-line: #BBF7D0;
+      --ck-waspada: #D97706; --ck-waspada-ink: #B45309; --ck-waspada-tint: #FFFBEB; --ck-waspada-line: #FDE68A;
+      --ck-bahaya: #DC2626;  --ck-bahaya-ink: #B91C1C;  --ck-bahaya-tint: #FEF2F2;  --ck-bahaya-line: #FECACA;
+
+      --ck-font: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+      --ck-radius: 12px;
+      --ck-radius-ctl: 10px;
+      --ck-shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 2px 6px rgba(15, 23, 42, .03);
+      --ck-shadow-lift: 0 2px 4px rgba(15, 23, 42, .05), 0 10px 24px rgba(15, 23, 42, .08);
+      --ck-ease: cubic-bezier(.2, .8, .2, 1);
+      --ck-dur: 180ms;
+    }
+
+    /* ---------- Dasar ---------- */
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    html body {
+      background-color: var(--ck-bg);
+      font-family: var(--ck-font);
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--ck-ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    html :is(h1, h2, h3) {
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      color: var(--ck-ink);
+    }
+    :focus-visible { outline: 2px solid var(--ck-navy); outline-offset: 2px; border-radius: 6px; }
+    .on-navy :focus-visible { outline-color: #fff; }
+    ::selection { background: var(--ck-navy-soft); }
+
+    /* ---------- Tata letak ---------- */
+    .container-page { width: 100%; max-width: 1152px; margin-inline: auto; padding-inline: 1rem; }
+    @media (min-width: 640px)  { .container-page { padding-inline: 1.5rem; } }
+    @media (min-width: 1024px) { .container-page { padding-inline: 2rem; } }
+
+    .skip-link {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
+    }
+    .skip-link:focus {
+      position: fixed; left: 1rem; top: 1rem; z-index: 60;
+      width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal;
+      padding: .5rem 1rem; border-radius: var(--ck-radius-ctl);
+      background: #fff; color: var(--ck-navy); font-weight: 600; box-shadow: var(--ck-shadow-lift);
+    }
+
+    /* ---------- Tombol ---------- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+      min-height: 48px; padding-inline: 1.5rem;
+      border-radius: var(--ck-radius-ctl);
+      font-size: 1rem; font-weight: 600; line-height: 1;
+      text-decoration: none; user-select: none;
+      transition: background-color var(--ck-dur) var(--ck-ease), border-color var(--ck-dur) var(--ck-ease),
+                  color var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease), transform var(--ck-dur) var(--ck-ease);
+    }
+    .btn:disabled, .btn[aria-disabled="true"] { cursor: not-allowed; opacity: .7; }
+    .btn-sm { min-height: 40px; padding-inline: 1rem; font-size: 14px; }
+    .btn-xs { min-height: 32px; padding-inline: .75rem; font-size: 13px; }
+
+    .btn.btn-primary { background-color: var(--ck-navy); color: #fff; }
+    .btn.btn-primary:hover { background-color: var(--ck-navy-hover); }
+    .btn.btn-secondary { border: 1px solid var(--ck-field); background-color: #fff; color: var(--ck-navy); }
+    .btn.btn-secondary:hover { border-color: var(--ck-navy); background-color: var(--ck-navy-tint); }
+    .btn.btn-ghost { color: var(--ck-navy); }
+    .btn.btn-ghost:hover { background-color: var(--ck-navy-tint); }
+    .btn.btn-white { background-color: #fff; color: var(--ck-navy); }
+    .btn.btn-white:hover { background-color: var(--ck-navy-tint); }
+
+    /* Indikator loading */
+    .spinner {
+      width: 20px; height: 20px; border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, .35); border-top-color: #fff;
+      animation: ck-spin .8s linear infinite;
+    }
+    @keyframes ck-spin { to { transform: rotate(360deg); } }
+
+    /* ---------- Input ---------- */
+    .input {
+      display: block; width: 100%; height: 3rem; padding-inline: 1rem;
+      border: 1px solid var(--ck-field); border-radius: var(--ck-radius-ctl);
+      background-color: #fff; color: var(--ck-ink);
+      font-size: 1rem; line-height: 1.5rem;
+      transition: border-color var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease);
+    }
+    .input::placeholder { color: #64748B; opacity: 1; }
+    .input:hover { border-color: #475569; }
+    .input:focus, .input:focus-visible { border-color: var(--ck-navy); outline: none; box-shadow: 0 0 0 3px var(--ck-navy-soft); }
+    .input[aria-invalid="true"] { border-color: var(--ck-bahaya-ink); }
+    .input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px var(--ck-bahaya-line); }
+
+    .field-label { display: block; font-size: 15px; font-weight: 600; color: var(--ck-ink); }
+    .field-error {
+      display: flex; align-items: flex-start; gap: .375rem; margin-top: .5rem;
+      font-size: .875rem; line-height: 1.25rem; font-weight: 600; color: var(--ck-bahaya-ink);
+    }
+    .field-error svg { flex-shrink: 0; width: 1rem; height: 1rem; margin-top: .125rem; }
+
+    /* ---------- Kartu ---------- */
+    .card {
+      border: 1px solid var(--ck-line); border-radius: var(--ck-radius);
+      background-color: #fff; box-shadow: var(--ck-shadow);
+    }
+    .card-hover { transition: transform var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease); }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: var(--ck-shadow-lift); }
+
+    /* ---------- Badge status risiko: warna + ikon + teks ---------- */
+    .badge {
+      display: inline-flex; align-items: center; gap: .375rem; white-space: nowrap;
+      padding: .25rem .625rem; border: 1px solid; border-radius: 9999px;
+      font-size: 13px; font-weight: 700; line-height: 1;
+    }
+    .badge svg { width: .875rem; height: .875rem; stroke-width: 2.5; }
+    .badge-lg { padding: .5rem 1rem; font-size: 15px; }
+    .badge-lg svg { width: 1.25rem; height: 1.25rem; }
+    .badge-aman    { border-color: var(--ck-aman-line);    background-color: var(--ck-aman-tint);    color: var(--ck-aman-ink); }
+    .badge-waspada { border-color: var(--ck-waspada-line); background-color: var(--ck-waspada-tint); color: var(--ck-waspada-ink); }
+    .badge-bahaya  { border-color: var(--ck-bahaya-line);  background-color: var(--ck-bahaya-tint);  color: var(--ck-bahaya-ink); }
+
+    /* ---------- Motif Penanda Bukti (Bounding Box) ---------- */
+    .evidence { position: relative; display: inline-block; }
+    .evidence-box {
+      position: absolute;
+      border: 2px solid var(--ck-bahaya);
+      border-radius: .375rem;
+      background: rgba(220, 38, 38, .07);
+      transition: all var(--ck-dur) var(--ck-ease);
+      cursor: pointer;
+    }
+    .evidence-box:hover, .evidence-box.is-active {
+      background: rgba(220, 38, 38, .18);
+      border-color: #B91C1C;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, .3);
+      z-index: 20;
+    }
+    .evidence-label {
+      position: absolute; top: -12px; left: 4px; white-space: nowrap;
+      padding: 3px 6px; border-radius: 4px; background: var(--ck-bahaya);
+      font-size: 11px; font-weight: 700; line-height: 1; color: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,.15);
+      pointer-events: none;
+    }
+    .evidence-box.is-waspada {
+      border-color: var(--ck-waspada); background: rgba(217, 119, 6, .08);
+    }
+    .evidence-box.is-waspada:hover, .evidence-box.is-waspada.is-active {
+      background: rgba(217, 119, 6, .2);
+      border-color: #B45309;
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, .3);
+    }
+    .evidence-box.is-waspada .evidence-label { background: var(--ck-waspada-ink); }
+
+    /* ---------- Kotak peringatan ---------- */
+    .alert {
+      display: flex; gap: .75rem; padding: 1rem;
+      border: 1px solid; border-radius: var(--ck-radius);
+      font-size: 15px; line-height: 1.625;
+    }
+    .alert-info    { border-color: var(--ck-navy-soft);   background-color: var(--ck-navy-tint);   color: var(--ck-ink); }
+    .alert-success { border-color: var(--ck-aman-line);   background-color: var(--ck-aman-tint);   color: var(--ck-ink); }
+    .alert-error   { border-color: var(--ck-bahaya-line); background-color: var(--ck-bahaya-tint); color: var(--ck-ink); }
+
+    .grid-paper {
+      background-image:
+        linear-gradient(to right, rgba(15, 23, 42, .035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(15, 23, 42, .035) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ck-navy); }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 1ms !important; }
+      .card-hover:hover { transform: none; }
+      .spinner { animation-duration: 2.4s; }
+    }
+
+    @media print {
+      body { background: #fff !important; }
+      .no-print { display: none !important; }
+      .card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+      .print-break-inside { break-inside: avoid; }
+    }
+  </style>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="ck-tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: { DEFAULT: 'var(--ck-navy)', hover: 'var(--ck-navy-hover)', tint: 'var(--ck-navy-tint)', soft: 'var(--ck-navy-soft)' },
+            canvas: 'var(--ck-bg)',
+            ink: 'var(--ck-ink)',
+            muted: 'var(--ck-muted)',
+            line: 'var(--ck-line)',
+            field: 'var(--ck-field)',
+            aman: { DEFAULT: 'var(--ck-aman)', ink: 'var(--ck-aman-ink)', tint: 'var(--ck-aman-tint)', line: 'var(--ck-aman-line)' },
+            waspada: { DEFAULT: 'var(--ck-waspada)', ink: 'var(--ck-waspada-ink)', tint: 'var(--ck-waspada-tint)', line: 'var(--ck-waspada-line)' },
+            bahaya: { DEFAULT: 'var(--ck-bahaya)', ink: 'var(--ck-bahaya-ink)', tint: 'var(--ck-bahaya-tint)', line: 'var(--ck-bahaya-line)' }
+          },
+          borderRadius: {
+            card: 'var(--ck-radius)',
+            ctl: 'var(--ck-radius-ctl)'
+          },
+          boxShadow: {
+            subtle: 'var(--ck-shadow)',
+            lift: 'var(--ck-shadow-lift)'
+          }
+        },
+        screens: {
+          sm: '640px', md: '768px', lg: '1024px', xl: '1280px', '2xl': '1536px',
+          short: { raw: '(min-width: 640px) and (max-height: 820px)' }
+        }
+      }
+    };
+  </script>
+</head>
+
+<body class="grid-paper min-h-screen text-ink">
+  <a href="#konten-utama" class="skip-link">Lewati ke hasil pemeriksaan</a>
+
+  <!-- Header Navigasi -->
+  <header class="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur-md">
+    <div class="container-page flex h-16 items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="flex items-center gap-2 rounded-ctl text-xl font-extrabold tracking-tight text-ink" aria-label="CekLoker, ke beranda">
+          <svg class="h-8 w-8 shrink-0" viewBox="0 0 32 32" aria-hidden="true">
+            <rect width="32" height="32" rx="8" fill="#1E3A8A"/>
+            <path d="M9 13V9h4M19 9h4v4M23 19v4h-4M13 23H9v-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12.5 16.2l2.4 2.4 4.6-4.6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>CekLoker</span>
+        </a>
+        <span class="hidden rounded-full bg-navy-tint px-2.5 py-0.5 text-xs font-semibold text-navy sm:inline-block">Hasil Analisis</span>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Guest counter indicator (FR-AKN-02) -->
+        <div class="hidden items-center gap-1.5 rounded-full border border-line bg-canvas px-3 py-1 text-xs font-medium text-muted md:flex">
+          <i data-lucide="sparkles" class="h-3.5 w-3.5 text-navy"></i>
+          <span>Mode Tamu: <strong>2</strong> dari 3 cek tersisa</span>
+        </div>
+
+        <button id="btn-print" type="button" class="btn btn-secondary btn-sm no-print" title="Cetak atau simpan sebagai dokumen PDF">
+          <i data-lucide="printer" class="h-4 w-4" aria-hidden="true"></i>
+          <span class="hidden sm:inline">Unduh PDF</span>
+        </button>
+
+        <button id="btn-toggle-upload" type="button" class="btn btn-primary btn-sm no-print">
+          <i data-lucide="plus-circle" class="h-4 w-4" aria-hidden="true"></i>
+          <span>Periksa Loker Baru</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Panel Demo Switcher & Upload Baru (Collapsible) -->
+  <section id="upload-panel" class="border-b border-line bg-white shadow-sm transition-all duration-200">
+    <div class="container-page py-5">
+      <!-- Quick Demo Switcher -->
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-muted">Contoh Data AI Regina (Dataset Evaluasi):</p>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <button type="button" class="demo-pill btn btn-sm border border-bahaya/30 bg-bahaya-tint !text-bahaya-ink hover:bg-bahaya-line" data-example="kamboja">
+              <i data-lucide="octagon-alert" class="h-3.5 w-3.5"></i>
+              Contoh 1: CS Kamboja (Bahaya TPPO)
+            </button>
+            <button type="button" class="demo-pill btn btn-sm border border-aman/30 bg-aman-tint !text-aman-ink hover:bg-aman-line" data-example="p3mi">
+              <i data-lucide="shield-check" class="h-3.5 w-3.5"></i>
+              Contoh 2: Perawat Jepang (Aman / P3MI Resmi)
+            </button>
+            <button type="button" class="demo-pill btn btn-sm border border-waspada/30 bg-waspada-tint !text-waspada-ink hover:bg-waspada-line" data-example="taiwan">
+              <i data-lucide="triangle-alert" class="h-3.5 w-3.5"></i>
+              Contoh 3: Pabrik Taiwan (Waspada Biaya)
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2 sm:pt-0">
+          <button id="btn-custom-upload" type="button" class="text-sm font-semibold text-navy hover:underline">
+            + Unggah File atau Ketik Manual Sendiri
+          </button>
+        </div>
+      </div>
+
+      <!-- Area Form Upload Mandiri (Tersembunyi by default) -->
+      <form id="custom-form" class="mt-5 hidden rounded-card border border-navy-soft bg-navy-tint/40 p-4 sm:p-6" novalidate>
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <!-- Dropzone Gambar -->
+          <div>
+            <label class="field-label">Unggah Poster / Screenshot Chat (1-5 file)</label>
+            <p class="text-xs text-muted">Mendukung format JPG, PNG, WEBP, atau PDF. Maksimal 5 MB per berkas.</p>
+            <div id="dropzone" class="mt-2 flex flex-col items-center justify-center rounded-card border-2 border-dashed border-field bg-white p-6 text-center transition-colors hover:border-navy">
+              <input type="file" id="file-input" class="sr-only" accept="image/png,image/jpeg,image/webp,application/pdf" multiple>
+              <i data-lucide="upload-cloud" class="h-9 w-9 text-navy"></i>
+              <p class="mt-2 text-sm font-medium text-ink">Seret & lepas gambar ke sini, atau <button type="button" id="browse-btn" class="font-bold text-navy underline">Pilih berkas</button></p>
+              <p id="file-count" class="mt-1 text-xs text-muted">Belum ada file dipilih</p>
+            </div>
+          </div>
+
+          <!-- Teks Tambahan / Chat Manual -->
+          <div>
+            <label for="text-input" class="field-label">Atau Salin Teks Lowongan / Chat Perekrut</label>
+            <p class="text-xs text-muted">Gunakan jika lowongan berupa teks obrolan WhatsApp, Telegram, atau surel.</p>
+            <textarea id="text-input" rows="5" class="input mt-2 h-auto py-2.5 font-mono text-sm leading-relaxed" placeholder="Contoh: Butuh staf admin cepat, gaji 20jt/bln. Paspor ditahan selama kontrak. Hubungi WA 0812..."></textarea>
+          </div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-end gap-3 border-t border-navy-soft/60 pt-4">
+          <button type="button" id="btn-cancel-upload" class="btn btn-ghost btn-sm">Batal</button>
+          <button type="submit" id="btn-submit-scan" class="btn btn-primary btn-sm">
+            <span class="spinner hidden" aria-hidden="true"></span>
+            <span data-label>Mulai Analisis AI</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Konten Utama: Hasil Pemeriksaan -->
+  <main id="konten-utama" class="container-page py-6 sm:py-8">
+
+    <!-- Header Ringkasan Status Risiko (Hero Card) -->
+    <div id="hero-risk-card" class="card border-l-8 border-l-bahaya p-6 transition-all duration-200 sm:p-8">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <div class="flex flex-wrap items-center gap-3">
+            <span id="risk-badge" class="badge badge-lg badge-bahaya">
+              <i data-lucide="octagon-alert"></i>
+              <span id="risk-level-text">BAHAYA</span>
+            </span>
+            <span id="confidence-pill" class="rounded-full bg-navy-tint px-3 py-1 text-xs font-semibold text-navy">
+              Tingkat Keyakinan AI: <strong>95%</strong>
+            </span>
+            <span id="verified-scam-pill" class="rounded-full bg-bahaya-tint px-3 py-1 text-xs font-semibold text-bahaya-ink">
+              Mirip 3 Laporan Penipuan
+            </span>
+          </div>
+
+          <h1 id="job-title-display" class="mt-3 text-2xl font-extrabold sm:text-3xl text-ink">
+            Customer Service Online — Phnom Penh, Kamboja
+          </h1>
+          <p id="risk-summary" class="mt-2 max-w-3xl text-[15px] leading-relaxed text-muted">
+            Lowongan ini memiliki <strong>8 indikator bahaya kritis</strong> yang mengarah kuat pada pola penipuan sindikat daring dan Tindak Pidana Perdagangan Orang (TPPO). Ditemukan desakan berangkat kilat, penahanan paspor, dan penggunaan visa turis tanpa kontrak resmi.
+          </p>
+        </div>
+
+        <!-- Tombol Aksi Cepat -->
+        <div class="flex flex-shrink-0 flex-wrap items-center gap-2 no-print">
+          <button id="btn-report-job" type="button" class="btn btn-secondary btn-sm !text-bahaya-ink hover:!border-bahaya">
+            <i data-lucide="flag" class="h-4 w-4"></i>
+            Laporkan Loker
+          </button>
+          <button id="btn-share-result" type="button" class="btn btn-ghost btn-sm">
+            <i data-lucide="share-2" class="h-4 w-4"></i>
+            Bagikan
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layout 2 Kolom: Kiri (Viewer Poster Anotasi) & Kanan (Detail Temuan & Verifikasi) -->
+    <div class="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+      
+      <!-- Kolom Kiri: Visual Evidence Viewer (Poster dengan Bounding Box) -->
+      <section class="lg:col-span-5 xl:col-span-5 print-break-inside" aria-labelledby="viewer-heading">
+        <div class="card overflow-hidden">
+          <div class="flex items-center justify-between border-b border-line bg-canvas px-4 py-3">
+            <div class="flex items-center gap-2">
+              <i data-lucide="scan" class="h-4 w-4 text-navy"></i>
+              <h2 id="viewer-heading" class="text-sm font-bold text-ink">Poster Asli & Penanda Bukti</h2>
+            </div>
+            <div class="flex items-center gap-2 no-print">
+              <button id="toggle-boxes" type="button" class="btn btn-ghost btn-xs text-xs font-medium" aria-pressed="true">
+                <i data-lucide="eye" class="h-3.5 w-3.5"></i>
+                <span data-toggle-label>Sembunyikan Kotak</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Canvas / Container Gambar Berkoordinat -->
+          <div class="relative flex items-center justify-center bg-slate-900 p-2 sm:p-4">
+            <div id="image-wrapper" class="relative max-w-full overflow-hidden rounded-md select-none">
+              <!-- Poster Image -->
+              <img id="job-poster-img" src="img/scam_kamboja.png" alt="Poster lowongan kerja yang dianalisis" class="block h-auto max-h-[640px] w-full object-contain">
+              
+              <!-- Layer Anotasi Bounding Box (Diinjeksi dinamis oleh JS) -->
+              <div id="bounding-boxes-layer" class="pointer-events-auto absolute inset-0"></div>
+            </div>
+          </div>
+
+          <!-- Petunjuk Interaksi di Bawah Gambar -->
+          <div class="border-t border-line bg-white p-3 text-center text-xs text-muted">
+            <span class="inline-flex items-center gap-1.5 font-medium text-navy">
+              <i data-lucide="info" class="h-3.5 w-3.5"></i>
+              Klik salah satu kotak merah pada gambar untuk langsung membaca alasan bahayanya.
+            </span>
+          </div>
+        </div>
+
+        <!-- Kartu Ekstraksi Metadata Loker (FR-LOK-06) -->
+        <div class="card mt-6 p-5">
+          <h3 class="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-muted">
+            <i data-lucide="file-text" class="h-4 w-4 text-navy"></i>
+            Informasi Lowongan Terekstraksi
+          </h3>
+          <dl class="mt-4 divide-y divide-line text-sm">
+            <div class="grid grid-cols-3 py-2.5">
+              <dt class="font-medium text-muted">Posisi</dt>
+              <dd id="meta-posisi" class="col-span-2 font-semibold text-ink">CUSTOMER SERVICE ONLINE</dd>
+            </div>
+            <div class="grid grid-cols-3 py-2.5">
+              <dt class="font-medium text-muted">Perusahaan</dt>
+              <dd id="meta-perusahaan" class="col-span-2 font-semibold text-bahaya-ink italic">Tidak dicantumkan (Anonim)</dd>
+            </div>
+            <div class="grid grid-cols-3 py-2.5">
+              <dt class="font-medium text-muted">Lokasi / Negara</dt>
+              <dd id="meta-lokasi" class="col-span-2 font-semibold text-ink">Phnom Penh, KAMBOJA</dd>
+            </div>
+            <div class="grid grid-cols-3 py-2.5">
+              <dt class="font-medium text-muted">Gaji Dijanjikan</dt>
+              <dd id="meta-gaji" class="col-span-2 font-semibold text-bahaya-ink">USD 1.500 + BONUS</dd>
+            </div>
+            <div class="grid grid-cols-3 py-2.5">
+              <dt class="font-medium text-muted">Biaya Diminta</dt>
+              <dd id="meta-biaya" class="col-span-2 font-semibold text-bahaya-ink">Rp 2.500.000 (di muka)</dd>
+            </div>
+            <div class="grid grid-cols-3 py-2.5">
+              <dt class="font-medium text-muted">Kontak</dt>
+              <dd id="meta-kontak" class="col-span-2 font-semibold text-ink">Telegram @kerja_luarnegeri_cepat, WA Pak Andi</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <!-- Kolom Kanan: Detail Red Flag, Jalur Resmi, dan Rekomendasi Tindakan -->
+      <section class="lg:col-span-7 xl:col-span-7 space-y-6">
+
+        <!-- Navigasi Tab Analisis -->
+        <div class="card p-2 sm:p-3">
+          <nav class="flex gap-2 border-b border-line pb-2" aria-label="Tab Analisis">
+            <button type="button" class="tab-btn active flex items-center gap-2 rounded-ctl px-4 py-2 text-sm font-bold text-navy bg-navy-tint transition-colors" data-target="panel-redflags">
+              <i data-lucide="shield-alert" class="h-4 w-4"></i>
+              <span>Tanda Bahaya (<span id="redflags-count">8</span>)</span>
+            </button>
+            <button type="button" class="tab-btn flex items-center gap-2 rounded-ctl px-4 py-2 text-sm font-semibold text-muted hover:bg-canvas transition-colors" data-target="panel-official">
+              <i data-lucide="check-check" class="h-4 w-4"></i>
+              <span>Verifikasi Jalur Resmi</span>
+            </button>
+            <button type="button" class="tab-btn flex items-center gap-2 rounded-ctl px-4 py-2 text-sm font-semibold text-muted hover:bg-canvas transition-colors" data-target="panel-action">
+              <i data-lucide="life-buoy" class="h-4 w-4"></i>
+              <span>Rekomendasi Tindakan</span>
+            </button>
+          </nav>
+
+          <!-- TAB 1: Daftar Temuan Red Flag -->
+          <div id="panel-redflags" class="tab-panel pt-4">
+            <div class="flex items-center justify-between pb-3">
+              <p class="text-xs text-muted">Temuan diurutkan dari bobot risiko tertinggi ke terendah.</p>
+              <span class="text-xs font-semibold text-navy">Sumber: AI & Aturan Ketenagakerjaan</span>
+            </div>
+
+            <!-- List Kartu Red Flag (Diinjeksi dinamis oleh JS) -->
+            <div id="redflags-list" class="space-y-4"></div>
+          </div>
+
+          <!-- TAB 2: Verifikasi Jalur Resmi (BP2MI / Kemnaker - FR-RSM) -->
+          <div id="panel-official" class="tab-panel hidden pt-4">
+            <div class="space-y-4">
+              <div id="official-status-alert" class="alert alert-error">
+                <i data-lucide="circle-x" class="h-5 w-5 shrink-0 text-bahaya-ink"></i>
+                <div>
+                  <h4 class="font-bold text-ink">Tidak Terdaftar di P3MI / SISKOP2MI Resmi</h4>
+                  <p class="text-sm text-muted mt-0.5">Nama perekrut atau perusahaan tidak ditemukan dalam database Perusahaan Penempatan Pekerja Migran Indonesia (P3MI) resmi Kemnaker dan BP2MI.</p>
+                </div>
+              </div>
+
+              <!-- Tabel Checklist Verifikasi Resmi -->
+              <div class="rounded-card border border-line bg-canvas p-4 text-sm">
+                <h4 class="font-bold text-ink">Hasil Pengecekan Sistem Terhadap Data Resmi Pemerintah:</h4>
+                <ul class="mt-3 space-y-2.5">
+                  <li class="flex items-start gap-2.5">
+                    <i data-lucide="x" class="h-4 w-4 text-bahaya-ink mt-0.5 shrink-0"></i>
+                    <div>
+                      <strong>Legalitas P3MI:</strong> Tidak ada izin SIP2MI yang cocok untuk negara tujuan Kamboja pada bidang Customer Service.
+                    </div>
+                  </li>
+                  <li class="flex items-start gap-2.5">
+                    <i data-lucide="x" class="h-4 w-4 text-bahaya-ink mt-0.5 shrink-0"></i>
+                    <div>
+                      <strong>Jenis Visa:</strong> Lowongan menawarkan keberangkatan dengan visa turis/kunjungan, yang melanggar pasal 51 UU No. 18/2017.
+                    </div>
+                  </li>
+                  <li class="flex items-start gap-2.5">
+                    <i data-lucide="alert-triangle" class="h-4 w-4 text-waspada-ink mt-0.5 shrink-0"></i>
+                    <div>
+                      <strong>Memorandum of Understanding (MoU):</strong> Indonesia tidak memiliki skema penempatan tenaga kerja formal non-profesional untuk kasino/daring di wilayah tersebut.
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Tautan Resmi Kemnaker & BP2MI (FR-RSM-03) -->
+              <div class="rounded-card border border-navy-soft bg-navy-tint p-4">
+                <h4 class="text-sm font-bold text-navy flex items-center gap-2">
+                  <i data-lucide="external-link" class="h-4 w-4"></i>
+                  Cek Mandiri di Portal Resmi Pemerintah
+                </h4>
+                <p class="text-xs text-muted mt-1">Kamu dapat memverifikasi nama PT atau lowongan luar negeri secara langsung melalui portal resmi:</p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <a href="https://siskop2mi.bp2mi.go.id/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-xs !text-navy">
+                    SISKOP2MI BP2MI <i data-lucide="arrow-up-right" class="h-3.5 w-3.5"></i>
+                  </a>
+                  <a href="https://karirhub.kemnaker.go.id/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-xs !text-navy">
+                    Karirhub Kemnaker <i data-lucide="arrow-up-right" class="h-3.5 w-3.5"></i>
+                  </a>
+                  <a href="https://satgassiber.polri.go.id/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-xs !text-navy">
+                    Satgas TPPO Polri <i data-lucide="arrow-up-right" class="h-3.5 w-3.5"></i>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Disclaimer Wajib FR-RSM-04 -->
+              <p class="text-xs text-muted leading-relaxed">
+                <em>Catatan penting:</em> Status "tidak ditemukan" tidak secara otomatis memvonis suatu perusahaan kriminal, namun menunjukkan tidak adanya perlindungan jaminan hukum ketenagakerjaan resmi dari negara RI.
+              </p>
+            </div>
+          </div>
+
+          <!-- TAB 3: Rekomendasi Tindakan (Action Plan) -->
+          <div id="panel-action" class="tab-panel hidden pt-4">
+            <div class="space-y-4">
+              <div class="rounded-card border border-bahaya-line bg-bahaya-tint p-4">
+                <h4 class="font-extrabold text-bahaya-ink flex items-center gap-2">
+                  <i data-lucide="alert-octagon" class="h-5 w-5"></i>
+                  LANGKAH DARURAT: JANGAN LANJUTKAN PROSES INI
+                </h4>
+                <ol class="mt-3 list-decimal pl-5 space-y-2 text-sm text-ink leading-relaxed">
+                  <li><strong>Jangan kirim uang sepeser pun.</strong> Biaya tiket dan administrasi yang diminta di muka adalah modus penipuan umum yang tidak akan pernah dikembalikan.</li>
+                  <li><strong>Jangan serahkan paspor, KTP, atau ijazah asli.</strong> Penahanan dokumen identitas membuat calon pekerja disandera dan tidak bisa pulang ke tanah air.</li>
+                  <li><strong>Tolak keberangkatan dengan visa turis.</strong> Bekerja dengan visa kunjungan di luar negeri adalah pelanggaran hukum keimigrasian berat (ilegal).</li>
+                  <li><strong>Laporkan nomor perekrut dan rekening tujuan.</strong> Bantu lindungi pencari kerja lain agar tidak terjerat sindikat yang sama.</li>
+                </ol>
+              </div>
+
+              <!-- Kanal Bantuan & Pengaduan Cepat -->
+              <div class="rounded-card border border-line bg-white p-4">
+                <h4 class="font-bold text-ink text-sm">Butuh Pendampingan atau Keluarga Telah Berangkat?</h4>
+                <p class="text-xs text-muted mt-1">Segera hubungi kanal darurat hotline perlindungan warga negara:</p>
+                <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div class="rounded-lg border border-line p-3 bg-canvas">
+                    <p class="font-semibold text-ink">Call Center BP2MI</p>
+                    <p class="text-navy font-bold text-base mt-1">1500-117</p>
+                    <p class="text-xs text-muted">Bebas pulsa (24 Jam)</p>
+                  </div>
+                  <div class="rounded-lg border border-line p-3 bg-canvas">
+                    <p class="font-semibold text-ink">Hotline Satgas TPPO Bareskrim</p>
+                    <p class="text-navy font-bold text-base mt-1">110 / 0812-1234-5678</p>
+                    <p class="text-xs text-muted">Layanan pengaduan darurat Polri</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- Peringatan Tanggung Jawab & Batasan Hukum (DESAIN.md aturan 6 & SRS ADM) -->
+    <div class="mt-12 rounded-card border border-line bg-canvas p-5 text-center sm:text-left">
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <div class="rounded-full bg-navy-tint p-3 text-navy shrink-0">
+          <i data-lucide="shield" class="h-6 w-6"></i>
+        </div>
+        <div class="flex-1 text-xs text-muted leading-relaxed">
+          <strong>Pernyataan Batasan Teknologi CekLoker:</strong> Hasil analisis ini dibuat secara otomatis oleh model kecerdasan buatan (*AI Analysis Service*) berdasarkan data visual dan teks yang kamu berikan. Analisis ini merupakan alat bantu penilaian awal (*preliminary risk assessment*) dan <strong>bukan merupakan putusan hukum resmi atau jaminan mutlak</strong>. Selalu lakukan verifikasi silang mandiri ke dinas ketenagakerjaan setempat sebelum mengambil keputusan kerja.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Koreksi Red Flag (FR-LPR-03) -->
+  <dialog id="modal-feedback" class="rounded-card border border-line p-0 shadow-lift backdrop:bg-slate-900/40 w-full max-w-md">
+    <div class="p-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-ink">Koreksi Hasil Analisis AI</h3>
+        <button type="button" class="btn-close-modal text-muted hover:text-ink"><i data-lucide="x" class="h-5 w-5"></i></button>
+      </div>
+      <p class="text-xs text-muted mt-1">Bantu kami meningkatkan akurasi sistem bila tanda bahaya yang terdeteksi kurang tepat.</p>
+      
+      <form id="form-feedback" class="mt-4 space-y-4">
+        <input type="hidden" id="feedback-rf-code">
+        <div>
+          <label class="field-label text-sm">Tanda Bahaya yang Dikoreksi</label>
+          <input type="text" id="feedback-rf-label" class="input mt-1 !bg-canvas text-sm font-semibold" readonly>
+        </div>
+        <div>
+          <label for="feedback-reason" class="field-label text-sm">Alasan Menurut Anda</label>
+          <textarea id="feedback-reason" rows="3" class="input mt-1 h-auto py-2 text-sm" placeholder="Contoh: Ini bukan penahanan paspor, tapi agen resmi yang mengurus visa kerja..." required></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" class="btn-close-modal btn btn-ghost btn-sm">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm">Kirim Koreksi</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Modal Laporkan Loker (FR-LPR-01) -->
+  <dialog id="modal-report" class="rounded-card border border-line p-0 shadow-lift backdrop:bg-slate-900/40 w-full max-w-md">
+    <div class="p-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-bahaya-ink">
+          <i data-lucide="flag" class="h-5 w-5"></i>
+          <h3 class="text-lg font-bold text-ink">Laporkan Lowongan Penipuan</h3>
+        </div>
+        <button type="button" class="btn-close-modal text-muted hover:text-ink"><i data-lucide="x" class="h-5 w-5"></i></button>
+      </div>
+      <p class="text-xs text-muted mt-1">Laporan akan ditinjau oleh tim moderator sebelum dimasukkan ke database penipuan komunitas.</p>
+
+      <form id="form-report" class="mt-4 space-y-4">
+        <div>
+          <label class="field-label text-sm">Kategori Dugaan</label>
+          <select class="input mt-1 text-sm">
+            <option>Perekrutan Online Scam / TPPO Luar Negeri</option>
+            <option>Pungutan Biaya Administrasi Palsu</option>
+            <option>Penyebaran File APK Berbahaya</option>
+            <option>Pencurian Identitas / Data Pribadi</option>
+          </select>
+        </div>
+        <div>
+          <label for="report-notes" class="field-label text-sm">Catatan Tambahan (Opsional)</label>
+          <textarea id="report-notes" rows="3" class="input mt-1 h-auto py-2 text-sm" placeholder="Sebutkan nama kontak pelaku, nomor rekening bila ada, dsb..."></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" class="btn-close-modal btn btn-ghost btn-sm">Batal</button>
+          <button type="submit" class="btn btn-primary btn-sm !bg-bahaya hover:!bg-bahaya-ink">Kirim Laporan</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Skrip Lucide & Interaktivitas Prototipe -->
+  <script src="https://unpkg.com/lucide@1.66.0/dist/umd/lucide.min.js"></script>
+  <script>
+    // Inisialisasi ikon Lucide
+    function refreshIcons() {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    // =========================================================================
+    // DATA DATASET EVALUASI AI REGINA (services/ai/hasil_eval.json & schema.py)
+    // =========================================================================
+    const DATASETS = {
+      kamboja: {
+        file: "img/scam_kamboja.png",
+        status: "BAHAYA",
+        keyakinan: 0.95,
+        scam_matches: 3,
+        info: {
+          posisi: "CUSTOMER SERVICE ONLINE",
+          perusahaan: "Tidak Dicantumkan (Anonim)",
+          negara_atau_lokasi: "Phnom Penh, KAMBOJA",
+          gaji: "USD 1.500 + BONUS",
+          biaya_diminta: "Rp 2.500.000 (di muka)",
+          kontak: "Telegram @kerja_luarnegeri_cepat, WA Pak Andi",
+          persyaratan: ["SMA/SMK", "tanpa pengalaman", "usia 18-30", "siap kerja shift"]
+        },
+        ringkasan: "Lowongan ini memiliki 8 indikator bahaya kritis yang mengarah kuat pada sindikat daring judi/penipuan dan Tindak Pidana Perdagangan Orang (TPPO). Ditemukan desakan berangkat kilat, penahanan paspor, dan penggunaan visa turis tanpa kontrak resmi.",
+        red_flags: [
+          {
+            kode: "paspor_ditahan",
+            label: "Penahanan dokumen identitas",
+            bobot: 4,
+            alasan: "Perekrut meminta paspor asli calon pekerja dititipkan kepada agen selama masa penempatan.",
+            bukti_teks: "Paspor dititipkan ke agen untuk proses visa kunjungan.",
+            dasar_hukum: "UU No. 21 Tahun 2007 (TPPO) & UU No. 18/2017 Pasal 68",
+            box_2d: [398, 64, 421, 706] // [ymin, xmin, ymax, xmax] skala 0-1000
+          },
+          {
+            kode: "visa_turis",
+            label: "Berangkat dengan visa turis",
+            bobot: 4,
+            alasan: "Calon pekerja diproses menggunakan visa kunjungan (turis) bukannya visa kerja resmi.",
+            bukti_teks: "proses visa kunjungan, langsung berangkat.",
+            dasar_hukum: "UU No. 18 Tahun 2017 tentang Pelindungan PMI",
+            box_2d: [400, 480, 423, 715]
+          },
+          {
+            kode: "negara_rawan",
+            label: "Negara tujuan rawan sindikat scam",
+            bobot: 3,
+            alasan: "Lokasi kerja di Kamboja untuk posisi customer service online terindikasi kuat dengan jaringan operasional judi online atau scam center.",
+            bukti_teks: "Phnom Penh, KAMBOJA",
+            dasar_hukum: "Surat Edaran Satgas Pemberantasan Perjudian Daring & TPPO",
+            box_2d: [138, 70, 157, 301]
+          },
+          {
+            kode: "biaya_di_muka",
+            label: "Biaya administrasi di muka",
+            bobot: 3,
+            alasan: "Pelamar diminta membayarkan uang pendaftaran dan administrasi sebelum mulai bekerja.",
+            bukti_teks: "Biaya administrasi Rp 2.500.000 (dikembalikan setelah gajian).",
+            dasar_hukum: "UU No. 18 Tahun 2017 Pasal 30 (Larangan Pungutan)",
+            box_2d: [367, 64, 390, 796]
+          },
+          {
+            kode: "gaji_tidak_wajar",
+            label: "Gaji tidak wajar untuk kualifikasi ringan",
+            bobot: 2,
+            alasan: "Gaji sebesar USD 1.500 (± Rp 24 juta) ditawarkan untuk posisi CS tanpa syarat pengalaman dan lulusan SMA.",
+            bukti_teks: "GAJI USD 1.500 + BONUS",
+            dasar_hukum: "UU No. 18 Tahun 2017 tentang Perlindungan Tenaga Kerja",
+            box_2d: [173, 42, 239, 700]
+          },
+          {
+            kode: "desakan_berangkat",
+            label: "Desakan berangkat kilat",
+            bobot: 2,
+            alasan: "Perekrut menciptakan kepanikan waktu dengan mendesak kuota tersisa 10 orang dan berangkat minggu depan.",
+            bukti_teks: "BERANGKAT MINGGU DEPAN! Kuota tinggal 10 orang!",
+            dasar_hukum: "Indikator Baku Perekrutan Ilegal Kemenaker",
+            box_2d: [338, 64, 357, 750]
+          },
+          {
+            kode: "wawancara_hanya_chat",
+            label: "Wawancara hanya via pesan",
+            bobot: 1,
+            alasan: "Proses seleksi instan tanpa wawancara formal, uji kompetensi, atau kontrak fisik.",
+            bukti_teks: "Wawancara via chat saja, langsung berangkat.",
+            dasar_hukum: "Permenaker Penempatan Tenaga Kerja Luar Negeri",
+            box_2d: [428, 64, 451, 608]
+          },
+          {
+            kode: "ajakan_telegram",
+            label: "Perekrutan diarahkan ke Telegram",
+            bobot: 2,
+            alasan: "Pendaftaran diarahkan melalui saluran Telegram pribadi anonim guna menghindari pelacakan jejak digital.",
+            bukti_teks: "Daftar via Telegram: @kerja_luarnegeri_cepat",
+            dasar_hukum: "Pedoman Keamanan Siber Ketenagakerjaan",
+            box_2d: [511, 64, 534, 619]
+          }
+        ]
+      },
+
+      p3mi: {
+        file: "img/asli_p3mi.png",
+        status: "AMAN",
+        keyakinan: 0.96,
+        scam_matches: 0,
+        info: {
+          posisi: "Perawat Lansia (Caregiver)",
+          perusahaan: "PT Samudra Penempatan Contoh (Resmi P3MI)",
+          negara_atau_lokasi: "Osaka & Tokyo, Jepang",
+          gaji: "JPY 210.000 / bln (Sesuai Standar UMR Jepang)",
+          biaya_diminta: "Biaya resmi diatur BP2MI (Tanpa Biaya Depan)",
+          kontak: "021-555-0199 / penempatan@samudra-contoh.co.id",
+          persyaratan: ["D3/S1 Keperawatan", "STR Aktif", "Pelatihan Bahasa di BLK Resmi"]
+        },
+        ringkasan: "Lowongan ini memenuhi standar kepatuhan resmi ketenagakerjaan luar negeri. Memiliki legalitas P3MI terverifikasi di SISKOP2MI, menggunakan visa kerja resmi (Specified Skilled Worker), dan perjanjian kerja jelas ditandatangani di hadapan pejabat berwenang.",
+        red_flags: []
+      },
+
+      taiwan: {
+        file: "img/scam_taiwan.png",
+        status: "WASPADA",
+        keyakinan: 0.88,
+        scam_matches: 1,
+        info: {
+          posisi: "Operator Pabrik Elektronik",
+          perusahaan: "PT Mitra Mandiri Abadi",
+          negara_atau_lokasi: "Taichung, TAIWAN",
+          gaji: "NT$ 27.470 (Standar UMR Taiwan)",
+          biaya_diminta: "Potong gaji Rp 35.000.000 selama 10 bulan",
+          kontak: "WA 0858-9999-8888",
+          persyaratan: ["Pria/Wanita 18-35 tahun", "Ijazah SMP/SMA"]
+        },
+        ringkasan: "Perusahaan memiliki kemiripan nama dengan P3MI terdaftar, namun skema pemotongan gaji (overcharging) melebihi batas batas ketentuan regulasi biaya penempatan BP2MI.",
+        red_flags: [
+          {
+            kode: "biaya_di_muka",
+            label: "Dugaan Pembebanan Biaya Berlebih (Overcharging)",
+            bobot: 3,
+            alasan: "Skema pemotongan biaya penempatan melebihi batas ketentuan struktur biaya resmi yang ditetapkan Kepala BP2MI.",
+            bukti_teks: "Potong gaji Rp 3.500.000 per bulan selama 10 bulan.",
+            dasar_hukum: "Peraturan BP2MI No. 09 Tahun 2020 tentang Pembebasan Biaya Penempatan",
+            box_2d: [350, 80, 390, 720]
+          },
+          {
+            kode: "kontak_tidak_resmi",
+            label: "Pendaftaran via Kontak Pribadi (Bukan Kantor Resmi)",
+            bobot: 2,
+            alasan: "Proses administrasi diarahkan ke nomor WhatsApp pribadi perorangan (sponsor/calo) tanpa kunjungan kantor cabang.",
+            bukti_teks: "Hubungi sponsor Mas Budi via WA 0858-9999-8888",
+            dasar_hukum: "UU No. 18 Tahun 2017 Pasal 69",
+            box_2d: [510, 80, 540, 750]
+          }
+        ]
+      }
+    };
+
+    // State Aplikasi
+    let currentDataKey = 'kamboja';
+    let areBoxesVisible = true;
+
+    // =========================================================================
+    // FUNGSI RENDER VIEWPORT & KOMPONEN
+    // =========================================================================
+    function renderResult(key) {
+      currentDataKey = key;
+      const data = DATASETS[key];
+      if (!data) return;
+
+      // 1. Gambar & Metadata
+      const img = document.getElementById('job-poster-img');
+      img.src = data.file;
+
+      document.getElementById('job-title-display').textContent = `${data.info.posisi} — ${data.info.negara_atau_lokasi}`;
+      document.getElementById('risk-summary').innerHTML = data.ringkasan;
+      document.getElementById('meta-posisi').textContent = data.info.posisi;
+      document.getElementById('meta-perusahaan').textContent = data.info.perusahaan;
+      document.getElementById('meta-lokasi').textContent = data.info.negara_atau_lokasi;
+      document.getElementById('meta-gaji').textContent = data.info.gaji;
+      document.getElementById('meta-biaya').textContent = data.info.biaya_diminta;
+      document.getElementById('meta-kontak').textContent = data.info.kontak;
+
+      // 2. Status Badge & Hero Border
+      const heroCard = document.getElementById('hero-risk-card');
+      const riskBadge = document.getElementById('risk-badge');
+      const riskLevelText = document.getElementById('risk-level-text');
+      const confPill = document.getElementById('confidence-pill');
+      const scamPill = document.getElementById('verified-scam-pill');
+
+      confPill.innerHTML = `Tingkat Keyakinan AI: <strong>${Math.round(data.keyakinan * 100)}%</strong>`;
+      
+      if (data.scam_matches > 0) {
+        scamPill.classList.remove('hidden');
+        scamPill.textContent = `Mirip ${data.scam_matches} Laporan Penipuan Terverifikasi`;
+      } else {
+        scamPill.classList.add('hidden');
+      }
+
+      // Reset classes
+      heroCard.className = 'card p-6 sm:p-8 transition-all duration-200';
+      riskBadge.className = 'badge badge-lg';
+
+      if (data.status === 'BAHAYA') {
+        heroCard.classList.add('border-l-8', 'border-l-bahaya');
+        riskBadge.classList.add('badge-bahaya');
+        riskBadge.innerHTML = '<i data-lucide="octagon-alert"></i><span>BAHAYA</span>';
+      } else if (data.status === 'WASPADA') {
+        heroCard.classList.add('border-l-8', 'border-l-waspada');
+        riskBadge.classList.add('badge-waspada');
+        riskBadge.innerHTML = '<i data-lucide="triangle-alert"></i><span>WASPADA</span>';
+      } else {
+        heroCard.classList.add('border-l-8', 'border-l-aman');
+        riskBadge.classList.add('badge-aman');
+        riskBadge.innerHTML = '<i data-lucide="shield-check"></i><span>AMAN</span>';
+      }
+
+      // 3. Render Bounding Boxes
+      renderBoundingBoxes(data.red_flags);
+
+      // 4. Render Daftar Red Flags di Kolom Kanan
+      renderRedFlagsList(data.red_flags, data.status);
+
+      // 5. Update Status Official Verifikasi
+      renderOfficialStatus(data);
+
+      refreshIcons();
+    }
+
+    // Render Bounding Boxes di atas Poster
+    function renderBoundingBoxes(redFlags) {
+      const layer = document.getElementById('bounding-boxes-layer');
+      layer.innerHTML = '';
+
+      if (!redFlags || redFlags.length === 0) return;
+
+      redFlags.forEach((rf, index) => {
+        if (!rf.box_2d || rf.box_2d.length !== 4) return;
+        const [ymin, xmin, ymax, xmax] = rf.box_2d;
+
+        // Koordinat persentase (skala 0-1000 dari Gemini model Regina)
+        const top = (ymin / 10).toFixed(2);
+        const left = (xmin / 10).toFixed(2);
+        const height = ((ymax - ymin) / 10).toFixed(2);
+        const width = ((xmax - xmin) / 10).toFixed(2);
+
+        const box = document.createElement('div');
+        box.className = `evidence-box ${rf.bobot >= 3 ? '' : 'is-waspada'}`;
+        box.id = `bbox-${index}`;
+        box.style.top = `${top}%`;
+        box.style.left = `${left}%`;
+        box.style.height = `${height}%`;
+        box.style.width = `${width}%`;
+
+        box.setAttribute('role', 'button');
+        box.setAttribute('tabindex', '0');
+        box.setAttribute('aria-label', `Tanda bahaya: ${rf.label}`);
+
+        const label = document.createElement('span');
+        label.className = 'evidence-label';
+        label.textContent = rf.label;
+        box.appendChild(label);
+
+        // Interaksi klik box -> highlight kartu penjelasan di tab kanan
+        box.addEventListener('click', () => {
+          highlightRedFlag(index);
+        });
+
+        box.addEventListener('mouseenter', () => {
+          highlightCard(index, true);
+        });
+        box.addEventListener('mouseleave', () => {
+          highlightCard(index, false);
+        });
+
+        layer.appendChild(box);
+      });
+    }
+
+    // Render Daftar Kartu Red Flag di Tab Kanan
+    function renderRedFlagsList(redFlags, status) {
+      const container = document.getElementById('redflags-list');
+      const countBadge = document.getElementById('redflags-count');
+      container.innerHTML = '';
+      countBadge.textContent = redFlags ? redFlags.length : 0;
+
+      if (!redFlags || redFlags.length === 0) {
+        container.innerHTML = `
+          <div class="rounded-card border border-aman-line bg-aman-tint p-6 text-center">
+            <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white text-aman-ink shadow-sm">
+              <i data-lucide="shield-check" class="h-6 w-6"></i>
+            </div>
+            <h4 class="mt-3 font-bold text-ink">Tidak Ditemukan Indikator Red Flag</h4>
+            <p class="mt-1 text-sm text-muted max-w-md mx-auto">
+              Seluruh kriteria lowongan memenuhi batas aman. Tidak ditemukan tanda bahaya umum seperti pemungutan biaya di muka, penahanan paspor, atau kontak anonim.
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      redFlags.forEach((rf, index) => {
+        const card = document.createElement('article');
+        card.id = `rf-card-${index}`;
+        card.className = 'card p-4 transition-all duration-180 hover:border-navy cursor-pointer';
+
+        const isCritical = rf.bobot >= 3;
+        const badgeColor = isCritical ? 'bg-bahaya-tint text-bahaya-ink border-bahaya-line' : 'bg-waspada-tint text-waspada-ink border-waspada-line';
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <span class="inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${isCritical ? 'bg-bahaya text-white' : 'bg-waspada text-white'}">
+                ${index + 1}
+              </span>
+              <h4 class="font-bold text-ink text-base">${rf.label}</h4>
+            </div>
+            <span class="rounded-full border px-2.5 py-0.5 text-xs font-bold ${badgeColor}">
+              Bobot ${rf.bobot}/4
+            </span>
+          </div>
+
+          <!-- Bukti teks dari poster -->
+          <div class="mt-2.5 rounded-md bg-navy-tint/60 border border-navy-soft/60 px-3 py-1.5 text-xs font-mono text-ink">
+            <span class="text-muted font-sans font-medium">Kutipan Gambar:</span> "${rf.bukti_teks}"
+          </div>
+
+          <!-- Alasan Risiko -->
+          <p class="mt-2.5 text-sm leading-relaxed text-muted">${rf.alasan}</p>
+
+          <!-- Dasar Hukum & Koreksi Button -->
+          <div class="mt-3 pt-2.5 border-t border-line flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span class="text-muted inline-flex items-center gap-1">
+              <i data-lucide="scale" class="h-3.5 w-3.5 text-navy"></i>
+              <strong>Dasar:</strong> ${rf.dasar_hukum}
+            </span>
+            <button type="button" class="btn-correct text-navy font-semibold hover:underline" data-code="${rf.kode}" data-label="${rf.label}">
+              Koreksi hasil ini
+            </button>
+          </div>
+        `;
+
+        // Interaksi hover kartu -> highlight bounding box pada gambar
+        card.addEventListener('mouseenter', () => {
+          highlightBox(index, true);
+        });
+        card.addEventListener('mouseleave', () => {
+          highlightBox(index, false);
+        });
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.btn-correct')) return;
+          highlightBox(index, true);
+        });
+
+        container.appendChild(card);
+      });
+
+      // Event listener tombol koreksi
+      container.querySelectorAll('.btn-correct').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openFeedbackModal(btn.dataset.code, btn.dataset.label);
+        });
+      });
+    }
+
+    function renderOfficialStatus(data) {
+      const alertBox = document.getElementById('official-status-alert');
+      if (data.status === 'AMAN') {
+        alertBox.className = 'alert alert-success';
+        alertBox.innerHTML = `
+          <i data-lucide="circle-check" class="h-5 w-5 shrink-0 text-aman-ink"></i>
+          <div>
+            <h4 class="font-bold text-ink">Terdaftar di SISKOP2MI / Kemnaker Resmi</h4>
+            <p class="text-sm text-muted mt-0.5">Badan usaha dan izin perekrutan penempatan luar negeri sesuai dengan izin operasional yang sah.</p>
+          </div>
+        `;
+      } else {
+        alertBox.className = 'alert alert-error';
+        alertBox.innerHTML = `
+          <i data-lucide="circle-x" class="h-5 w-5 shrink-0 text-bahaya-ink"></i>
+          <div>
+            <h4 class="font-bold text-ink">Tidak Terdaftar di P3MI / SISKOP2MI Resmi</h4>
+            <p class="text-sm text-muted mt-0.5">Nama perekrut atau perusahaan tidak ditemukan dalam database Perusahaan Penempatan Pekerja Migran Indonesia (P3MI) resmi Kemnaker dan BP2MI.</p>
+          </div>
+        `;
+      }
+    }
+
+    // =========================================================================
+    // HIGHLIGHT & LINKING INTERACTION
+    // =========================================================================
+    function highlightRedFlag(index) {
+      // Beralih ke tab red flags bila sedang di tab lain
+      switchTab('panel-redflags');
+      const card = document.getElementById(`rf-card-${index}`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('ring-2', 'ring-navy');
+        setTimeout(() => card.classList.remove('ring-2', 'ring-navy'), 1500);
+      }
+    }
+
+    function highlightBox(index, active) {
+      const box = document.getElementById(`bbox-${index}`);
+      if (box) {
+        box.classList.toggle('is-active', active);
+      }
+    }
+
+    function highlightCard(index, active) {
+      const card = document.getElementById(`rf-card-${index}`);
+      if (card) {
+        card.classList.toggle('bg-navy-tint/30', active);
+      }
+    }
+
+    // =========================================================================
+    // TAB CONTROLLER
+    // =========================================================================
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    function switchTab(targetId) {
+      tabBtns.forEach(btn => {
+        const isTarget = btn.dataset.target === targetId;
+        btn.classList.toggle('active', isTarget);
+        btn.classList.toggle('text-navy', isTarget);
+        btn.classList.toggle('bg-navy-tint', isTarget);
+        btn.classList.toggle('font-bold', isTarget);
+        btn.classList.toggle('text-muted', !isTarget);
+        btn.classList.toggle('font-semibold', !isTarget);
+      });
+
+      tabPanels.forEach(panel => {
+        panel.classList.toggle('hidden', panel.id !== targetId);
+      });
+      refreshIcons();
+    }
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.target));
+    });
+
+    // =========================================================================
+    // TOGGLE BOUNDING BOXES
+    // =========================================================================
+    const toggleBoxesBtn = document.getElementById('toggle-boxes');
+    toggleBoxesBtn.addEventListener('click', () => {
+      areBoxesVisible = !areBoxesVisible;
+      document.getElementById('bounding-boxes-layer').style.display = areBoxesVisible ? 'block' : 'none';
+      toggleBoxesBtn.setAttribute('aria-pressed', String(areBoxesVisible));
+      toggleBoxesBtn.querySelector('[data-toggle-label]').textContent = areBoxesVisible ? 'Sembunyikan Kotak' : 'Tampilkan Kotak';
+    });
+
+    // =========================================================================
+    // QUICK PRESET BUTTONS
+    // =========================================================================
+    document.querySelectorAll('.demo-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        renderResult(pill.dataset.example);
+      });
+    });
+
+    // =========================================================================
+    // UPLOAD PANEL TOGGLE & DRAG-DROP SIMULATION
+    // =========================================================================
+    const toggleUploadBtn = document.getElementById('btn-toggle-upload');
+    const customUploadBtn = document.getElementById('btn-custom-upload');
+    const customForm = document.getElementById('custom-form');
+    const cancelUploadBtn = document.getElementById('btn-cancel-upload');
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const browseBtn = document.getElementById('browse-btn');
+    const fileCount = document.getElementById('file-count');
+
+    function toggleForm(show) {
+      customForm.classList.toggle('hidden', !show);
+      if (show) customForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    toggleUploadBtn.addEventListener('click', () => toggleForm(true));
+    customUploadBtn.addEventListener('click', () => toggleForm(true));
+    cancelUploadBtn.addEventListener('click', () => toggleForm(false));
+    browseBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      const files = e.target.files;
+      if (files.length > 0) {
+        fileCount.textContent = `${files.length} berkas dipilih: ${files[0].name}`;
+        // Jika file berupa gambar, tampilkan preview langsung di canvas
+        const file = files[0];
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (re) => {
+            document.getElementById('job-poster-img').src = re.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    });
+
+    // Form Scan Submit Simulation
+    customForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-scan');
+      btn.disabled = true;
+      btn.querySelector('.spinner').classList.remove('hidden');
+      btn.querySelector('[data-label]').textContent = 'Memindai AI…';
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.querySelector('.spinner').classList.add('hidden');
+        btn.querySelector('[data-label]').textContent = 'Mulai Analisis AI';
+        toggleForm(false);
+        renderResult('kamboja');
+        alert('Simulasi pemindaian selesai! Menampilkan hasil analisis AI.');
+      }, 1400);
+    });
+
+    // =========================================================================
+    // MODAL DIALOGS
+    // =========================================================================
+    const modalFeedback = document.getElementById('modal-feedback');
+    const modalReport = document.getElementById('modal-report');
+
+    function openFeedbackModal(code, label) {
+      document.getElementById('feedback-rf-code').value = code;
+      document.getElementById('feedback-rf-label').value = label;
+      modalFeedback.showModal();
+      refreshIcons();
+    }
+
+    document.getElementById('btn-report-job').addEventListener('click', () => {
+      modalReport.showModal();
+      refreshIcons();
+    });
+
+    document.querySelectorAll('.btn-close-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        modalFeedback.close();
+        modalReport.close();
+      });
+    });
+
+    document.getElementById('form-feedback').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Terima kasih! Koreksi berhasil dicatat untuk dievaluasi tim.');
+      modalFeedback.close();
+    });
+
+    document.getElementById('form-report').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Laporan berhasil dikirim ke moderator CekLoker dan Satgas terkait.');
+      modalReport.close();
+    });
+
+    // =========================================================================
+    // CETAK / UNDUH PDF & SHARE
+    // =========================================================================
+    document.getElementById('btn-print').addEventListener('click', () => {
+      window.print();
+    });
+
+    document.getElementById('btn-share-result').addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Hasil Pemeriksaan CekLoker',
+          text: 'Lihat hasil deteksi tanda bahaya lowongan kerja ini di CekLoker.',
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Tautan hasil pemeriksaan berhasil disalin ke clipboard!');
+      }
+    });
+
+    // Inisialisasi awal saat load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderResult('kamboja');
+    });
+  </script>
+</body>
+</html>
