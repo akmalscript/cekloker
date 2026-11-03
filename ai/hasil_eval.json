@@ -1,0 +1,615 @@
+[
+  {
+    "file": "scam_kamboja.png",
+    "label": "jebakan",
+    "hasil": {
+      "info": {
+        "posisi": "CUSTOMER SERVICE ONLINE",
+        "perusahaan": null,
+        "negara_atau_lokasi": "Phnom Penh, KAMBOJA",
+        "gaji": "USD 1.500 + BONUS",
+        "persyaratan": [
+          "SMA/SMK",
+          "tanpa pengalaman",
+          "usia 18-30",
+          "siap kerja shift"
+        ],
+        "kontak": [
+          "Telegram: @kerja_luarnegeri_cepat",
+          "WA: 0812-0000-1111 (Pak Andi)"
+        ],
+        "biaya_diminta": "Rp 2.500.000"
+      },
+      "red_flags": [
+        {
+          "kode": "gaji_tidak_wajar",
+          "alasan": "Gaji sebesar USD 1.500 ditawarkan untuk posisi customer service tanpa syarat pengalaman kerja dan kualifikasi pendidikan minimal SMA/SMK.",
+          "bukti_teks": "GAJI USD 1.500 + BONUS",
+          "gambar_ke": 1,
+          "box_2d": [
+            173,
+            42,
+            239,
+            700
+          ],
+          "label": "Gaji tidak wajar",
+          "bobot": 2,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "negara_rawan",
+          "alasan": "Lokasi kerja di Kamboja untuk posisi customer service online terindikasi kuat dengan jaringan operasional judi online atau TPPO/scam center.",
+          "bukti_teks": "Phnom Penh, KAMBOJA",
+          "gambar_ke": 1,
+          "box_2d": [
+            138,
+            70,
+            157,
+            301
+          ],
+          "label": "Negara tujuan rawan penipuan",
+          "bobot": 3,
+          "dasar_hukum": "UU No. 21 Tahun 2007 tentang Pemberantasan Tindak Pidana Perdagangan Orang"
+        },
+        {
+          "kode": "desakan_berangkat",
+          "alasan": "Perekrut menciptakan tekanan waktu dengan mendesak keberangkatan minggu depan dan mengklaim kuota tersisa sedikit.",
+          "bukti_teks": "BERANGKAT MINGGU DEPAN! Kuota tinggal 10 orang!",
+          "gambar_ke": 1,
+          "box_2d": [
+            338,
+            64,
+            357,
+            750
+          ],
+          "label": "Desakan berangkat cepat",
+          "bobot": 2,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "biaya_di_muka",
+          "alasan": "Pelamar diminta membayarkan biaya administrasi sebesar Rp 2.500.000 sebelum mulai bekerja.",
+          "bukti_teks": "Biaya administrasi Rp 2.500.000 (dikembalikan setelah gajian).",
+          "gambar_ke": 1,
+          "box_2d": [
+            367,
+            64,
+            390,
+            796
+          ],
+          "label": "Biaya di muka",
+          "bobot": 3,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "paspor_ditahan",
+          "alasan": "Perekrut meminta paspor asli calon pekerja dititipkan kepada agen.",
+          "bukti_teks": "Paspor dititipkan ke agen untuk proses visa kunjungan.",
+          "gambar_ke": 1,
+          "box_2d": [
+            398,
+            64,
+            421,
+            706
+          ],
+          "label": "Penahanan dokumen",
+          "bobot": 4,
+          "dasar_hukum": "UU No. 21 Tahun 2007 tentang Pemberantasan Tindak Pidana Perdagangan Orang"
+        },
+        {
+          "kode": "visa_turis",
+          "alasan": "Calon pekerja diproses menggunakan visa kunjungan (turis) bukannya visa kerja resmi.",
+          "bukti_teks": "Paspor dititipkan ke agen untuk proses visa kunjungan.",
+          "gambar_ke": 1,
+          "box_2d": [
+            398,
+            64,
+            421,
+            706
+          ],
+          "label": "Berangkat dengan visa turis",
+          "bobot": 4,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "wawancara_hanya_chat",
+          "alasan": "Proses seleksi dilakukan secara instan hanya melalui pesan/chat tanpa verifikasi resmi.",
+          "bukti_teks": "Wawancara via chat saja, langsung berangkat.",
+          "gambar_ke": 1,
+          "box_2d": [
+            428,
+            64,
+            451,
+            608
+          ],
+          "label": "Wawancara hanya lewat chat",
+          "bobot": 1,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "ajakan_telegram",
+          "alasan": "Pendaftaran diarahkan melalui saluran Telegram pribadi.",
+          "bukti_teks": "Daftar via Telegram: @kerja_luarnegeri_cepat",
+          "gambar_ke": 1,
+          "box_2d": [
+            511,
+            64,
+            534,
+            619
+          ],
+          "label": "Ajakan pindah ke kanal lain",
+          "bobot": 2,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "kontak_tidak_resmi",
+          "alasan": "Kontak perusahan hanya berupa nomor WhatsApp pribadi dan akun Telegram tanpa kanal komunikasi resmi perusahaan.",
+          "bukti_teks": "WA: 0812-0000-1111 (Pak Andi)",
+          "gambar_ke": 1,
+          "box_2d": [
+            542,
+            64,
+            565,
+            439
+          ],
+          "label": "Kontak tidak resmi",
+          "bobot": 1,
+          "dasar_hukum": null
+        }
+      ],
+      "keyakinan": 0.98,
+      "ringkasan": "Lowongan kerja ini memiliki banyak indikasi bahaya seperti permintaan biaya administrasi, penggunaan visa kunjungan, penahanan paspor, serta lokasi kerja di Kamboja. Sangat disarankan untuk tidak melanjutkan lamaran karena berisiko tinggi penipuan atau tindak pidana perdagangan orang.",
+      "risk_level": "Bahaya",
+      "risk_score": 22,
+      "saran_cek_manual": false,
+      "disclaimer": "Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."
+    }
+  },
+  {
+    "file": "scam_jepang.png",
+    "label": "jebakan",
+    "hasil": {
+      "info": {
+        "posisi": "CAREGIVER JEPANG",
+        "perusahaan": null,
+        "negara_atau_lokasi": "Jepang",
+        "gaji": "35 JUTA/BULAN",
+        "persyaratan": [
+          "Tanpa Bahasa Jepang",
+          "Tanpa Pengalaman"
+        ],
+        "kontak": [
+          "0812-0000-2222 (Bu Rina)"
+        ],
+        "biaya_diminta": "Rp 15.000.000 (DP Rp 5.000.000 hari ini)"
+      },
+      "red_flags": [
+        {
+          "kode": "gaji_tidak_wajar",
+          "alasan": "Gaji ditawarkan sangat tinggi sebesar 35 juta per bulan tanpa memerlukan keahlian bahasa Jepang maupun pengalaman kerja.",
+          "bukti_teks": "Tanpa Bahasa Jepang • Tanpa Pengalaman",
+          "gambar_ke": 1,
+          "box_2d": [
+            153,
+            37,
+            241,
+            822
+          ],
+          "label": "Gaji tidak wajar",
+          "bobot": 2,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "biaya_di_muka",
+          "alasan": "Pelamar diminta membayarkan biaya pelatihan dan dokumen di muka serta uang muka (DP) pada hari pendaftaran.",
+          "bukti_teks": "Biaya pelatihan & dokumen Rp 15.000.000 (DP Rp 5.000.000 hari ini)",
+          "gambar_ke": 1,
+          "box_2d": [
+            277,
+            87,
+            335,
+            927
+          ],
+          "label": "Biaya di muka",
+          "bobot": 3,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "visa_turis",
+          "alasan": "Calon pekerja diarahkan berangkat menggunakan visa wisata, yang melanggar hukum kerja internasional dan sangat berisiko.",
+          "bukti_teks": "Tiket gratis, berangkat bulan ini lewat visa wisata dulu",
+          "gambar_ke": 1,
+          "box_2d": [
+            352,
+            87,
+            373,
+            773
+          ],
+          "label": "Berangkat dengan visa turis",
+          "bobot": 4,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "tiket_tanpa_kontrak",
+          "alasan": "Perekrut menjanjikan keberangkatan tanpa memberikan kontrak kerja tertulis sebelum berangkat.",
+          "bukti_teks": "Kontrak kerja menyusul setelah tiba di Jepang",
+          "gambar_ke": 1,
+          "box_2d": [
+            389,
+            87,
+            411,
+            676
+          ],
+          "label": "Tiket/keberangkatan tanpa kontrak",
+          "bobot": 3,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "minta_dirahasiakan",
+          "alasan": "Instruksi untuk merahasiakan keberangkatan dari keluarga merupakan indikasi kuat modus perdagangan orang (TPPO).",
+          "bukti_teks": "Mohon dirahasiakan dulu dari keluarga sampai berangkat",
+          "gambar_ke": 1,
+          "box_2d": [
+            425,
+            87,
+            447,
+            820
+          ],
+          "label": "Diminta merahasiakan",
+          "bobot": 3,
+          "dasar_hukum": "UU No. 21 Tahun 2007 tentang Pemberantasan Tindak Pidana Perdagangan Orang"
+        },
+        {
+          "kode": "desakan_berangkat",
+          "alasan": "Perekrut memberi tekanan waktu agar pelamar segera mendaftar tanpa pertimbangan matang.",
+          "bukti_teks": "Kuota terbatas, daftar sekarang atau hangus!",
+          "gambar_ke": 1,
+          "box_2d": [
+            462,
+            87,
+            484,
+            663
+          ],
+          "label": "Desakan berangkat cepat",
+          "bobot": 2,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "kontak_tidak_resmi",
+          "alasan": "Informasi kontak hanya menyertakan nomor WhatsApp pribadi tanpa identitas perusahaan penyalur yang legal.",
+          "bukti_teks": "Hubungi WhatsApp pribadi: 0812-0000-2222 (Bu Rina)",
+          "gambar_ke": 1,
+          "box_2d": [
+            516,
+            37,
+            541,
+            806
+          ],
+          "label": "Kontak tidak resmi",
+          "bobot": 1,
+          "dasar_hukum": null
+        }
+      ],
+      "keyakinan": 0.98,
+      "ringkasan": "Poster lowongan kerja ini memiliki banyak indikasi penipuan dan bahaya TPPO seperti penggunaan visa wisata dan kewajiban bayar DP di muka. Sangat disarankan untuk tidak mendaftar atau mengirimkan uang ke pihak tersebut.",
+      "risk_level": "Bahaya",
+      "risk_score": 18,
+      "saran_cek_manual": false,
+      "disclaimer": "Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."
+    }
+  },
+  {
+    "file": "scam_admin_online.png",
+    "label": "jebakan",
+    "hasil": {
+      "info": {
+        "posisi": "ADMIN ONLINE PART TIME / WFH",
+        "perusahaan": null,
+        "negara_atau_lokasi": null,
+        "gaji": "Rp 500.000 / HARI",
+        "persyaratan": [
+          "Kerja cuma 2 jam dari HP",
+          "Bisa pelajar & mahasiswa"
+        ],
+        "kontak": [
+          "gajiharian.admin88@gmail.com",
+          "0812-0000-3333",
+          "t.me/adminonline_harian"
+        ],
+        "biaya_diminta": null
+      },
+      "red_flags": [
+        {
+          "kode": "gaji_tidak_wajar",
+          "alasan": "Gaji sebesar Rp 500.000 per hari untuk pekerjaan 2 jam dari HP tergolong tidak masuk akal untuk posisi tanpa kualifikasi khusus.",
+          "bukti_teks": "Rp 500.000 / HARI",
+          "gambar_ke": 1,
+          "box_2d": [
+            154,
+            41,
+            198,
+            549
+          ],
+          "label": "Gaji tidak wajar",
+          "bobot": 2,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "kirim_apk",
+          "alasan": "Perekrut meminta pelamar mengunduh file APK yang berisiko tinggi mengandung malware atau pencurian data.",
+          "bukti_teks": "Unduh aplikasi kerja: AdminKerja.apk (kami kirim link-nya)",
+          "gambar_ke": 1,
+          "box_2d": [
+            308,
+            65,
+            330,
+            822
+          ],
+          "label": "Kiriman file APK/tautan mencurigakan",
+          "bobot": 3,
+          "dasar_hukum": null
+        },
+        {
+          "kode": "data_pribadi_berlebihan",
+          "alasan": "Permintaan foto KTP dan nomor rekening di tahap pendaftaran sangat berbahaya dan rawan disalahgunakan.",
+          "bukti_teks": "Kirim foto KTP + nomor rekening untuk verifikasi",
+          "gambar_ke": 1,
+          "box_2d": [
+            339,
+            65,
+            362,
+            684
+          ],
+          "label": "Permintaan data pribadi berlebihan",
+          "bobot": 2,
+          "dasar_hukum": null
+        },
+        {
+          "kode": "ajakan_telegram",
+          "alasan": "Pelamar diminta bergabung ke kanal Telegram pribadi yang sering menjadi wadah penipuan berbasis tugas.",
+          "bukti_teks": "Gabung grup Telegram t.me/adminonline_harian",
+          "gambar_ke": 1,
+          "box_2d": [
+            372,
+            65,
+            395,
+            710
+          ],
+          "label": "Ajakan pindah ke kanal lain",
+          "bobot": 2,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "wawancara_hanya_chat",
+          "alasan": "Proses seleksi dilakukan sepenuhnya melalui pesan singkat tanpa wawancara resmi atau kejelasan legalitas kerja.",
+          "bukti_teks": "Seleksi hanya lewat chat. Langsung kerja hari ini!",
+          "gambar_ke": 1,
+          "box_2d": [
+            404,
+            65,
+            427,
+            666
+          ],
+          "label": "Wawancara hanya lewat chat",
+          "bobot": 1,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "kontak_tidak_resmi",
+          "alasan": "Kontak perekrut hanya menggunakan email domain gratisan (Gmail) dan nomor seluler pribadi.",
+          "bukti_teks": "Kontak: gajiharian.admin88@gmail.com",
+          "gambar_ke": 1,
+          "box_2d": [
+            493,
+            67,
+            516,
+            552
+          ],
+          "label": "Kontak tidak resmi",
+          "bobot": 1,
+          "dasar_hukum": null
+        }
+      ],
+      "keyakinan": 0.98,
+      "ringkasan": "Lowongan kerja ini menunjukkan banyak indikasi penipuan, seperti tawaran gaji tidak wajar, instruksi mengunduh file APK, serta pengumpulan foto KTP dan rekening. Pelamar disarankan untuk ekstra waspada dan tidak mengirimkan data pribadi sensitif atau menginstal aplikasi asing.",
+      "risk_level": "Bahaya",
+      "risk_score": 11,
+      "saran_cek_manual": false,
+      "disclaimer": "Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."
+    }
+  },
+  {
+    "file": "scam_taiwan.png",
+    "label": "jebakan",
+    "hasil": {
+      "info": {
+        "posisi": "OPERATOR PABRIK ELEKTRONIK",
+        "perusahaan": null,
+        "negara_atau_lokasi": "TAIWAN",
+        "gaji": "NT$ 60.000 (± Rp 30 JUTA)",
+        "persyaratan": [
+          "Lembur sepuasnya, semua ditanggung",
+          "Cocok untuk lulusan SMA, tanpa pengalaman",
+          "Bayar DP Rp 5.000.000, sisanya dipotong dari gaji",
+          "Ijazah asli dan paspor dikumpulkan ke kantor kami",
+          "Berangkat bulan ini dengan visa kunjungan",
+          "Alamat kantor: hubungi admin"
+        ],
+        "kontak": [
+          "WA 0812-000-4444",
+          "DM Instagram"
+        ],
+        "biaya_diminta": "DP Rp 5.000.000"
+      },
+      "red_flags": [
+        {
+          "kode": "gaji_tidak_wajar",
+          "alasan": "Tawaran gaji sekitar Rp 30 juta sangat tinggi untuk posisi operator tanpa syarat pengalaman.",
+          "bukti_teks": "GAJI NT$ 60.000 (± Rp 30 JUTA)",
+          "gambar_ke": 1,
+          "box_2d": [
+            136,
+            49,
+            175,
+            545
+          ],
+          "label": "Gaji tidak wajar",
+          "bobot": 2,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "biaya_di_muka",
+          "alasan": "Pelamar diminta membayarkan uang muka (DP) sebesar Rp 5.000.000 sebelum mulai bekerja.",
+          "bukti_teks": "Bayar DP Rp 5.000.000, sisanya dipotong dari gaji",
+          "gambar_ke": 1,
+          "box_2d": [
+            312,
+            61,
+            338,
+            693
+          ],
+          "label": "Biaya di muka",
+          "bobot": 3,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "paspor_ditahan",
+          "alasan": "Perekrut meminta dokumen asli seperti ijazah dan paspor untuk dikumpulkan.",
+          "bukti_teks": "Ijazah asli dan paspor dikumpulkan ke kantor kami",
+          "gambar_ke": 1,
+          "box_2d": [
+            348,
+            61,
+            375,
+            694
+          ],
+          "label": "Penahanan dokumen",
+          "bobot": 4,
+          "dasar_hukum": "UU No. 21 Tahun 2007 tentang Pemberantasan Tindak Pidana Perdagangan Orang"
+        },
+        {
+          "kode": "visa_turis",
+          "alasan": "Pelamar diminta berangkat bekerja menggunakan visa kunjungan (turis) yang berisiko ilegal.",
+          "bukti_teks": "Berangkat bulan ini dengan visa kunjungan",
+          "gambar_ke": 1,
+          "box_2d": [
+            385,
+            61,
+            411,
+            603
+          ],
+          "label": "Berangkat dengan visa turis",
+          "bobot": 4,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "perusahaan_mencurigakan",
+          "alasan": "Nama dan alamat resmi perusahaan tidak tertera secara jelas pada poster.",
+          "bukti_teks": "Alamat kantor: hubungi admin",
+          "gambar_ke": 1,
+          "box_2d": [
+            421,
+            61,
+            447,
+            440
+          ],
+          "label": "Identitas perusahaan mencurigakan",
+          "bobot": 2,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "desakan_berangkat",
+          "alasan": "Terdapat tekanan batas waktu dan jumlah kuota terbatas untuk mendesak pelamar.",
+          "bukti_teks": "Hanya 5 slot tersisa!",
+          "gambar_ke": 1,
+          "box_2d": [
+            457,
+            61,
+            477,
+            319
+          ],
+          "label": "Desakan berangkat cepat",
+          "bobot": 2,
+          "dasar_hukum": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia"
+        },
+        {
+          "kode": "kontak_tidak_resmi",
+          "alasan": "Kontak pendaftaran hanya menyantumkan WhatsApp dan Instagram pribadi.",
+          "bukti_teks": "Info: WA 0812-000-4444 atau DM Instagram",
+          "gambar_ke": 1,
+          "box_2d": [
+            537,
+            59,
+            563,
+            614
+          ],
+          "label": "Kontak tidak resmi",
+          "bobot": 1,
+          "dasar_hukum": null
+        }
+      ],
+      "keyakinan": 0.95,
+      "ringkasan": "Poster lowongan ini menunjukkan berbagai indikasi kuat penipuan dan prosedur kerja ilegal ke luar negeri, seperti penggunaan visa kunjungan dan penahanan dokumen asli. Pelamar sangat disarankan untuk tidak menyetor uang DP maupun menyerahkan dokumen identitas asli.",
+      "risk_level": "Bahaya",
+      "risk_score": 18,
+      "saran_cek_manual": false,
+      "disclaimer": "Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."
+    }
+  },
+  {
+    "file": "asli_it_jakarta.png",
+    "label": "asli",
+    "hasil": {
+      "info": {
+        "posisi": "Software Engineer (Backend)",
+        "perusahaan": "PT Nusantara Teknologi Mandiri",
+        "negara_atau_lokasi": "Jakarta Selatan",
+        "gaji": null,
+        "persyaratan": [
+          "S1 Informatika/Sistem Informasi, pengalaman minimal 2 tahun",
+          "Menguasai Python atau Go, PostgreSQL, dan Git"
+        ],
+        "kontak": [
+          "karier@nusantaratekno.example"
+        ],
+        "biaya_diminta": null
+      },
+      "red_flags": [],
+      "keyakinan": 0.95,
+      "ringkasan": "Lowongan kerja sebagai Software Engineer (Backend) di PT Nusantara Teknologi Mandiri memuat informasi lowongan yang jelas dan profesional. Tidak ditemukan adanya indikasi penipuan atau red flag pada pengumuman ini.",
+      "risk_level": "Aman",
+      "risk_score": 0,
+      "saran_cek_manual": false,
+      "disclaimer": "Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."
+    }
+  },
+  {
+    "file": "asli_p3mi.png",
+    "label": "asli",
+    "hasil": {
+      "info": {
+        "posisi": "Perawat Lansia (Caregiver)",
+        "perusahaan": "PT Samudra Penempatan Contoh",
+        "negara_atau_lokasi": "Jepang",
+        "gaji": "Gaji sesuai standar negara tujuan dan tercantum dalam kontrak",
+        "persyaratan": [
+          "Lulusan D3/S1 Keperawatan, STR aktif, usia 21-35",
+          "Pelatihan bahasa dan kompetensi di BLK resmi mitra",
+          "Perjanjian kerja tertulis ditandatangani sebelum berangkat"
+        ],
+        "kontak": [
+          "024-000-0000",
+          "penempatan@samudra-contoh.example"
+        ],
+        "biaya_diminta": "Biaya penempatan sesuai ketentuan pemerintah dan dijelaskan tertulis, tanpa utang di muka"
+      },
+      "red_flags": [],
+      "keyakinan": 0.95,
+      "ringkasan": "Lowongan kerja ini mencantumkan informasi penempatan resmi perawat lansia ke Jepang dengan prosedur wawancara tatap muka serta identitas penyalur yang transparan. Tidak ditemukan indikasi red flag atau poin mencurigakan dalam informasi poster tersebut.",
+      "risk_level": "Aman",
+      "risk_score": 0,
+      "saran_cek_manual": false,
+      "disclaimer": "Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."
+    }
+  }
+]

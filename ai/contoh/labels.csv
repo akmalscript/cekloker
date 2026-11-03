@@ -1,0 +1,7 @@
+file,label,red_flag_yang_diharapkan
+scam_kamboja.png,jebakan,gaji_tidak_wajar;negara_rawan;desakan_berangkat;biaya_di_muka;visa_turis;paspor_ditahan;wawancara_hanya_chat;ajakan_telegram
+scam_jepang.png,jebakan,gaji_tidak_wajar;biaya_di_muka;visa_turis;tiket_tanpa_kontrak;minta_dirahasiakan;desakan_berangkat;kontak_tidak_resmi
+scam_admin_online.png,jebakan,gaji_tidak_wajar;kirim_apk;data_pribadi_berlebihan;ajakan_telegram;wawancara_hanya_chat;kontak_tidak_resmi
+scam_taiwan.png,jebakan,gaji_tidak_wajar;biaya_di_muka;paspor_ditahan;visa_turis;desakan_berangkat;perusahaan_mencurigakan
+asli_it_jakarta.png,asli,
+asli_p3mi.png,asli,
