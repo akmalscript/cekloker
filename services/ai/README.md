@@ -23,3 +23,4 @@ Layanan analisis cerdas CekLoker berbasis Python FastAPI, dikembangkan oleh Regi
    uvicorn main:app --reload --port 8000
    ```
 5. Buka dokumentasi Swagger interaktif di: `http://localhost:8000/docs`
+

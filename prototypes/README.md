@@ -10,3 +10,4 @@ Folder ini berisi prototipe mandiri (mono HTML) untuk mematangkan alur antarmuka
 
 ## Tahap Selanjutnya:
 - `result.html` (PRIORITAS TERTINGGI): Halaman unggah gambar/teks dan hasil pemindaian AI dengan visualisasi kotak bukti (*bounding box* red flag).
+

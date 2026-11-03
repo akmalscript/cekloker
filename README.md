@@ -1,15 +1,6 @@
 # CekLoker — Cek Dulu Sebelum Melamar
 
-Aplikasi berbasis AI untuk membantu pencari kerja mendeteksi lowongan kerja mencurigakan, penipuan (*scam*), atau TPPO melalui analisis screenshot lowongan, teks, dan percakapan rekruter dengan penanda bukti visual (*red flags*).
-
----
-
-## Tim Pengembang
-- **Akmal Pratama** — Full-Stack Web Developer
-- **Dhimas** — Full-Stack Web Developer
-- **Regina** — AI Engineer
-
----
+Aplikasi berbasis AI untuk membantu pencari kerja mendeteksi lowongan kerja mencurigakan, penipuan (_scam_), atau TPPO melalui analisis screenshot lowongan, teks, dan percakapan rekruter dengan penanda bukti visual (_red flags_).
 
 ## Struktur Repositori (Monorepo)
 
@@ -34,20 +25,22 @@ cekloker/
 └── README.md
 ```
 
----
-
 ## Panduan Memulai Cepat
 
 ### 1. Menjalankan Prototipe Antarmuka
+
 Buka berkas di folder `prototypes/` langsung di peramban web:
+
 - `prototypes/index.html` — Landing page
 - `prototypes/login.html` — Halaman masuk
 - `prototypes/register.html` — Halaman daftar
 
 ### 2. Menjalankan Layanan AI (FastAPI)
+
 ```bash
 cd services/ai
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
+
 Buka `http://localhost:8000/docs` untuk menguji endpoint analisis via Swagger UI.
