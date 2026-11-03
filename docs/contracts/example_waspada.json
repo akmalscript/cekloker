@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "input_type": "lowongan",
+  "risk_level": "waspada",
+  "confidence": 0.78,
+  "needs_manual_check": false,
+  "summary": "Ditemukan beberapa indikasi yang perlu dicermati: gaji di atas rata-rata untuk posisi tanpa pengalaman dan desakan waktu pendaftaran.",
+  "extracted": {
+    "position": "Operator Produksi",
+    "company": "CV Sejahtera Abadi",
+    "country": "Taiwan",
+    "salary": "TWD 25.000/bulan",
+    "requirements": ["Tidak perlu pengalaman", "Lulusan SMA"],
+    "contact": ["hr.sejahtera@gmail.com"],
+    "fees": null
+  },
+  "red_flags": [
+    {
+      "code": "gaji_tidak_wajar",
+      "label": "Gaji tidak wajar",
+      "severity": "waspada",
+      "quote": "Gaji TWD 25.000 tanpa syarat pengalaman",
+      "reason": "Gaji yang ditawarkan jauh di atas rata-rata pasar untuk posisi tanpa pengalaman.",
+      "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
+      "regions": [
+        {"image_index": 0, "bbox": {"x": 0.05, "y": 0.30, "w": 0.55, "h": 0.04}}
+      ]
+    },
+    {
+      "code": "desakan_berangkat",
+      "label": "Desakan berangkat cepat",
+      "severity": "waspada",
+      "quote": "Kuota terbatas, daftar sebelum 5 November",
+      "reason": "Tekanan waktu singkat membatasi kemampuan calon pekerja untuk memverifikasi lowongan.",
+      "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
+      "regions": [
+        {"image_index": 0, "bbox": {"x": 0.05, "y": 0.70, "w": 0.70, "h": 0.04}}
+      ]
+    }
+  ],
+  "fingerprint": {
+    "image_phash": ["b2c3d4e5f6789012"],
+    "raw_text": "Operator Produksi Taiwan Gaji TWD 25000 Kuota terbatas daftar sebelum 5 November",
+    "normalized_text": "operator produksi taiwan gaji twd 25000 kuota terbatas daftar sebelum 5 november"
+  },
+  "meta": {
+    "model": "gemini-2.0-flash",
+    "prompt_version": "v1.0",
+    "catalog_version": "1.0.0",
+    "normalization_version": "1",
+    "risk_score": 4,
+    "latency_ms": 1520
+  }
+}
+

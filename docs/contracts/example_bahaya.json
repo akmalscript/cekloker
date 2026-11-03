@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "input_type": "lowongan",
+  "risk_level": "bahaya",
+  "confidence": 0.91,
+  "needs_manual_check": false,
+  "summary": "Lowongan ini menunjukkan dua red flag kritis: permintaan berangkat dengan visa turis dan penahanan paspor. Keduanya merupakan indikator kuat TPPO.",
+  "extracted": {
+    "position": "Customer Service Online",
+    "company": "PT Maju Bersama",
+    "country": "Kamboja",
+    "salary": "USD 3.000/bulan",
+    "requirements": ["Tidak perlu pengalaman", "Usia 18-35 tahun"],
+    "contact": ["@admin_kamboja", "wa.me/628123456789"],
+    "fees": "Biaya keberangkatan Rp 5.000.000"
+  },
+  "red_flags": [
+    {
+      "code": "visa_turis",
+      "label": "Berangkat dengan visa turis",
+      "severity": "bahaya",
+      "quote": "Berangkat memakai visa turis dulu, nanti diurus di sana",
+      "reason": "Bekerja dengan visa turis melanggar hukum ketenagakerjaan dan berisiko deportasi serta eksploitasi.",
+      "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
+      "regions": [
+        {"image_index": 0, "bbox": {"x": 0.10, "y": 0.45, "w": 0.60, "h": 0.05}}
+      ]
+    },
+    {
+      "code": "paspor_ditahan",
+      "label": "Penahanan dokumen",
+      "severity": "bahaya",
+      "quote": "Paspor dititipkan ke agen selama masa kontrak",
+      "reason": "Penahanan paspor adalah tanda perdagangan orang dan menghilangkan kebebasan bergerak.",
+      "legal_basis": "UU No. 21 Tahun 2007 tentang Pemberantasan Tindak Pidana Perdagangan Orang",
+      "regions": [
+        {"image_index": 0, "bbox": {"x": 0.10, "y": 0.55, "w": 0.65, "h": 0.05}}
+      ]
+    }
+  ],
+  "fingerprint": {
+    "image_phash": ["a1b2c3d4e5f67890"],
+    "raw_text": "Customer Service Online Kamboja Gaji USD 3000 Paspor dititipkan ke agen visa turis",
+    "normalized_text": "customer service online kamboja gaji usd 3000 paspor dititipkan ke agen visa turis"
+  },
+  "meta": {
+    "model": "gemini-2.0-flash",
+    "prompt_version": "v1.0",
+    "catalog_version": "1.0.0",
+    "normalization_version": "1",
+    "risk_score": 8,
+    "latency_ms": 1840
+  }
+}
+
