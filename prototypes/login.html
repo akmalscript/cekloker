@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Masuk — CekLoker</title>
+  <meta name="description" content="Masuk ke CekLoker untuk menyimpan riwayat pemeriksaan lowongan kerja.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231E3A8A'/%3E%3Cpath d='M9 13V9h4M19 9h4v4M23 19v4h-4M13 23H9v-4' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12.5 16.2l2.4 2.4 4.6-4.6' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Design system: token + komponen (lihat DESAIN.md) -->
+  <style id="ck-design-system">
+    /* =====================================================================
+       CekLoker — design system (token + komponen)
+       Blok ini IDENTIK di index.html dan login.html. Ubah di keduanya.
+       Harus berada SEBELUM <script src="https://cdn.tailwindcss.com">.
+
+       Catatan spesifisitas: Tailwind CDN menyuntikkan reset (preflight) dan
+       utilitasnya SETELAH blok ini. Karena itu:
+       - Gaya dasar elemen memakai `html body` / `html :is(h1,h2,h3)` agar
+         menang dari reset, tetapi tetap kalah dari kelas utilitas.
+       - Varian tombol memakai `.btn.btn-*` agar warna latarnya tidak
+         dihapus reset `button, [type='submit'] { background-color: transparent }`.
+       - Komponen lain cukup satu kelas, jadi utilitas Tailwind di elemen
+         yang sama (mis. `hidden`, `w-full`) tetap bisa menimpanya.
+       ===================================================================== */
+
+    /* ---------- Token ---------- */
+    :root {
+      --ck-navy: #1E3A8A;
+      --ck-navy-hover: #172F70;
+      --ck-navy-tint: #EEF2FB;
+      --ck-navy-soft: #DCE4F5;
+      --ck-bg: #F8FAFC;
+      --ck-surface: #FFFFFF;
+      --ck-ink: #0F172A;
+      --ck-muted: #475569;
+      --ck-line: #E2E8F0;
+      --ck-field: #8792A6;          /* border input, kontras >= 3:1 */
+
+      --ck-aman: #16A34A;    --ck-aman-ink: #15803D;    --ck-aman-tint: #F0FDF4;    --ck-aman-line: #BBF7D0;
+      --ck-waspada: #D97706; --ck-waspada-ink: #B45309; --ck-waspada-tint: #FFFBEB; --ck-waspada-line: #FDE68A;
+      --ck-bahaya: #DC2626;  --ck-bahaya-ink: #B91C1C;  --ck-bahaya-tint: #FEF2F2;  --ck-bahaya-line: #FECACA;
+
+      --ck-font: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+      --ck-radius: 12px;
+      --ck-radius-ctl: 10px;
+      --ck-shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 2px 6px rgba(15, 23, 42, .03);
+      --ck-shadow-lift: 0 2px 4px rgba(15, 23, 42, .05), 0 10px 24px rgba(15, 23, 42, .08);
+      --ck-ease: cubic-bezier(.2, .8, .2, 1);
+      --ck-dur: 180ms;
+    }
+
+    /* ---------- Dasar ---------- */
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    html body {
+      background-color: var(--ck-bg);
+      font-family: var(--ck-font);
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--ck-ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    html :is(h1, h2, h3) {
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      color: var(--ck-ink);
+    }
+    :focus-visible { outline: 2px solid var(--ck-navy); outline-offset: 2px; border-radius: 6px; }
+    .on-navy :focus-visible { outline-color: #fff; }
+    ::selection { background: var(--ck-navy-soft); }
+
+    /* ---------- Tata letak ---------- */
+    .container-page { width: 100%; max-width: 1152px; margin-inline: auto; padding-inline: 1rem; }
+    @media (min-width: 640px)  { .container-page { padding-inline: 1.5rem; } }
+    @media (min-width: 1024px) { .container-page { padding-inline: 2rem; } }
+
+    .skip-link {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
+    }
+    .skip-link:focus {
+      position: fixed; left: 1rem; top: 1rem; z-index: 60;
+      width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal;
+      padding: .5rem 1rem; border-radius: var(--ck-radius-ctl);
+      background: #fff; color: var(--ck-navy); font-weight: 600; box-shadow: var(--ck-shadow-lift);
+    }
+
+    /* ---------- Tombol ---------- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+      min-height: 48px; padding-inline: 1.5rem;
+      border-radius: var(--ck-radius-ctl);
+      font-size: 1rem; font-weight: 600; line-height: 1;
+      text-decoration: none; user-select: none;
+      transition: background-color var(--ck-dur) var(--ck-ease), border-color var(--ck-dur) var(--ck-ease),
+                  color var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease);
+    }
+    .btn:disabled, .btn[aria-disabled="true"] { cursor: not-allowed; opacity: .7; }
+    .btn-sm { min-height: 40px; padding-inline: 1rem; font-size: 15px; }
+
+    .btn.btn-primary { background-color: var(--ck-navy); color: #fff; }
+    .btn.btn-primary:hover { background-color: var(--ck-navy-hover); }
+    .btn.btn-secondary { border: 1px solid var(--ck-field); background-color: #fff; color: var(--ck-navy); }
+    .btn.btn-secondary:hover { border-color: var(--ck-navy); background-color: var(--ck-navy-tint); }
+    .btn.btn-ghost { color: var(--ck-navy); }
+    .btn.btn-ghost:hover { background-color: var(--ck-navy-tint); }
+    .btn.btn-white { background-color: #fff; color: var(--ck-navy); }   /* hanya di atas latar navy */
+    .btn.btn-white:hover { background-color: var(--ck-navy-tint); }
+
+    /* Indikator loading di dalam tombol */
+    .spinner {
+      width: 20px; height: 20px; border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, .35); border-top-color: #fff;
+      animation: ck-spin .8s linear infinite;
+    }
+    @keyframes ck-spin { to { transform: rotate(360deg); } }
+
+    /* ---------- Input ---------- */
+    .input {
+      display: block; width: 100%; height: 3rem; padding-inline: 1rem;
+      border: 1px solid var(--ck-field); border-radius: var(--ck-radius-ctl);
+      background-color: #fff; color: var(--ck-ink);
+      font-size: 1rem; line-height: 1.5rem;
+      transition: border-color var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease);
+    }
+    .input::placeholder { color: #64748B; opacity: 1; }
+    .input:hover { border-color: #475569; }
+    .input:focus, .input:focus-visible { border-color: var(--ck-navy); outline: none; box-shadow: 0 0 0 3px var(--ck-navy-soft); }
+    .input[aria-invalid="true"] { border-color: var(--ck-bahaya-ink); }
+    .input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px var(--ck-bahaya-line); }
+
+    .field-label { display: block; font-size: 15px; font-weight: 600; color: var(--ck-ink); }
+    .field-error {
+      display: flex; align-items: flex-start; gap: .375rem; margin-top: .5rem;
+      font-size: .875rem; line-height: 1.25rem; font-weight: 600; color: var(--ck-bahaya-ink);
+    }
+    .field-error svg { flex-shrink: 0; width: 1rem; height: 1rem; margin-top: .125rem; }
+
+    /* ---------- Kartu ---------- */
+    .card {
+      border: 1px solid var(--ck-line); border-radius: var(--ck-radius);
+      background-color: #fff; box-shadow: var(--ck-shadow);
+    }
+    .card-hover { transition: transform var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease); }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: var(--ck-shadow-lift); }
+
+    /* ---------- Badge status risiko: warna + ikon + teks ---------- */
+    .badge {
+      display: inline-flex; align-items: center; gap: .375rem; white-space: nowrap;
+      padding: .25rem .625rem; border: 1px solid; border-radius: 9999px;
+      font-size: 13px; font-weight: 700; line-height: 1;
+    }
+    .badge svg { width: .875rem; height: .875rem; stroke-width: 2.5; }
+    .badge-aman    { border-color: var(--ck-aman-line);    background-color: var(--ck-aman-tint);    color: var(--ck-aman-ink); }
+    .badge-waspada { border-color: var(--ck-waspada-line); background-color: var(--ck-waspada-tint); color: var(--ck-waspada-ink); }
+    .badge-bahaya  { border-color: var(--ck-bahaya-line);  background-color: var(--ck-bahaya-tint);  color: var(--ck-bahaya-ink); }
+
+    /* ---------- Motif "penanda bukti" ---------- */
+    .evidence { position: relative; display: inline-block; }
+    .evidence-box {
+      pointer-events: none; position: absolute; inset: -.375rem -.5rem;
+      border: 2px solid var(--ck-bahaya); border-radius: .375rem;
+      background: rgba(220, 38, 38, .05);
+    }
+    .evidence-label {
+      position: absolute; top: -11px; left: .375rem; white-space: nowrap;
+      padding: 3px .375rem; border-radius: .25rem; background: var(--ck-bahaya);
+      font-size: 11px; font-weight: 700; line-height: 1; color: #fff;
+    }
+    .evidence-box.is-roomy { inset: -.5rem -.625rem; }
+    .evidence-box.is-waspada { border-color: var(--ck-waspada); background: rgba(217, 119, 6, .06); }
+    .evidence-box.is-waspada .evidence-label { background: var(--ck-waspada-ink); }
+    .evidence-box.is-aman { border-color: var(--ck-aman); background: rgba(22, 163, 74, .05); }
+    .evidence-box.is-aman .evidence-label { background: var(--ck-aman-ink); }
+
+    /* Bracket bidik (viewfinder) untuk ikon */
+    .viewfinder {
+      position: relative; display: grid; place-items: center; width: 3rem; height: 3rem;
+      border-radius: var(--ck-radius-ctl); background-color: var(--ck-navy-tint); color: var(--ck-navy);
+    }
+    .viewfinder::before, .viewfinder::after {
+      content: ""; position: absolute; width: .75rem; height: .75rem;
+      border: 0 solid var(--ck-navy);
+    }
+    .viewfinder::before { left: -.25rem; top: -.25rem; border-left-width: 2px; border-top-width: 2px; border-top-left-radius: .375rem; }
+    .viewfinder::after { right: -.25rem; bottom: -.25rem; border-right-width: 2px; border-bottom-width: 2px; border-bottom-right-radius: .375rem; }
+
+    /* ---------- Kotak peringatan ---------- */
+    .alert {
+      display: flex; gap: .75rem; padding: 1rem;
+      border: 1px solid; border-radius: var(--ck-radius);
+      font-size: 15px; line-height: 1.625;
+    }
+    .alert-info    { border-color: var(--ck-navy-soft);   background-color: var(--ck-navy-tint);   color: var(--ck-ink); }
+    .alert-success { border-color: var(--ck-aman-line);   background-color: var(--ck-aman-tint);   color: var(--ck-ink); }
+    .alert-error   { border-color: var(--ck-bahaya-line); background-color: var(--ck-bahaya-tint); color: var(--ck-ink); }
+
+    /* ---------- Pola, teks kecil, navigasi ---------- */
+    .grid-paper {
+      background-image:
+        linear-gradient(to right, rgba(15, 23, 42, .035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(15, 23, 42, .035) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .grid-paper-navy {
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, .06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, .06) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    .eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ck-navy); }
+    .skeleton { display: block; height: .5rem; border-radius: 9999px; background-color: #E2E8F0; }
+    .nav-link {
+      padding: .5rem .75rem; border-radius: var(--ck-radius-ctl);
+      font-size: 15px; font-weight: 600; color: var(--ck-muted);
+      transition: background-color var(--ck-dur) var(--ck-ease), color var(--ck-dur) var(--ck-ease);
+    }
+    .nav-link:hover { background-color: var(--ck-navy-tint); color: var(--ck-navy); }
+
+    /* ---------- Gerak dikurangi ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 1ms !important; }
+      .card-hover:hover { transform: none; }
+      .spinner { animation-duration: 2.4s; }
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="ck-tailwind-config">
+    /* Konfigurasi Tailwind CekLoker — IDENTIK di index.html dan login.html.
+       Warna utilitas (bg-navy, text-muted, dst.) merujuk ke token di blok ck-design-system. */
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: { DEFAULT: 'var(--ck-navy)', hover: 'var(--ck-navy-hover)', tint: 'var(--ck-navy-tint)', soft: 'var(--ck-navy-soft)' },
+            canvas: 'var(--ck-bg)',
+            ink: 'var(--ck-ink)',
+            muted: 'var(--ck-muted)',
+            line: 'var(--ck-line)',
+            field: 'var(--ck-field)',
+            aman: { DEFAULT: 'var(--ck-aman)', ink: 'var(--ck-aman-ink)', tint: 'var(--ck-aman-tint)', line: 'var(--ck-aman-line)' },
+            waspada: { DEFAULT: 'var(--ck-waspada)', ink: 'var(--ck-waspada-ink)', tint: 'var(--ck-waspada-tint)', line: 'var(--ck-waspada-line)' },
+            bahaya: { DEFAULT: 'var(--ck-bahaya)', ink: 'var(--ck-bahaya-ink)', tint: 'var(--ck-bahaya-tint)', line: 'var(--ck-bahaya-line)' }
+          },
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+          borderRadius: { card: 'var(--ck-radius)', ctl: 'var(--ck-radius-ctl)' },
+          boxShadow: { card: 'var(--ck-shadow)', lift: 'var(--ck-shadow-lift)' },
+          maxWidth: { page: '1152px' }
+        },
+        screens: {
+          sm: '640px', md: '768px', lg: '1024px', xl: '1280px', '2xl': '1536px',
+          short: { raw: '(min-width: 640px) and (max-height: 820px)' }   /* laptop pendek, mis. 1366×768 */
+        }
+      }
+    };
+  </script>
+
+</head>
+
+<body class="grid-paper">
+  <a href="#form-masuk" class="skip-link">Lewati ke formulir masuk</a>
+
+  <div class="relative flex min-h-screen flex-col">
+    <!-- Kembali ke beranda (pojok kiri atas) -->
+    <header class="px-4 pt-4 sm:absolute sm:left-0 sm:top-0 sm:px-6 sm:pt-6 short:pt-4">
+      <a href="index.html" class="btn btn-ghost btn-sm !px-3">
+        <i data-lucide="arrow-left" class="h-4 w-4" aria-hidden="true"></i>
+        Beranda
+      </a>
+    </header>
+
+    <main id="konten" class="flex flex-1 flex-col items-center justify-center px-4 pb-10 pt-4 sm:px-6 sm:py-12 short:py-3">
+      <!-- Logo -->
+      <a href="index.html" class="mb-6 flex items-center gap-2 rounded-ctl text-xl font-extrabold tracking-tight text-ink short:mb-3" aria-label="CekLoker, ke beranda">
+        <svg class="h-9 w-9 shrink-0 short:h-8 short:w-8" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8" fill="#1E3A8A"/>
+          <path d="M9 13V9h4M19 9h4v4M23 19v4h-4M13 23H9v-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12.5 16.2l2.4 2.4 4.6-4.6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        CekLoker
+      </a>
+
+      <!-- Kartu form -->
+      <div class="card w-full max-w-[420px] p-6 sm:p-10 short:px-8 short:py-5">
+        <h1 class="text-center text-[28px] sm:text-[32px] short:text-2xl">Masuk ke CekLoker</h1>
+        <p class="mx-auto mt-2 max-w-[300px] text-center text-[15px] leading-normal text-muted short:mt-1">Simpan riwayat pemeriksaan dan bantu laporkan loker palsu.</p>
+
+        <div id="form-alert"></div>
+
+        <form id="form-masuk" class="mt-8 space-y-5 short:mt-4 short:space-y-3" novalidate>
+          <div>
+            <label for="email" class="field-label">Email</label>
+            <input id="email" name="email" type="email" class="input mt-2 short:mt-1 short:h-10" autocomplete="email" inputmode="email" placeholder="nama@email.com" aria-invalid="false">
+            <p id="email-error" class="field-error hidden"><i data-lucide="circle-alert" aria-hidden="true"></i><span></span></p>
+          </div>
+
+          <div>
+            <label for="password" class="field-label">Password</label>
+            <div class="relative mt-2 short:mt-1">
+              <input id="password" name="password" type="password" class="input !pr-14 short:h-10" autocomplete="current-password" placeholder="Minimal 8 karakter" aria-invalid="false">
+              <button id="pw-toggle" type="button" class="absolute right-1 top-1/2 grid h-10 w-10 short:h-9 short:w-9 -translate-y-1/2 place-items-center rounded-lg text-muted hover:bg-navy-tint hover:text-navy" aria-label="Tampilkan password" aria-pressed="false" aria-controls="password">
+                <span data-icon-show><i data-lucide="eye" class="h-5 w-5" aria-hidden="true"></i></span>
+                <span data-icon-hide class="hidden"><i data-lucide="eye-off" class="h-5 w-5" aria-hidden="true"></i></span>
+              </button>
+            </div>
+            <p id="password-error" class="field-error hidden"><i data-lucide="circle-alert" aria-hidden="true"></i><span></span></p>
+            <div class="mt-2 flex justify-end short:mt-1">
+              <a href="#" class="rounded text-sm font-semibold text-navy underline-offset-4 hover:underline">Lupa password?</a>
+            </div>
+          </div>
+
+          <button id="submit-btn" type="submit" class="btn btn-primary w-full short:min-h-[40px]">
+            <span class="spinner hidden" aria-hidden="true"></span>
+            <span data-label>Masuk</span>
+          </button>
+        </form>
+
+        <div class="my-6 flex items-center gap-4 text-sm font-medium text-muted short:my-2.5">
+          <span class="h-px flex-1 bg-line" aria-hidden="true"></span>
+          atau
+          <span class="h-px flex-1 bg-line" aria-hidden="true"></span>
+        </div>
+
+        <button id="google-btn" type="button" class="btn btn-secondary w-full !text-ink short:min-h-[40px]">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" aria-hidden="true">
+            <path d="M20 12a8 8 0 1 1-2.34-5.66"/>
+            <path d="M20 12h-7"/>
+          </svg>
+          Masuk dengan Google
+        </button>
+      </div>
+
+      <!-- Jalur tamu: gaya berbeda dari tombol Google -->
+      <div class="mt-6 grid w-full max-w-[420px] grid-cols-1 items-center gap-x-4 sm:grid-cols-[minmax(0,1fr)_auto] rounded-card border border-navy-soft bg-navy-tint px-5 py-4 short:mt-3 short:py-2">
+        <p class="order-1 font-bold leading-snug text-ink sm:order-none">Belum mau daftar?</p>
+        <button id="guest-btn" type="button" class="btn btn-ghost btn-sm order-3 -ml-3 mt-2 justify-self-start !px-3 hover:!bg-navy-soft sm:order-none sm:row-span-2 sm:-mr-2 sm:ml-0 sm:mt-0" aria-describedby="guest-note">
+          Cek tanpa login
+          <i data-lucide="arrow-right" class="h-4 w-4" aria-hidden="true"></i>
+        </button>
+        <p id="guest-note" class="order-2 text-[13px] leading-snug text-muted sm:order-none">Tamu bisa cek 3 kali per hari</p>
+      </div>
+
+      <div class="mt-6 w-full max-w-[420px] text-center short:mt-3 short:max-w-[520px]">
+        <p class="text-[15px] text-muted short:text-sm">Belum punya akun? <a href="register.html" class="rounded font-bold text-navy underline-offset-4 hover:underline">Daftar</a></p>
+        <p class="mt-2 text-[13px] leading-relaxed text-muted short:mt-0.5">Dengan masuk, kamu menyetujui pemrosesan data sesuai <a href="#" class="rounded font-semibold text-navy underline underline-offset-2">Kebijakan Privasi</a>.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/lucide@1.66.0/dist/umd/lucide.min.js"></script>
+  <script>
+    lucide.createIcons();
+
+    const form = document.getElementById('form-masuk');
+    const email = document.getElementById('email');
+    const pw = document.getElementById('password');
+    const submitBtn = document.getElementById('submit-btn');
+    const alertRegion = document.getElementById('form-alert');
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    let attempted = false;
+
+    // ---------- Validasi per field ----------
+    function emailMessage() {
+      const v = email.value.trim();
+      if (!v) return 'Email wajib diisi.';
+      if (!EMAIL_RE.test(v)) return 'Format email belum benar. Contoh: nama@email.com';
+      return '';
+    }
+    function passwordMessage() {
+      if (!pw.value) return 'Password wajib diisi.';
+      if (pw.value.length < 8) return 'Password minimal 8 karakter.';
+      return '';
+    }
+    function setFieldError(input, msg) {
+      const err = document.getElementById(input.id + '-error');
+      err.querySelector('span').textContent = msg;
+      err.classList.toggle('hidden', !msg);
+      input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      if (msg) input.setAttribute('aria-describedby', err.id);
+      else input.removeAttribute('aria-describedby');
+    }
+    [[email, emailMessage], [pw, passwordMessage]].forEach(([input, check]) => {
+      input.addEventListener('blur', () => { if (attempted || input.value) setFieldError(input, check()); });
+      input.addEventListener('input', () => { if (attempted || input.getAttribute('aria-invalid') === 'true') setFieldError(input, check()); });
+    });
+
+    // ---------- Pesan di atas form ----------
+    const ALERTS = {
+      success: { variant: 'alert-success', icon: 'CircleCheck', color: 'text-aman-ink', title: 'Berhasil masuk (simulasi)', text: 'Di aplikasi final, kamu akan diarahkan ke riwayat pemeriksaan.' },
+      google:  { variant: 'alert-info',    icon: 'Info',        color: 'text-navy',     title: 'Belum tersedia di prototipe', text: 'Masuk dengan Google akan disambungkan pada tahap pengembangan.' },
+      guest:   { variant: 'alert-info',    icon: 'Info',        color: 'text-navy',     title: 'Mode tamu', text: 'Di aplikasi final, tombol ini membuka halaman unggah tanpa perlu akun.' }
+    };
+    function showAlert(kind) {
+      const a = ALERTS[kind];
+      const box = document.createElement('div');
+      box.className = 'alert mt-5 ' + a.variant;
+      box.setAttribute('role', 'status');
+      const icon = lucide.createElement(lucide.icons[a.icon]);
+      icon.setAttribute('class', 'mt-0.5 h-5 w-5 shrink-0 ' + a.color);
+      icon.setAttribute('aria-hidden', 'true');
+      const body = document.createElement('div');
+      const t = document.createElement('p'); t.className = 'font-bold text-ink'; t.textContent = a.title;
+      const p = document.createElement('p'); p.className = 'text-muted'; p.textContent = a.text;
+      body.append(t, p);
+      box.append(icon, body);
+      alertRegion.replaceChildren(box);
+      const r = box.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > window.innerHeight) box.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+
+    // ---------- Submit ----------
+    function setLoading(on) {
+      submitBtn.disabled = on;
+      submitBtn.setAttribute('aria-busy', String(on));
+      submitBtn.querySelector('.spinner').classList.toggle('hidden', !on);
+      submitBtn.querySelector('[data-label]').textContent = on ? 'Memproses…' : 'Masuk';
+    }
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      attempted = true;
+      alertRegion.replaceChildren();
+      const eMsg = emailMessage(), pMsg = passwordMessage();
+      setFieldError(email, eMsg);
+      setFieldError(pw, pMsg);
+      if (eMsg || pMsg) { (eMsg ? email : pw).focus(); return; }
+
+      setLoading(true);
+      setTimeout(() => {
+        setLoading(false);
+        submitBtn.focus();
+        showAlert('success');
+      }, 1500);
+    });
+
+    // ---------- Tampil / sembunyikan password ----------
+    const pwToggle = document.getElementById('pw-toggle');
+    pwToggle.addEventListener('click', () => {
+      const show = pw.type === 'password';
+      pw.type = show ? 'text' : 'password';
+      pwToggle.setAttribute('aria-pressed', String(show));
+      pwToggle.querySelector('[data-icon-show]').classList.toggle('hidden', show);
+      pwToggle.querySelector('[data-icon-hide]').classList.toggle('hidden', !show);
+    });
+
+    document.getElementById('google-btn').addEventListener('click', () => showAlert('google'));
+    document.getElementById('guest-btn').addEventListener('click', () => showAlert('guest'));
+  </script>
+</body>
+</html>
