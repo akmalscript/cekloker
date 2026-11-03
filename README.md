@@ -2,6 +2,8 @@
 
 Aplikasi berbasis AI untuk membantu pencari kerja mendeteksi lowongan kerja mencurigakan, penipuan (_scam_), atau TPPO melalui analisis screenshot lowongan, teks, dan percakapan rekruter dengan penanda bukti visual (_red flags_).
 
+---
+
 ## Struktur Repositori (Monorepo)
 
 ```text
@@ -25,6 +27,8 @@ cekloker/
 └── README.md
 ```
 
+---
+
 ## Panduan Memulai Cepat
 
 ### 1. Menjalankan Prototipe Antarmuka
@@ -44,3 +48,5 @@ uvicorn main:app --reload --port 8000
 ```
 
 Buka `http://localhost:8000/docs` untuk menguji endpoint analisis via Swagger UI.
+
+---
