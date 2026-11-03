@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "input_type": "lowongan",
+  "risk_level": "aman",
+  "confidence": 0.85,
+  "needs_manual_check": false,
+  "summary": "Tidak ditemukan red flag pada lowongan ini. Perusahaan mencantumkan alamat lengkap, kontak resmi, dan prosedur rekrutmen yang transparan.",
+  "extracted": {
+    "position": "Software Engineer",
+    "company": "PT Inovasi Teknologi Jakarta",
+    "country": "Indonesia",
+    "salary": "Rp 12.000.000 - 18.000.000/bulan",
+    "requirements": ["S1 Informatika/Ilmu Komputer", "Pengalaman 2 tahun", "Menguasai Python/JavaScript"],
+    "contact": ["hr@inovasitekno.co.id", "+6221-5555-1234"],
+    "fees": null
+  },
+  "red_flags": [],
+  "fingerprint": {
+    "image_phash": ["c3d4e5f678901234"],
+    "raw_text": "Software Engineer PT Inovasi Teknologi Jakarta Rp 12 18 juta per bulan S1 Informatika pengalaman 2 tahun",
+    "normalized_text": "software engineer pt inovasi teknologi jakarta rp 12 18 juta per bulan s1 informatika pengalaman 2 tahun"
+  },
+  "meta": {
+    "model": "gemini-2.0-flash",
+    "prompt_version": "v1.0",
+    "catalog_version": "1.0.0",
+    "normalization_version": "1",
+    "risk_score": 0,
+    "latency_ms": 1210
+  }
+}
+

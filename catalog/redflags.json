@@ -1,0 +1,141 @@
+{
+  "version": "1.0.0",
+  "entries": [
+    {
+      "code": "gaji_tidak_wajar",
+      "label": "Gaji tidak wajar",
+      "description": "Gaji jauh di atas pasaran untuk posisi dan syarat yang ringan (tanpa pengalaman, tanpa ijazah), atau dijanjikan dalam mata uang asing dengan nominal tidak masuk akal.",
+      "severity": "waspada",
+      "weight": 2,
+      "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
+      "legal_basis_verified": false
+    },
+    {
+      "code": "visa_turis",
+      "label": "Berangkat dengan visa turis",
+      "description": "Calon pekerja diminta atau disarankan berangkat memakai visa turis/kunjungan untuk bekerja.",
+      "severity": "bahaya",
+      "weight": 4,
+      "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
+      "legal_basis_verified": false
+    },
+    {
+      "code": "paspor_ditahan",
+      "label": "Penahanan dokumen",
+      "description": "Paspor, ijazah asli, KTP, atau dokumen identitas lain diminta dititipkan/ditahan oleh perekrut atau perusahaan.",
+      "severity": "bahaya",
+      "weight": 4,
+      "legal_basis": "UU No. 21 Tahun 2007 tentang Pemberantasan Tindak Pidana Perdagangan Orang",
+      "legal_basis_verified": false
+    },
+    {
+      "code": "biaya_di_muka",
+      "label": "Biaya di muka",
+      "description": "Diminta membayar biaya pendaftaran, administrasi, pelatihan, tiket, atau utang keberangkatan sebelum bekerja.",
+      "severity": "waspada",
+      "weight": 3,
+      "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
+      "legal_basis_verified": false
+    },
+    {
+      "code": "negara_rawan",
+      "label": "Negara tujuan rawan penipuan",
+      "description": "Negara tujuan yang dikenal sebagai pusat online scam/TPPO (misalnya Kamboja, Myanmar, Laos, Filipina utara) untuk posisi seperti customer service atau operator online.",
+      "severity": "waspada",
+      "weight": 3,
+      "legal_basis": "UU No. 21 Tahun 2007 tentang Pemberantasan Tindak Pidana Perdagangan Orang",
+      "legal_basis_verified": false
+    },
+    {
+      "code": "desakan_berangkat",
+      "label": "Desakan berangkat cepat",
+      "description": "Tekanan waktu: kuota terbatas, harus segera daftar, berangkat dalam hitungan hari.",
+      "severity": "waspada",
+      "weight": 2,
+      "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
+      "legal_basis_verified": false
+    },
+    {
+      "code": "wawancara_hanya_chat",
+      "label": "Wawancara hanya lewat chat",
+      "description": "Seluruh proses seleksi hanya lewat chat/pesan, tanpa wawancara langsung atau video dan tanpa kontrak yang jelas.",
+      "severity": "waspada",
+      "weight": 1,
+      "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
+      "legal_basis_verified": false
+    },
+    {
+      "code": "ajakan_telegram",
+      "label": "Ajakan pindah ke kanal lain",
+      "description": "Diajak pindah ke Telegram, WhatsApp pribadi, atau kanal lain di luar platform lowongan.",
+      "severity": "waspada",
+      "weight": 2,
+      "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
+      "legal_basis_verified": false
+    },
+    {
+      "code": "minta_dirahasiakan",
+      "label": "Diminta merahasiakan",
+      "description": "Diminta tidak memberi tahu keluarga atau pihak lain tentang pekerjaan atau keberangkatan.",
+      "severity": "waspada",
+      "weight": 3,
+      "legal_basis": "UU No. 21 Tahun 2007 tentang Pemberantasan Tindak Pidana Perdagangan Orang",
+      "legal_basis_verified": false
+    },
+    {
+      "code": "kirim_apk",
+      "label": "Kiriman file APK/tautan mencurigakan",
+      "description": "Perekrut mengirim file APK atau tautan untuk diinstal/diunduh.",
+      "severity": "waspada",
+      "weight": 3,
+      "legal_basis": null,
+      "legal_basis_verified": false
+    },
+    {
+      "code": "data_pribadi_berlebihan",
+      "label": "Permintaan data pribadi berlebihan",
+      "description": "Diminta NIK, foto KTP/KK/paspor, data rekening, atau kode OTP yang tidak relevan pada tahap lamaran.",
+      "severity": "waspada",
+      "weight": 2,
+      "legal_basis": null,
+      "legal_basis_verified": false
+    },
+    {
+      "code": "perusahaan_mencurigakan",
+      "label": "Identitas perusahaan mencurigakan",
+      "description": "Nama perusahaan tidak jelas, alamat tidak ada atau tidak lengkap, tidak ada situs atau legalitas yang bisa dicek.",
+      "severity": "waspada",
+      "weight": 2,
+      "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
+      "legal_basis_verified": false
+    },
+    {
+      "code": "kontak_tidak_resmi",
+      "label": "Kontak tidak resmi",
+      "description": "Hanya mencantumkan nomor pribadi atau email gratisan, tanpa kontak perusahaan.",
+      "severity": "waspada",
+      "weight": 1,
+      "legal_basis": null,
+      "legal_basis_verified": false
+    },
+    {
+      "code": "akun_tidak_terverifikasi",
+      "label": "Akun perekrut tidak terverifikasi",
+      "description": "Akun perekrut baru dibuat, tidak memiliki riwayat, tidak terverifikasi oleh platform, atau menggunakan nama samaran yang tidak jelas.",
+      "severity": "waspada",
+      "weight": 1,
+      "legal_basis": null,
+      "legal_basis_verified": false
+    },
+    {
+      "code": "tiket_tanpa_kontrak",
+      "label": "Tiket/keberangkatan tanpa kontrak",
+      "description": "Dijanjikan tiket dan keberangkatan tanpa perjanjian kerja tertulis yang jelas.",
+      "severity": "waspada",
+      "weight": 3,
+      "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
+      "legal_basis_verified": false
+    }
+  ]
+}
+
