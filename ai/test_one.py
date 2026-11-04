@@ -18,6 +18,10 @@ def main(path: str):
     mime = mimetypes.guess_type(p.name)[0] or "image/png"
     hasil = analisis([(p.read_bytes(), mime)])
     print(json.dumps(hasil, ensure_ascii=False, indent=2))
+    if hasil.get("_dari_cache"):
+        print("\n(hasil dari cache, tanpa memanggil API)")
+    else:
+        print(f"\nModel: {hasil['_model']} | Waktu: {hasil['_detik']} detik")
 
     img = Image.open(p).convert("RGB")
     w, h = img.size
