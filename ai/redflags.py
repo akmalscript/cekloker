@@ -30,7 +30,7 @@ RED_FLAGS = {
         weight=4, legal=UU_TPPO),
     "biaya_di_muka": dict(
         label="Biaya di muka",
-        definition="Diminta membayar biaya pendaftaran, administrasi, pelatihan, tiket, atau utang keberangkatan sebelum bekerja.",
+        definition="Diminta membayar biaya pendaftaran, administrasi, pelatihan, tiket, atau utang keberangkatan sebelum bekerja. Termasuk biaya yang 'ditalangi dulu' lalu dipotong dari gaji, atau deposit yang dijanjikan kembali.",
         weight=3, legal=UU_PPMI),
     "negara_rawan": dict(
         label="Negara tujuan rawan penipuan",
@@ -38,7 +38,7 @@ RED_FLAGS = {
         weight=3, legal=UU_TPPO),
     "desakan_berangkat": dict(
         label="Desakan berangkat cepat",
-        definition="Tekanan waktu: kuota terbatas, harus segera daftar, berangkat dalam hitungan hari.",
+        definition="Tekanan waktu yang menghalangi korban berpikir, membaca kontrak, atau mengecek legalitas: harus segera berangkat, setor, atau memutuskan dalam hitungan hari. Tenggat konfirmasi wajar dari HR yang tetap memberi kesempatan membaca dokumen BUKAN red flag.",
         weight=2, legal=UU_PPMI),
     "wawancara_hanya_chat": dict(
         label="Wawancara hanya lewat chat",

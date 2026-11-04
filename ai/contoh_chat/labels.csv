@@ -2,7 +2,7 @@ file,label,red_flag_yang_diharapkan
 chat_scam_transfer.png,jebakan,biaya_di_muka;desakan_berangkat;data_pribadi_berlebihan
 chat_scam_telegram_apk.png,jebakan,gaji_tidak_wajar;ajakan_telegram;kirim_apk;minta_dirahasiakan
 chat_scam_paspor.png,jebakan,negara_rawan;desakan_berangkat;visa_turis;paspor_ditahan;tiket_tanpa_kontrak
-chat_scam_halus.png,jebakan,biaya_di_muka;tiket_tanpa_kontrak
+chat_scam_halus.png,jebakan,biaya_di_muka;tiket_tanpa_kontrak;desakan_berangkat
 chat_scam_tugas_deposit.png,jebakan,gaji_tidak_wajar;ajakan_telegram;biaya_di_muka
 chat_asli_hrd.png,asli,
 chat_asli_hrd_tegas.png,asli,
