@@ -16,6 +16,8 @@ FOLDER = Path(sys.argv[1] if len(sys.argv) > 1 else "contoh")
 FILTER = sys.argv[2] if len(sys.argv) > 2 else ""
 JEDA = 8  # detik antar panggilan API (tidak berlaku untuk hasil dari cache)
 
+import os
+print("Mode RAG:", "AKTIF" if os.getenv("CEKLOKER_RAG", "1") != "0" else "MATI (pembanding)")
 rows = list(csv.DictReader(open(FOLDER / "labels.csv", encoding="utf-8")))
 
 tp = fn = fp = tn = 0
@@ -41,6 +43,7 @@ for r in rows:
     print(f"\n{r['file']}  [{r['label']}] -> {h['risk_level']} (skor {h['risk_score']})  <{sumber}>")
     print("  terlewat :", sorted(harap - dapat) or "-")
     print("  ekstra   :", sorted(dapat - harap) or "-")
+    print("  rujukan  :", [r["id"] for r in h.get("rujukan", [])] or "-")
     semua.append({"file": r["file"], "label": r["label"], "hasil": h})
     if not h["_dari_cache"]:
         time.sleep(JEDA)

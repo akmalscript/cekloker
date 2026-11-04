@@ -9,7 +9,11 @@ def _flag_list() -> str:
 
 def build_system_prompt(rag_context: str = "") -> str:
     """rag_context: potongan rujukan hasil retrieval (langkah RAG, nanti)."""
-    ctx = f"\n\nRUJUKAN TAMBAHAN (gunakan hanya bila relevan):\n{rag_context}" if rag_context else ""
+    ctx = (
+        "\n\nRUJUKAN TAMBAHAN (penjelasan konsep, bukan bukti):\n" + rag_context +
+        "\nAturan rujukan: gunakan hanya untuk memahami apakah sebuah kalimat termasuk red flag atau praktik wajar. "
+        "Setiap red flag tetap WAJIB punya bukti_teks yang dikutip dari input pengguna, bukan dari rujukan."
+    ) if rag_context else ""
     return f"""Kamu adalah pemeriksa lowongan kerja untuk aplikasi CekLoker, yang membantu pencari kerja di Indonesia mengenali lowongan yang berindikasi penipuan atau perdagangan orang.
 
 Input: satu atau beberapa screenshot/poster lowongan atau chat perekrut, dan/atau teks.
