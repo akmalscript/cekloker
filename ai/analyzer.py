@@ -14,7 +14,8 @@ from scoring import hitung_risiko
 load_dotenv()
 
 # Ganti lewat .env (GEMINI_MODEL). Cek nama model terbaru di Google AI Studio.
-MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+FALLBACK = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.5-flash")  # dipakai bila model utama sibuk (503)
 _client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 DISCLAIMER = (
@@ -29,11 +30,13 @@ def retrieve_context(teks_query: str) -> str:
     return ""
 
 
-def _panggil_model(contents, system_prompt: str, percobaan: int = 3):
+def _panggil_model(contents, system_prompt: str, percobaan: int = 6):
+    daftar_model = [MODEL] + ([FALLBACK] if FALLBACK and FALLBACK != MODEL else [])
     for i in range(percobaan):
+        model = daftar_model[i % len(daftar_model)]
         try:
             return _client.models.generate_content(
-                model=MODEL,
+                model=model,
                 contents=contents,
                 config=types.GenerateContentConfig(
                     system_instruction=system_prompt,
@@ -42,10 +45,12 @@ def _panggil_model(contents, system_prompt: str, percobaan: int = 3):
                     temperature=0.1,
                 ),
             )
-        except Exception as e:  # 429/503 dll: coba ulang dengan jeda
-            if i == percobaan - 1:
+        except Exception as e:
+            kode = getattr(e, "code", None)
+            # hanya ulang untuk error sementara; sisanya langsung dilaporkan
+            if kode not in (429, 500, 503) or i == percobaan - 1:
                 raise
-            time.sleep(4 * (i + 1))
+            time.sleep(min(5 * 2**i, 30))  # 5, 10, 20, 30 detik
 
 
 def analisis(gambar: list[tuple[bytes, str]], teks: str | None = None) -> dict:
