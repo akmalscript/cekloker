@@ -47,7 +47,14 @@ KB = [
          isi="Perekrut memakai nomor WhatsApp pribadi, email gratis, atau akun media sosial tanpa alamat kantor dan nama perusahaan yang bisa diverifikasi. Perusahaan sah biasanya memakai domain email resmi dan alamat kantor yang jelas.",
          kata_kunci=["whatsapp", "wa", "nomor pribadi", "gmail", "akun", "kantor", "dm"], sumber=None, verifikasi=True),
 
+    dict(id="modus_tautan_bio", jenis="modus", judul="Lowongan mencatut nama perusahaan dengan pendaftaran lewat link di bio",
+         isi="Poster lowongan memakai nama dan logo perusahaan atau instansi terkenal, diunggah akun pribadi atau akun 'info loker', lalu pendaftaran diarahkan ke 'link di bio', tautan pendek, atau formulir online. Tautan itu membuka formulir yang meminta nama, alamat, dan nomor Telegram, yang dipakai untuk pencurian data atau penipuan lanjutan. Perusahaan resmi menerima lamaran lewat situs karier dengan domain resmi atau portal pemerintah.",
+         kata_kunci=["link di bio", "bio profil", "cek bio", "klik link", "tautan", "formulir", "pendaftaran", "daftar sekarang", "telegram", "vercel", "bit.ly"], sumber="https://turnbackhoax.id/articles/36331-penipuan-gambar-pendaftaran-lowongan-kerja-japfa-indonesia", verifikasi=True),
+
     # --- Praktik wajar: mencegah alarm palsu ---
+    dict(id="wajar_kanal_resmi", jenis="wajar", judul="Pendaftaran lewat situs karier resmi atau portal pemerintah",
+         isi="Perusahaan sah mengarahkan pelamar ke situs karier dengan domain resmi perusahaan (misalnya career.namaperusahaan.com) atau ke portal pemerintah seperti Karirhub Kemnaker dan Siskop2mi. Akun media sosial resmi perusahaan boleh mempromosikan lowongan selama pendaftarannya menuju kanal resmi tersebut.",
+         kata_kunci=["career", "karir", "situs resmi", "website resmi", "karirhub", "siskop2mi", "apply lewat", "domain", "akun resmi"], sumber=None, verifikasi=True),
     dict(id="wajar_tenggat_hr", jenis="wajar", judul="Tenggat konfirmasi dari HR yang sah",
          isi="HR yang sah boleh menetapkan batas waktu konfirmasi offering letter, termasuk alasan kuota onboarding. Itu wajar selama kandidat diberi kesempatan membaca dokumen dan bertanya sebelum memutuskan.",
          kata_kunci=["offering letter", "konfirmasi", "batas waktu", "hr", "onboarding", "kuota"], sumber=None, verifikasi=True),

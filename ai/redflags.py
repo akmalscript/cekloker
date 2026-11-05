@@ -68,6 +68,13 @@ RED_FLAGS = {
         label="Kontak tidak resmi",
         definition="Hanya mencantumkan nomor pribadi atau email gratisan, tanpa kontak perusahaan.",
         weight=1, legal=None),
+    "pendaftaran_tidak_resmi": dict(
+        label="Pendaftaran di luar kanal resmi",
+        definition=("Lowongan memakai nama perusahaan atau instansi tertentu, tetapi pendaftaran diarahkan ke 'link di bio', "
+                    "tautan pendek, formulir online, situs gratisan, atau DM/chat, bukan ke situs dengan domain resmi perusahaan "
+                    "atau portal pemerintah. BUKAN red flag bila tertulis alamat dengan domain resmi perusahaan "
+                    "(misalnya career.namaperusahaan.com) atau portal pemerintah, atau bila gambar adalah halaman lowongan di portal resmi."),
+        weight=3, legal=None),
     "tiket_tanpa_kontrak": dict(
         label="Tiket/keberangkatan tanpa kontrak",
         definition="Dijanjikan tiket dan keberangkatan tanpa perjanjian kerja tertulis yang jelas.",
