@@ -7,7 +7,9 @@ Pemakaian:
 Hemat kuota: hasil mentah model disimpan di .cache/, jadi file yang sudah pernah
 diuji (dengan prompt yang sama) tidak memanggil API lagi.
 """
-import csv, json, mimetypes, sys, time
+import csv, json, mimetypes, os, sys, time
+
+os.environ.setdefault("CEKLOKER_RAG_WAJIB", "1")  # eval: jangan diam-diam lewati RAG
 from pathlib import Path
 
 from analyzer import analisis
@@ -16,11 +18,11 @@ FOLDER = Path(sys.argv[1] if len(sys.argv) > 1 else "contoh")
 FILTER = sys.argv[2] if len(sys.argv) > 2 else ""
 JEDA = 8  # detik antar panggilan API (tidak berlaku untuk hasil dari cache)
 
-import os
 print("Mode RAG:", "AKTIF" if os.getenv("CEKLOKER_RAG", "1") != "0" else "MATI (pembanding)")
 rows = list(csv.DictReader(open(FOLDER / "labels.csv", encoding="utf-8")))
 
 tp = fn = fp = tn = 0
+modelpakai = {}
 semua = []
 for r in rows:
     if FILTER not in r["file"]:
@@ -45,10 +47,12 @@ for r in rows:
     print("  ekstra   :", sorted(dapat - harap) or "-")
     print("  rujukan  :", [r["id"] for r in h.get("rujukan", [])] or "-")
     semua.append({"file": r["file"], "label": r["label"], "hasil": h})
+    modelpakai[h.get("_model", "cache")] = modelpakai.get(h.get("_model", "cache"), 0) + 1
     if not h["_dari_cache"]:
         time.sleep(JEDA)
 
 print("\n=== RINGKASAN ===")
+print("Model penilai  :", modelpakai)
 if tp + fn: print(f"Recall jebakan : {tp}/{tp+fn} = {tp/(tp+fn):.0%}")
 if fp + tn: print(f"Alarm palsu    : {fp}/{fp+tn} = {fp/(fp+tn):.0%}")
 json.dump(semua, open("hasil_eval.json", "w", encoding="utf-8"), ensure_ascii=False, indent=2)

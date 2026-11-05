@@ -4,3 +4,8 @@ __pycache__/
 out_*.png
 .cache/
 hasil_eval.json
+hasil_eval*.json
+data_nyata/*.png
+data_nyata/*.jpg
+data_nyata/*.jpeg
+data_nyata/*.webp

@@ -20,6 +20,9 @@ load_dotenv()
 # Ganti lewat .env. Cek nama model terbaru di Google AI Studio.
 MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
 FALLBACK = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.5-flash")
+# Model khusus tahap ekstraksi teks (RAG). Dipisah supaya jatah harian model penilai
+# tidak habis dipakai dua kali per gambar, dan model penilai tidak tercampur.
+EKSTRAK = os.getenv("GEMINI_EXTRACT_MODEL", FALLBACK)
 _client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
 # Cache hasil MENTAH model di disk. Tujuannya menghemat kuota: menjalankan ulang
@@ -62,10 +65,20 @@ def _kuota_harian_habis(e: Exception) -> bool:
     return getattr(e, "code", None) == 429 and ("PerDay" in pesan or "per day" in pesan)
 
 
-def _panggil_model(contents, system_prompt: str, skema=AnalysisResult, percobaan: int = 6):
+def _daftar_penilai() -> list[str]:
+    """Model untuk tahap penilaian. Bila RAG aktif dan model ekstraksi berbeda dari
+    model utama, model ekstraksi TIDAK dipakai sebagai cadangan penilai (hindari
+    hasil dari dua model berbeda dalam satu eval)."""
+    semua = list(dict.fromkeys(m for m in (MODEL, FALLBACK) if m))
+    if PAKAI_RAG and EKSTRAK != MODEL:
+        semua = [m for m in semua if m != EKSTRAK]
+    return semua
+
+
+def _panggil_model(contents, system_prompt: str, skema=AnalysisResult, percobaan: int = 6, daftar=None):
     """Return (response, nama_model). Kuota harian habis -> pindah model
     SEKETIKA (tanpa menunggu). Error sementara (429/500/503) -> jeda lalu ulang."""
-    daftar = list(dict.fromkeys(m for m in (MODEL, FALLBACK) if m))
+    daftar = daftar or _daftar_penilai()
     terakhir: Exception | None = None
     for i in range(percobaan):
         tersedia = [m for m in daftar if m not in _HABIS]
@@ -127,7 +140,7 @@ def _ekstrak_teks(gambar, teks) -> tuple[str, float]:
     t0 = time.time()
     contents = [types.Part.from_bytes(data=b, mime_type=m) for b, m in gambar]
     contents.append("Salin teksnya.")
-    resp, _ = _panggil_model(contents, PROMPT_EKSTRAK, skema=Transkripsi)
+    resp, _ = _panggil_model(contents, PROMPT_EKSTRAK, skema=Transkripsi, daftar=[EKSTRAK])
     hasil = resp.parsed or Transkripsi(**json.loads(resp.text))
     _simpan(file, {"teks": hasil.teks})
     return hasil.teks, round(time.time() - t0, 1)
@@ -146,7 +159,11 @@ def analisis(gambar: list[tuple[bytes, str]], teks: str | None = None) -> dict:
         try:
             transkrip, detik_ekstrak = _ekstrak_teks(gambar, teks) if gambar else ("", 0.0)
             konteks, rujukan = retrieve_context(f"{transkrip}\n{teks or ''}")
-        except Exception as e:  # RAG gagal -> tetap analisis tanpa rujukan
+        except Exception as e:
+            # Saat eval (CEKLOKER_RAG_WAJIB=1) RAG yang gagal harus menggagalkan gambar itu,
+            # bukan diam-diam dinilai tanpa RAG (hasilnya akan tercampur).
+            if os.getenv("CEKLOKER_RAG_WAJIB", "0") == "1":
+                raise
             print(f"[peringatan] RAG dilewati: {str(e)[:120]}")
 
     system_prompt = build_system_prompt(konteks)
