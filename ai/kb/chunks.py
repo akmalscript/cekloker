@@ -60,11 +60,11 @@ KB = [
 
     # --- Hukum & tindakan: ISI DULU dari sumber resmi, baru aktif ---
     dict(id="hukum_ppmi", jenis="hukum", judul="UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
-         isi="[ISI: salin dari teks UU resmi, tanpa mengarang. Yang dibutuhkan: pihak yang berwenang menempatkan PMI, ketentuan biaya penempatan, larangan menahan dokumen. Tulis nomor pasal HANYA bila sudah dicek, dan isi `sumber` dengan tautan.]",
-         kata_kunci=["pekerja migran", "penempatan", "p3mi", "biaya", "dokumen", "luar negeri"], sumber=None, verifikasi=True),
+         isi="Pasal 30 ayat (1): 'Pekerja Migran Indonesia tidak dapat dibebani biaya penempatan.' Pasal 13 mewajibkan calon pekerja migran memiliki dokumen sebelum ditempatkan, antara lain visa kerja (huruf f) dan perjanjian kerja (huruf h). Pasal 6 ayat (1) huruf j memberi hak pekerja migran untuk menguasai dokumen perjalanan selama bekerja. Pasal 49 menyebut pelaksana penempatan adalah Badan, Perusahaan Penempatan Pekerja Migran Indonesia, atau perusahaan yang menempatkan untuk kepentingan sendiri; Pasal 69 melarang orang perseorangan melaksanakan penempatan. Ketentuan ini berlaku untuk penempatan kerja ke luar negeri.",
+         kata_kunci=["pekerja migran", "penempatan", "p3mi", "biaya penempatan", "visa kerja", "perjanjian kerja", "paspor", "dokumen", "luar negeri", "perseorangan"], sumber="https://peraturan.go.id/files/uu18-2017bt.pdf", verifikasi=True),
     dict(id="hukum_tppo", jenis="hukum", judul="UU No. 21 Tahun 2007 tentang Pemberantasan Tindak Pidana Perdagangan Orang",
-         isi="[ISI: salin dari teks UU resmi. Yang dibutuhkan: definisi TPPO dan unsur proses, cara, dan tujuan eksploitasi. Nomor pasal hanya bila sudah dicek; isi `sumber`.]",
-         kata_kunci=["perdagangan orang", "tppo", "eksploitasi", "jerat utang", "penipuan", "iming-iming"], sumber=None, verifikasi=True),
+         isi="Pasal 1 angka 1 mendefinisikan perdagangan orang sebagai tindakan perekrutan, pengangkutan, penampungan, pengiriman, pemindahan, atau penerimaan seseorang dengan cara antara lain penipuan, penyalahgunaan posisi rentan, atau penjeratan utang, baik di dalam negara maupun antarnegara, untuk tujuan eksploitasi. Pasal 4 mengatur pidana bagi setiap orang yang membawa warga negara Indonesia ke luar wilayah Indonesia dengan maksud untuk dieksploitasi di luar wilayah Indonesia.",
+         kata_kunci=["perdagangan orang", "tppo", "eksploitasi", "jerat utang", "penjeratan utang", "penipuan", "luar negeri", "perekrutan"], sumber="https://jdih.kemenkeu.go.id/api/download/fulltext/2007/21TAHUN2007UU.htm", verifikasi=True),
     dict(id="tindakan_lapor", jenis="tindakan", judul="Apa yang dilakukan bila curiga",
          isi="[ISI: langkah praktis dan kontak resmi TERBARU dari situs pemerintah (instansi pelindungan pekerja migran, Kemnaker, kepolisian, perwakilan RI di luar negeri). Nama dan kontak instansi sempat berubah, jadi cek yang terbaru. Jangan memakai nomor dari ingatan.]",
          kata_kunci=["lapor", "korban", "bantuan", "hubungi", "polisi", "kbri"], sumber=None, verifikasi=True),

@@ -145,6 +145,26 @@ def _ekstrak_teks(gambar, teks) -> tuple[str, float]:
     return hasil.teks, round(time.time() - t0, 1)
 
 
+_NEGARA_LN = (
+    "luar negeri", "malaysia", "singapura", "singapore", "brunei", "thailand", "kamboja", "cambodia",
+    "myanmar", "laos", "vietnam", "filipina", "philippines", "taiwan", "hong kong", "hongkong", "jepang",
+    "japan", "korea", "tiongkok", "china", "arab saudi", "saudi", "uni emirat arab", "uae", "dubai",
+    "abu dhabi", "qatar", "kuwait", "oman", "bahrain", "turki", "turkey", "polandia", "poland", "jerman",
+    "germany", "belanda", "inggris", "australia", "selandia baru", "new zealand", "amerika", "kanada",
+    "madagaskar", "afrika", "eropa", "timur tengah",
+)
+_FLAG_LN = {"visa_turis", "negara_rawan", "tiket_tanpa_kontrak"}
+
+
+def _luar_negeri(data: dict) -> bool:
+    """Perkiraan sederhana: lowongan ke luar negeri bila lokasi menyebut negara/kawasan
+    di luar Indonesia, atau ada red flag yang khas penempatan luar negeri."""
+    if _FLAG_LN & {f["kode"] for f in data.get("red_flags", [])}:
+        return True
+    lokasi = ((data.get("info") or {}).get("negara_atau_lokasi") or "").lower()
+    return any(n in lokasi for n in _NEGARA_LN)
+
+
 def analisis(gambar: list[tuple[bytes, str]], teks: str | None = None) -> dict:
     """gambar: list (bytes, mime_type). teks: teks lowongan/chat opsional."""
     bagian = [("img", b, m) for b, m in gambar]
@@ -183,11 +203,16 @@ def analisis(gambar: list[tuple[bytes, str]], teks: str | None = None) -> dict:
     data["rujukan"] = rujukan
 
     # Pengayaan + skor dihitung ULANG dari data mentah (jadi tuning bobot gratis)
+    luar = _luar_negeri(data)
     for f in data["red_flags"]:
         meta = RED_FLAGS[f["kode"]]
         f["label"] = meta["label"]
         f["bobot"] = meta["weight"]
-        f["dasar_hukum"] = meta["legal"]
+        legal = meta["legal"]
+        # Pasal UU Pekerja Migran hanya relevan untuk penempatan ke luar negeri
+        if legal and legal.startswith("UU No. 18") and not luar:
+            legal = None
+        f["dasar_hukum"] = legal
 
     data.update(hitung_risiko([f["kode"] for f in data["red_flags"]], data["keyakinan"]))
     data["disclaimer"] = DISCLAIMER
