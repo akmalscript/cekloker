@@ -5,8 +5,6 @@ import time
 from pathlib import Path
 
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
 
 from prompts import build_system_prompt
 from redflags import RED_FLAGS
@@ -14,16 +12,23 @@ from kb.retrieval import cari, format_konteks
 from pydantic import BaseModel
 from schema import AnalysisResult
 from scoring import hitung_risiko
+from providers import ModelError, panggil
 
 load_dotenv()
 
-# Ganti lewat .env. Cek nama model terbaru di Google AI Studio.
-MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
-FALLBACK = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.5-flash")
-# Model khusus tahap ekstraksi teks (RAG). Dipisah supaya jatah harian model penilai
-# tidak habis dipakai dua kali per gambar, dan model penilai tidak tercampur.
-EKSTRAK = os.getenv("GEMINI_EXTRACT_MODEL", FALLBACK)
-_client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+# Penyedia LLM: gemini (bawaan, Google AI Studio langsung) atau openrouter.
+PROVIDER = os.getenv("LLM_PROVIDER", "gemini").strip().lower()
+if PROVIDER == "openrouter":
+    MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-3.6-flash")
+    FALLBACK = os.getenv("OPENROUTER_FALLBACK_MODEL", "")
+    EKSTRAK = os.getenv("OPENROUTER_EXTRACT_MODEL", MODEL)
+else:
+    # Ganti lewat .env. Cek nama model terbaru di Google AI Studio.
+    MODEL = os.getenv("GEMINI_MODEL", "gemini-3.6-flash")
+    FALLBACK = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.5-flash")
+    # Model khusus tahap ekstraksi teks (RAG). Dipisah supaya jatah harian model penilai
+    # tidak habis dipakai dua kali per gambar, dan model penilai tidak tercampur.
+    EKSTRAK = os.getenv("GEMINI_EXTRACT_MODEL", FALLBACK)
 
 # Cache hasil MENTAH model di disk. Tujuannya menghemat kuota: menjalankan ulang
 # eval setelah mengubah bobot/skor (bukan prompt) tidak memanggil API lagi.
@@ -62,7 +67,9 @@ def retrieve_context(teks_query: str) -> tuple[str, list[dict]]:
 
 def _kuota_harian_habis(e: Exception) -> bool:
     pesan = str(e)
-    return getattr(e, "code", None) == 429 and ("PerDay" in pesan or "per day" in pesan)
+    return getattr(e, "code", None) == 429 and (
+        "PerDay" in pesan or "per day" in pesan.lower() or "per-day" in pesan.lower()
+    )
 
 
 def _daftar_penilai() -> list[str]:
@@ -75,9 +82,9 @@ def _daftar_penilai() -> list[str]:
     return semua
 
 
-def _panggil_model(contents, system_prompt: str, skema=AnalysisResult, percobaan: int = 6, daftar=None):
-    """Return (response, nama_model). Kuota harian habis -> pindah model
-    SEKETIKA (tanpa menunggu). Error sementara (429/500/503) -> jeda lalu ulang."""
+def _panggil_model(bagian, system_prompt: str, skema=AnalysisResult, percobaan: int = 6, daftar=None):
+    """Return (hasil_terparse, nama_model). Kuota harian habis -> pindah model
+    SEKETIKA (tanpa menunggu). Error sementara (429/5xx) -> jeda lalu ulang."""
     daftar = daftar or _daftar_penilai()
     terakhir: Exception | None = None
     for i in range(percobaan):
@@ -89,24 +96,14 @@ def _panggil_model(contents, system_prompt: str, skema=AnalysisResult, percobaan
             ) from terakhir
         model = tersedia[i % len(tersedia)]
         try:
-            resp = _client.models.generate_content(
-                model=model,
-                contents=contents,
-                config=types.GenerateContentConfig(
-                    system_instruction=system_prompt,
-                    response_mime_type="application/json",
-                    response_schema=skema,
-                    temperature=0.1,
-                ),
-            )
-            return resp, model
-        except Exception as e:
+            return panggil(PROVIDER, model, bagian, system_prompt, skema), model
+        except ModelError as e:
             terakhir = e
             if _kuota_harian_habis(e):
                 _HABIS.add(model)
                 continue
             kode = getattr(e, "code", None)
-            if kode not in (429, 500, 503) or i == percobaan - 1:
+            if kode not in (408, 429, 500, 502, 503, 504) or i == percobaan - 1:
                 raise
             time.sleep(min(5 * 2**i, 30))  # 5, 10, 20, 30 detik
     raise terakhir  # type: ignore[misc]
@@ -119,6 +116,8 @@ def _kunci_cache(gambar, teks, system_prompt) -> str:
         h.update(m.encode())
     h.update((teks or "").encode())
     h.update(system_prompt.encode())
+    if PROVIDER != "gemini":
+        h.update(f"|{PROVIDER}|{MODEL}".encode())
     return h.hexdigest()
 
 
@@ -134,24 +133,24 @@ def _ekstrak_teks(gambar, teks) -> tuple[str, float]:
     for b, m in gambar:
         h.update(b)
     h.update(PROMPT_EKSTRAK.encode())
+    if PROVIDER != "gemini":
+        h.update(f"|{PROVIDER}|{EKSTRAK}".encode())
     file = CACHE_DIR / f"ekstrak_{h.hexdigest()}.json"
     if PAKAI_CACHE and file.exists():
         return json.loads(file.read_text(encoding="utf-8"))["teks"], 0.0
     t0 = time.time()
-    contents = [types.Part.from_bytes(data=b, mime_type=m) for b, m in gambar]
-    contents.append("Salin teksnya.")
-    resp, _ = _panggil_model(contents, PROMPT_EKSTRAK, skema=Transkripsi, daftar=[EKSTRAK])
-    hasil = resp.parsed or Transkripsi(**json.loads(resp.text))
+    bagian = [("img", b, m) for b, m in gambar] + [("txt", "Salin teksnya.")]
+    hasil, _ = _panggil_model(bagian, PROMPT_EKSTRAK, skema=Transkripsi, daftar=[EKSTRAK])
     _simpan(file, {"teks": hasil.teks})
     return hasil.teks, round(time.time() - t0, 1)
 
 
 def analisis(gambar: list[tuple[bytes, str]], teks: str | None = None) -> dict:
     """gambar: list (bytes, mime_type). teks: teks lowongan/chat opsional."""
-    contents = [types.Part.from_bytes(data=b, mime_type=m) for b, m in gambar]
+    bagian = [("img", b, m) for b, m in gambar]
     if teks:
-        contents.append(f"Teks lowongan/chat:\n{teks}")
-    contents.append("Periksa input di atas sesuai instruksi.")
+        bagian.append(("txt", f"Teks lowongan/chat:\n{teks}"))
+    bagian.append(("txt", "Periksa input di atas sesuai instruksi."))
 
     # Tahap 1 (RAG): baca teks -> cari rujukan. Hanya bila RAG aktif.
     detik_ekstrak, rujukan, konteks = 0.0, [], ""
@@ -175,8 +174,7 @@ def analisis(gambar: list[tuple[bytes, str]], teks: str | None = None) -> dict:
         dari_cache = True
     else:
         t0 = time.time()
-        resp, model = _panggil_model(contents, system_prompt)
-        hasil: AnalysisResult = resp.parsed or AnalysisResult(**json.loads(resp.text))
+        hasil, model = _panggil_model(bagian, system_prompt)
         data = hasil.model_dump(mode="json")
         data["_model"] = model
         data["_detik"] = round(time.time() - t0 + detik_ekstrak, 1)
