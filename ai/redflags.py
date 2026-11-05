@@ -31,7 +31,7 @@ RED_FLAGS = {
     "biaya_di_muka": dict(
         label="Biaya di muka",
         definition="Diminta membayar biaya pendaftaran, administrasi, pelatihan, tiket, atau utang keberangkatan sebelum bekerja. Termasuk biaya yang 'ditalangi dulu' lalu dipotong dari gaji, atau deposit yang dijanjikan kembali.",
-        weight=3, legal="UU No. 18 Tahun 2017 Pasal 30 ayat (1) dan Pasal 86 huruf a (larangan membebankan biaya penempatan)"),
+        weight=3, legal="UU No. 18 Tahun 2017 Pasal 30 ayat (1) (pekerja migran tidak dapat dibebani biaya penempatan) dan Pasal 86 huruf a"),
     "negara_rawan": dict(
         label="Negara tujuan rawan penipuan",
         definition="Negara tujuan yang dikenal sebagai pusat online scam/TPPO (misalnya Kamboja, Myanmar, Laos, Filipina utara) untuk posisi seperti customer service atau operator online.",
