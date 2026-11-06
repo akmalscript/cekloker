@@ -65,3 +65,4 @@ export function consumeGuestQuota(guestId: string): QuotaStatus {
     resetAt: new Date(record.firstUsedAt + WINDOW_MS),
   };
 }
+

@@ -45,3 +45,4 @@ export async function getScan(id: string): Promise<StoredScan | null> {
 
   return scan;
 }
+
