@@ -10,3 +10,7 @@ data_nyata/*.jpg
 data_nyata/*.jpeg
 data_nyata/*.webp
 hasil_*.json
+data_uji2/*.png
+data_uji2/*.jpg
+data_uji2/*.jpeg
+data_uji2/*.webp

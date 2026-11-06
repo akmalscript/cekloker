@@ -1,0 +1,17 @@
+file,label,red_flag_yang_diharapkan,jenis,catatan
+jebakan_alfamart.png,jebakan,pendaftaran_tidak_resmi,biasa,FB; link di bio + tautan regkerja.vbg.my.id
+jebakan_elnusa.png,jebakan,pendaftaran_tidak_resmi,biasa,TikTok; klik link di bio; label AI-generated TikTok
+jebakan_matahari.png,jebakan,pendaftaran_tidak_resmi,biasa,TikTok; pendaftaran di bio; label AI-generated TikTok
+jebakan_posproperti.png,jebakan,pendaftaran_tidak_resmi,sulit,link di bio tapi poster mencantumkan situs resmi
+jebakan_kpc.png,jebakan,,sulit,barcode ke formulir; klaim link resmi
+jebakan_vale.png,jebakan,,sulit,barcode ke formulir; klaim link resmi
+jebakan_panin.png,jebakan,,tanpa_petunjuk_visual,ajakan daftar tidak terlihat di gambar
+jebakan_pegadaian.png,jebakan,,tanpa_petunjuk_visual,hanya tanggal pendaftaran; ajakan daftar tidak terlihat
+asli_ig_alfakarir.png,asli,,sulit,akun karier resmi Alfamart; daftar lewat alfa.id (domain pendek milik Alfamart) + QR
+asli_ig_idmgroup2.png,asli,,biasa,akun karier resmi Indomaret Group; daftar lewat career.indomaretgroup.com
+asli_ig_mayora.png,asli,,biasa,akun karier resmi Mayora; kirim CV ke email @mayora.co.id
+asli_ig_tanobel.png,asli,,sulit,akun karier resmi Tanobel; daftar lewat bit.ly + QR; ada www.tanobel.com di poster
+asli_vale_pdf.png,asli,,biasa,pengumuman rekrutmen resmi Vale (PDF dari situs resmi)
+asli_repost_nestle.png,asli,,sulit,repost akun info loker bercentang (jaringan Glints TapLoker); tautan pendek t.ly + QR; label sedang
+asli_karirhub_xlsmart.jpeg,asli,,biasa,halaman lowongan di portal Karirhub Kemnaker (dari Toploker.com); ss dari HP
+asli_karirhub_georekon.jpeg,asli,,biasa,halaman lowongan di portal Karirhub Kemnaker (dari Glints); ss dari HP
