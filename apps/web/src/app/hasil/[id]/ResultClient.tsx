@@ -657,3 +657,4 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
     </>
   );
 }
+
