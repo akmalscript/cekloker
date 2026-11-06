@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -15,6 +15,8 @@ import {
   Trash2,
   FileText,
   Image as ImageIcon,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -39,9 +41,28 @@ export default function CekLokerPage() {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [quotaLeft] = useState(3);
+  const [quotaRemaining, setQuotaRemaining] = useState<number>(3);
+  const [quotaLoading, setQuotaLoading] = useState(true);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Ambil kuota tamu dari server
+  useEffect(() => {
+    async function loadQuota() {
+      try {
+        const res = await fetch("/api/quota");
+        if (res.ok) {
+          const data = await res.json();
+          setQuotaRemaining(data.remaining ?? 3);
+        }
+      } catch (err) {
+        console.warn("Gagal mengambil kuota:", err);
+      } finally {
+        setQuotaLoading(false);
+      }
+    }
+    loadQuota();
+  }, []);
 
   const validateAndAddFiles = (newFiles: FileList | File[]) => {
     setError(null);
@@ -108,6 +129,11 @@ export default function CekLokerPage() {
     e.preventDefault();
     setError(null);
 
+    if (quotaRemaining <= 0) {
+      setError("Jatah cek tanpa login Anda hari ini telah habis. Silakan masuk atau daftarkan akun.");
+      return;
+    }
+
     if (files.length === 0 && !teks.trim()) {
       setError("Silakan masukkan minimal satu berkas gambar/dokumen atau teks lowongan.");
       return;
@@ -116,7 +142,6 @@ export default function CekLokerPage() {
     setLoading(true);
 
     try {
-      // In this phase, we route to result page. If backend API is active, we post to /api/analyze
       const formData = new FormData();
       formData.append("jenis", jenis);
       if (teks.trim()) {
@@ -126,14 +151,35 @@ export default function CekLokerPage() {
         formData.append("files", file);
       });
 
-      // Temporary demo handover to result page while full API route is mounted
-      router.push("/hasil/demo");
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          setQuotaRemaining(0);
+          throw new Error(data.message || "Batas kuota harian tamu telah tercapai.");
+        }
+        throw new Error(data.error || "Gagal melakukan analisis lowongan.");
+      }
+
+      // Berhasil: perbarui jatah kuota dan arahkan ke halaman hasil
+      if (data.quota && typeof data.quota.remaining === "number") {
+        setQuotaRemaining(data.quota.remaining);
+      }
+
+      router.push(`/hasil/${data.id}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Terjadi kesalahan saat memproses data.";
       setError(msg);
       setLoading(false);
     }
   };
+
+  const isQuotaExhausted = !quotaLoading && quotaRemaining <= 0;
 
   return (
     <>
@@ -154,24 +200,56 @@ export default function CekLokerPage() {
               <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted sm:text-lg short:mt-4">
                 Verifikasi keaslian lowongan kerja atau pesan dari rekrutmen dengan bantuan AI.
               </p>
+
+              {/* Status Kuota Tamu (FR-AKN-02) */}
               <div className="mt-8 flex justify-center short:mt-6">
                 <p
                   id="quota-pill"
-                  className="inline-flex items-center gap-2 rounded-full border border-navy-soft bg-navy-tint px-4 py-2 text-left text-[14px] font-semibold leading-snug text-navy"
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-left text-[14px] font-semibold leading-snug",
+                    isQuotaExhausted
+                      ? "border-bahaya-line bg-bahaya-tint text-bahaya-ink"
+                      : "border-navy-soft bg-navy-tint text-navy"
+                  )}
                 >
                   <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
                   <span>
-                    Sisa jatah cek tanpa login: <span className="font-bold">{quotaLeft}</span> dari 3
+                    Sisa jatah cek tanpa login:{" "}
+                    <span className="font-bold">{quotaRemaining}</span> dari 3
                   </span>
                 </p>
               </div>
             </div>
 
+            {/* Peringatan Kuota Habis (Modal Ajakan Masuk) */}
+            {isQuotaExhausted && (
+              <div className="card mx-auto mt-6 w-full max-w-[736px] p-6 bg-amber-50 border-amber-300">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="space-y-1 text-center sm:text-left">
+                    <h3 className="font-bold text-amber-900">Jatah Cek Tamu Hari Ini Habis</h3>
+                    <p className="text-xs text-amber-800">
+                      Tamu dibatasi maksimal 3 kali cek per hari. Masuk atau daftar akun gratis untuk pemeriksaan tanpa batas dan simpan riwayat permanen.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Link href="/login" className="btn btn-secondary btn-sm">
+                      <LogIn className="h-4 w-4" />
+                      <span>Masuk</span>
+                    </Link>
+                    <Link href="/daftar-akun" className="btn btn-primary btn-sm">
+                      <UserPlus className="h-4 w-4" />
+                      <span>Daftar</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Kartu Formulir Pemeriksaan */}
             <form
               id="form-periksa"
               onSubmit={handleSubmit}
-              className="card mx-auto mt-12 w-full max-w-[736px] p-4 sm:p-6 short:mt-8 shadow-card"
+              className="card mx-auto mt-8 w-full max-w-[736px] p-4 sm:p-6 shadow-card"
               noValidate
             >
               {/* Jenis Pemeriksaan */}
@@ -307,7 +385,8 @@ export default function CekLokerPage() {
                   <button
                     id="pick-btn"
                     type="button"
-                    className="btn btn-secondary btn-sm mt-4 !border-2 !border-navy cursor-pointer"
+                    disabled={isQuotaExhausted}
+                    className="btn btn-secondary btn-sm mt-4 !border-2 !border-navy cursor-pointer disabled:opacity-50"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     Pilih Berkas
@@ -318,6 +397,7 @@ export default function CekLokerPage() {
                     type="file"
                     className="hidden"
                     multiple
+                    disabled={isQuotaExhausted}
                     accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf"
                     aria-label="Pilih file gambar atau dokumen"
                     onChange={(e) => {
@@ -388,8 +468,9 @@ export default function CekLokerPage() {
                     id="teks"
                     name="teks"
                     value={teks}
+                    disabled={isQuotaExhausted}
                     onChange={(e) => setTeks(e.target.value)}
-                    className="input !h-40 resize-none !py-4 !pb-10"
+                    className="input !h-40 resize-none !py-4 !pb-10 disabled:opacity-50"
                     maxLength={MAX_TEXT_LENGTH}
                     autoComplete="off"
                     placeholder={
@@ -421,8 +502,8 @@ export default function CekLokerPage() {
               <button
                 id="submit-btn"
                 type="submit"
-                disabled={loading}
-                className="btn btn-primary mt-6 w-full shadow-lift short:min-h-[40px] cursor-pointer"
+                disabled={loading || isQuotaExhausted}
+                className="btn btn-primary mt-6 w-full shadow-lift short:min-h-[40px] cursor-pointer disabled:opacity-50"
               >
                 {loading ? (
                   <>
