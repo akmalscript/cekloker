@@ -117,14 +117,28 @@ Sebelum gambar dikirim ke Gemini AI, **wajib blur** data pribadi sensitif:
 > [!CAUTION]
 > Jangan pernah mengirim data sensitif mentah ke API eksternal. Implementasikan blur di layer backend `apps/web/` sebelum memanggil `services/ai/`.
 
-### Disclaimer Wajib di Setiap Hasil (FR-LOK-09, FR-LOK-10)
+### Disclaimer Wajib di Setiap Hasil (FR-LOK-09, FR-LOK-10, FR-RSM-04)
 
-Setiap halaman hasil **harus** menampilkan disclaimer. Teks resmi (dari `analyzer.py`):
+Setiap halaman hasil **harus** menampilkan disclaimer. Di layer web/UI, teks disajikan secara kontekstual mengikuti prototipe dan SRS (bukan satu string kaku):
 
-> _"Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."_
+1. **Format Ringkas (Mobile `sm:hidden` / Banner Alert / Landing Page):**
+   > _"Penting: Hasil analisis AI merupakan alat bantu pemeriksaan dan bukan keputusan hukum atau jaminan bahwa suatu lowongan pasti aman."_
+   *(Rujukan: SRS Catatan Halaman 4, `prototypes/index.html`, `prototypes/hasil-pemeriksaan.html`)*
 
-- Jangan mengubah teks ini tanpa diskusi tim.
-- Layer web JUGA harus menampilkannya — bukan hanya dari API.
+2. **Format Komprehensif (Desktop `sm:block` / Kartu Batasan Teknologi):**
+   > _"Hasil analisis ini dibuat secara otomatis oleh model kecerdasan buatan (*AI Analysis Service*) berdasarkan pola indikasi risiko. Analisis ini merupakan alat bantu penilaian awal (*preliminary risk assessment*) dan bukan merupakan putusan hukum resmi atau jaminan mutlak. Selalu lakukan verifikasi mandiri melalui kanal resmi pemerintah sebelum mengambil keputusan kerja."_
+   *(Rujukan: `prototypes/hasil-pemeriksaan.html`, `prototypes/result.html`)*
+
+3. **Disclaimer Status Jalur Resmi (FR-RSM-04):**
+   > _"Catatan penting: Status 'tidak ditemukan' pada basis data resmi bukan bukti bahwa suatu perusahaan otomatis ilegal/kriminal, melainkan menunjukkan ketiadaan jaminan pelindungan hukum ketenagakerjaan resmi dari negara RI."_
+   *(Rujukan: SRS FR-RSM-04, `prototypes/result.html`)*
+
+- Teks dasar dari backend `services/ai/analyzer.py` (`"Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."`) adalah payload API, sedangkan antarmuka web menampilkan format di atas sesuai form-factor pengguna.
+
+### Retensi Penyimpanan Hasil Pemeriksaan (FR-AKN, FR-PRI)
+
+- **Mode Tamu (Tanpa Login):** Hasil pemeriksaan disimpan secara lokal/sesi selama **24 jam**. Setelahnya, data kedaluwarsa kecuali pengguna mendaftar akun.
+- **Akun Terdaftar:** Hasil pemeriksaan tersimpan permanen di riwayat akun pengguna hingga pengguna menghapusnya secara mandiri sesuai hak privasi (FR-PRI-02).
 
 ### Tidak Boleh Kata "Pasti" (FR-LOK-09)
 
@@ -135,7 +149,8 @@ Aturan ini berlaku di semua layer: prompt AI, UI copy, komentar kode, dan dokume
 
 ### Rate Limit Pengguna Tanpa Login (FR-AKN-02)
 
-Pengguna tanpa akun dibatasi **maksimal 3 kali cek** per sesi. Implementasi ada di `apps/web/`, bukan di `services/ai/`.
+Pengguna tanpa akun dibatasi **maksimal 3 kali cek** (UI copy: *"Tamu bisa cek 3 kali per hari"* / *"Sisa jatah cek tanpa login: 3 dari 3"*). Implementasi ada di layer `apps/web/` (bukan di `services/ai/`).
+- Jika kuota habis, form menonaktifkan proses submit dan memunculkan status/modal ajakan masuk (`login.html`) atau mendaftar (`daftar-akun.html`).
 
 ### CORS Production (bukan dev)
 
