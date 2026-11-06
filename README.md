@@ -8,20 +8,23 @@ Aplikasi berbasis AI untuk membantu pencari kerja mendeteksi lowongan kerja menc
 
 ```text
 cekloker/
+├── catalog/                     # Sumber kebenaran katalog indikasi red flag (redflags.json)
 ├── docs/                        # Dokumen SRS (Software Requirements Specification) & referensi
 │   └── SRS-Aplikasi-CekLoker.pdf
 ├── prototypes/                  # Prototipe UI mandiri (Mono HTML & Tailwind)
 │   ├── DESAIN.md                # Panduan Design System CekLoker
 │   ├── index.html               # Landing page interaktif
+│   ├── cekloker.html            # Halaman periksa lowongan
+│   ├── hasil-pemeriksaan.html   # Hasil evaluasi risiko AI
+│   ├── result.html              # Hasil scan AI dengan bounding box interaktif
 │   ├── login.html               # Halaman masuk
-│   ├── register.html            # Halaman pendaftaran
+│   ├── daftar-akun.html         # Halaman pendaftaran
 │   └── README.md
 ├── apps/
 │   └── web/                     # Aplikasi Web Full-Stack (Akmal & Dhimas)
 │       └── README.md
 ├── services/
 │   └── ai/                      # Layanan Analisis AI FastAPI (Regina)
-│       ├── app/
 │       ├── requirements.txt
 │       └── README.md
 └── README.md
@@ -36,8 +39,9 @@ cekloker/
 Buka berkas di folder `prototypes/` langsung di peramban web:
 
 - `prototypes/index.html` — Landing page
-- `prototypes/login.html` — Halaman masuk
-- `prototypes/register.html` — Halaman daftar
+- `prototypes/cekloker.html` — Form periksa lowongan
+- `prototypes/hasil-pemeriksaan.html` & `prototypes/result.html` — Hasil pemeriksaan & anotasi bukti visual
+- `prototypes/login.html` & `prototypes/daftar-akun.html` — Alur masuk & pendaftaran akun
 
 ### 2. Menjalankan Layanan AI (FastAPI)
 
