@@ -169,7 +169,7 @@ Jangan salin atau hardcode kontrak di sini — selalu mengacu ke:
 
 ### Endpoint
 
-`POST /analyze` — menerima `files` (JPG/PNG/WEBP/PDF, maks 5 file, maks 5 MB/file) dan `teks` (opsional).
+`POST /analyze` — menerima `files` (JPG/PNG/WEBP/PDF, maks 5 file, maks 10 MB/file, total maks 25 MB, PDF maks 10 halaman) dan `teks` (opsional, maks 10.000 karakter) sesuai validasi antarmuka di `prototypes/cekloker.html`.
 
 Kalau input tidak bisa dianalisis (bukan lowongan, OCR kosong, gambar buram): kembalikan **HTTP 422** dengan `AnalysisError` yang berisi `error_code` (`no_text_found` / `not_a_job_posting` / `low_quality_image`). UI yang menerjemahkan kode ini ke pesan ramah — jangan kembalikan hasil palsu.
 
@@ -192,6 +192,11 @@ Kalau input tidak bisa dianalisis (bukan lowongan, OCR kosong, gambar buram): ke
    - Blur tidak boleh mengubah dimensi gambar (koordinat bbox akan meleset).
 4. **`disclaimer` tidak ada di model ini.** Teks legal disimpan sebagai konstanta berversi di frontend dan backend — bukan di-generate AI.
 5. **`recommendations` tidak ada di model ini.** Dibuat backend dari template berdasarkan `risk_level`, hasil `official_check`, dan tautan resmi.
+6. **Transformasi Koordinat Bounding Box:**
+   - Model mentah Gemini menghasilkan `box_2d: [ymin, xmin, ymax, xmax]` berskala integer `0–1000`.
+   - Skema kontrak API [`services/ai/schema.py`](services/ai/schema.py) menormalisasinya menjadi `BBox(x, y, w, h)` bertipe float `0.0–1.0`.
+   - Frontend UI (`prototypes/result.html`) merender kotak penanda di atas poster gambar memakai persentase CSS `0–100%`:
+     `top: ${bbox.y * 100}%; left: ${bbox.x * 100}%; width: ${bbox.w * 100}%; height: ${bbox.h * 100}%;`
 
 ### Pipeline TypeScript (wajib dijalankan setelah ubah schema)
 
@@ -228,6 +233,11 @@ Semua halaman UI mengacu pada `prototypes/DESAIN.md`. Aturan wajib saat membuat 
 7. **Halaman acuan implementasi (prototypes):**
    - Registrasi: gunakan `daftar-akun.html` sebagai acuan utama (bukan `register.html` yang bersifat legacy).
    - Halaman hasil: gabungkan struktur pelaporan komprehensif dari `hasil-pemeriksaan.html` dan visualisasi interaktif bounding box dari `result.html`.
+
+8. **Alur Aksi Interaktif Halaman Hasil:**
+   - **Koreksi Hasil AI (FR-LPR-03):** Sediakan modal formulir sanggahan agar pengguna dapat mengoreksi temuan red flag yang dirasa keliru.
+   - **Laporkan Loker (FR-LPR-01):** Tombol aksi pelaporan mengarahkan ke `laporkan-loker-ini.html` dengan membawa query param ID atau data lowongan yang telah diperiksa.
+   - **Ekspor Dokumen PDF (FR-HSL-02):** Sediakan tombol cetak dokumen yang memanfaatkan CSS `@media print` dan kelas `.no-print` untuk mengunduh/mencetak dokumen evaluasi.
 
 ---
 
