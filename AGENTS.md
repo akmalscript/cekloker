@@ -56,6 +56,7 @@ All agents **MUST** create a new branch before making any changes. **Never commi
 ```
 
 **Examples:**
+
 - `feat/add-ocr-image-upload`
 - `fix/correct-red-flag-badge-alignment`
 - `docs/update-ai-service-readme`
@@ -84,7 +85,14 @@ The `<type>` prefix must match one of the allowed commit types (see Section 1).
 
 ## 3. Repository Overview & Architecture
 
-- `prototypes/`: Standalone HTML + Tailwind CSS mockups/prototypes for fast UI testing.
+- `catalog/`: Single source of truth for scam red flag indicators (`catalog/redflags.json`) with severity weights and legal bases.
+- `prototypes/`: Standalone HTML + Tailwind CSS mockups/prototypes for fast UI testing and web slicing reference.
+  - **Public / Landing:** `index.html`
+  - **Job Check Flow:** `cekloker.html` (upload & text input), `hasil-pemeriksaan.html` (comprehensive risk analysis & legal actions), `result.html` (interactive 2-way red flag bounding boxes), `riwayat-pemeriksaan.html`
+  - **Auth Flow:** `login.html`, `daftar-akun.html` (canonical registration), `lupa-password-a.html` to `lupa-password-d.html`, `tautan-kedaluwarsa.html`
+  - **Reporting & Database:** `laporkan-loker-ini.html`, `database-loker.html`
+  - **Admin Moderation:** `laporan-masuk.html` (queue), `tinjau-laporan.html` (review & decision)
+  - **Legal:** `kebijakan-privasi.html`, `syarat-layanan.html`
 - `apps/web/`: Web application frontend & backend.
 - `services/ai/`: FastAPI microservice for AI scam detection and OCR analysis.
 - `docs/`: Product documentation and SRS files.
@@ -98,6 +106,7 @@ Aturan berikut berasal langsung dari SRS dan **HARUS** dipatuhi. Melanggar atura
 ### Privacy — Blur PII Sebelum Dikirim ke AI (FR-PRI-01)
 
 Sebelum gambar dikirim ke Gemini AI, **wajib blur** data pribadi sensitif:
+
 - NIK, foto KTP, KK, Paspor, Ijazah
 - Nomor rekening, alamat lengkap
 
@@ -108,14 +117,28 @@ Sebelum gambar dikirim ke Gemini AI, **wajib blur** data pribadi sensitif:
 > [!CAUTION]
 > Jangan pernah mengirim data sensitif mentah ke API eksternal. Implementasikan blur di layer backend `apps/web/` sebelum memanggil `services/ai/`.
 
-### Disclaimer Wajib di Setiap Hasil (FR-LOK-09, FR-LOK-10)
+### Disclaimer Wajib di Setiap Hasil (FR-LOK-09, FR-LOK-10, FR-RSM-04)
 
-Setiap halaman hasil **harus** menampilkan disclaimer. Teks resmi (dari `analyzer.py`):
+Setiap halaman hasil **harus** menampilkan disclaimer. Di layer web/UI, teks disajikan secara kontekstual mengikuti prototipe dan SRS (bukan satu string kaku):
 
-> *"Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."*
+1. **Format Ringkas (Mobile `sm:hidden` / Banner Alert / Landing Page):**
+   > _"Penting: Hasil analisis AI merupakan alat bantu pemeriksaan dan bukan keputusan hukum atau jaminan bahwa suatu lowongan pasti aman."_
+   *(Rujukan: SRS Catatan Halaman 4, `prototypes/index.html`, `prototypes/hasil-pemeriksaan.html`)*
 
-- Jangan mengubah teks ini tanpa diskusi tim.
-- Layer web JUGA harus menampilkannya — bukan hanya dari API.
+2. **Format Komprehensif (Desktop `sm:block` / Kartu Batasan Teknologi):**
+   > _"Hasil analisis ini dibuat secara otomatis oleh model kecerdasan buatan (*AI Analysis Service*) berdasarkan pola indikasi risiko. Analisis ini merupakan alat bantu penilaian awal (*preliminary risk assessment*) dan bukan merupakan putusan hukum resmi atau jaminan mutlak. Selalu lakukan verifikasi mandiri melalui kanal resmi pemerintah sebelum mengambil keputusan kerja."_
+   *(Rujukan: `prototypes/hasil-pemeriksaan.html`, `prototypes/result.html`)*
+
+3. **Disclaimer Status Jalur Resmi (FR-RSM-04):**
+   > _"Catatan penting: Status 'tidak ditemukan' pada basis data resmi bukan bukti bahwa suatu perusahaan otomatis ilegal/kriminal, melainkan menunjukkan ketiadaan jaminan pelindungan hukum ketenagakerjaan resmi dari negara RI."_
+   *(Rujukan: SRS FR-RSM-04, `prototypes/result.html`)*
+
+- Teks dasar dari backend `services/ai/analyzer.py` (`"Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."`) adalah payload API, sedangkan antarmuka web menampilkan format di atas sesuai form-factor pengguna.
+
+### Retensi Penyimpanan Hasil Pemeriksaan (FR-AKN, FR-PRI)
+
+- **Mode Tamu (Tanpa Login):** Hasil pemeriksaan disimpan secara lokal/sesi selama **24 jam**. Setelahnya, data kedaluwarsa kecuali pengguna mendaftar akun.
+- **Akun Terdaftar:** Hasil pemeriksaan tersimpan permanen di riwayat akun pengguna hingga pengguna menghapusnya secara mandiri sesuai hak privasi (FR-PRI-02).
 
 ### Tidak Boleh Kata "Pasti" (FR-LOK-09)
 
@@ -126,7 +149,8 @@ Aturan ini berlaku di semua layer: prompt AI, UI copy, komentar kode, dan dokume
 
 ### Rate Limit Pengguna Tanpa Login (FR-AKN-02)
 
-Pengguna tanpa akun dibatasi **maksimal 3 kali cek** per sesi. Implementasi ada di `apps/web/`, bukan di `services/ai/`.
+Pengguna tanpa akun dibatasi **maksimal 3 kali cek** (UI copy: *"Tamu bisa cek 3 kali per hari"* / *"Sisa jatah cek tanpa login: 3 dari 3"*). Implementasi ada di layer `apps/web/` (bukan di `services/ai/`).
+- Jika kuota habis, form menonaktifkan proses submit dan memunculkan status/modal ajakan masuk (`login.html`) atau mendaftar (`daftar-akun.html`).
 
 ### CORS Production (bukan dev)
 
@@ -145,7 +169,7 @@ Jangan salin atau hardcode kontrak di sini — selalu mengacu ke:
 
 ### Endpoint
 
-`POST /analyze` — menerima `files` (JPG/PNG/WEBP, maks 5 file, maks 5 MB/file) dan `teks` (opsional).
+`POST /analyze` — menerima `files` (JPG/PNG/WEBP/PDF, maks 5 file, maks 10 MB/file, total maks 25 MB, PDF maks 10 halaman) dan `teks` (opsional, maks 10.000 karakter) sesuai validasi antarmuka di `prototypes/cekloker.html`.
 
 Kalau input tidak bisa dianalisis (bukan lowongan, OCR kosong, gambar buram): kembalikan **HTTP 422** dengan `AnalysisError` yang berisi `error_code` (`no_text_found` / `not_a_job_posting` / `low_quality_image`). UI yang menerjemahkan kode ini ke pesan ramah — jangan kembalikan hasil palsu.
 
@@ -162,11 +186,17 @@ Kalau input tidak bisa dianalisis (bukan lowongan, OCR kosong, gambar buram): ke
    ```
    [Gambar masuk] → pHash dihitung dari ORIGINAL → [PII Blur] → [Kirim ke Gemini]
    ```
+
    - `image_phash` di `Fingerprint` berasal dari **gambar asli** (sebelum blur).
    - `raw_text` dan `normalized_text` berasal dari gambar **post-blur**.
    - Blur tidak boleh mengubah dimensi gambar (koordinat bbox akan meleset).
 4. **`disclaimer` tidak ada di model ini.** Teks legal disimpan sebagai konstanta berversi di frontend dan backend — bukan di-generate AI.
 5. **`recommendations` tidak ada di model ini.** Dibuat backend dari template berdasarkan `risk_level`, hasil `official_check`, dan tautan resmi.
+6. **Transformasi Koordinat Bounding Box:**
+   - Model mentah Gemini menghasilkan `box_2d: [ymin, xmin, ymax, xmax]` berskala integer `0–1000`.
+   - Skema kontrak API [`services/ai/schema.py`](services/ai/schema.py) menormalisasinya menjadi `BBox(x, y, w, h)` bertipe float `0.0–1.0`.
+   - Frontend UI (`prototypes/result.html`) merender kotak penanda di atas poster gambar memakai persentase CSS `0–100%`:
+     `top: ${bbox.y * 100}%; left: ${bbox.x * 100}%; width: ${bbox.w * 100}%; height: ${bbox.h * 100}%;`
 
 ### Pipeline TypeScript (wajib dijalankan setelah ubah schema)
 
@@ -186,7 +216,7 @@ Jangan tulis tipe TypeScript untuk kontrak ini secara manual — selalu generate
 
 Semua halaman UI mengacu pada `prototypes/DESAIN.md`. Aturan wajib saat membuat atau memodifikasi halaman HTML:
 
-1. **Salin `<head>` dari halaman yang sudah ada.** Dua blok harus selalu identik di semua halaman:
+1. **Salin `<head>` dari halaman acuan standar terbaru** (gunakan `index.html` atau `cekloker.html`). Dua blok harus selalu identik di semua halaman:
    - `<style id="ck-design-system">` — token warna dan kelas komponen
    - `<script id="ck-tailwind-config">` — konfigurasi Tailwind
 
@@ -199,6 +229,15 @@ Semua halaman UI mengacu pada `prototypes/DESAIN.md`. Aturan wajib saat membuat 
 5. **Merah hanya untuk red flag dan error form.** Bukan untuk dekorasi atau penekanan biasa.
 
 6. **Aksesibilitas tidak boleh turun** — setiap `<input>` harus punya `<label>`, kontras WCAG AA, dan dukungan `prefers-reduced-motion`.
+
+7. **Halaman acuan implementasi (prototypes):**
+   - Registrasi: gunakan `daftar-akun.html` sebagai acuan utama (bukan `register.html` yang bersifat legacy).
+   - Halaman hasil: gabungkan struktur pelaporan komprehensif dari `hasil-pemeriksaan.html` dan visualisasi interaktif bounding box dari `result.html`.
+
+8. **Alur Aksi Interaktif Halaman Hasil:**
+   - **Koreksi Hasil AI (FR-LPR-03):** Sediakan modal formulir sanggahan agar pengguna dapat mengoreksi temuan red flag yang dirasa keliru.
+   - **Laporkan Loker (FR-LPR-01):** Tombol aksi pelaporan mengarahkan ke `laporkan-loker-ini.html` dengan membawa query param ID atau data lowongan yang telah diperiksa.
+   - **Ekspor Dokumen PDF (FR-HSL-02):** Sediakan tombol cetak dokumen yang memanfaatkan CSS `@media print` dan kelas `.no-print` untuk mengunduh/mencetak dokumen evaluasi.
 
 ---
 
