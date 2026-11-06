@@ -34,3 +34,4 @@ export function DisclaimerBanner({ variant = "general", className }: DisclaimerP
     </div>
   );
 }
+

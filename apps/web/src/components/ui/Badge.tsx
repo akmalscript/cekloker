@@ -37,3 +37,4 @@ export function RiskBadge({ status, className, label }: BadgeProps) {
     </span>
   );
 }
+

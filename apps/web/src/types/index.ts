@@ -10,3 +10,4 @@ export type Meta = components["schemas"]["Meta"];
 
 export type RiskLevel = "aman" | "waspada" | "bahaya";
 export type FlagSeverity = "waspada" | "bahaya";
+
