@@ -56,6 +56,7 @@ All agents **MUST** create a new branch before making any changes. **Never commi
 ```
 
 **Examples:**
+
 - `feat/add-ocr-image-upload`
 - `fix/correct-red-flag-badge-alignment`
 - `docs/update-ai-service-readme`
@@ -84,7 +85,14 @@ The `<type>` prefix must match one of the allowed commit types (see Section 1).
 
 ## 3. Repository Overview & Architecture
 
-- `prototypes/`: Standalone HTML + Tailwind CSS mockups/prototypes for fast UI testing.
+- `catalog/`: Single source of truth for scam red flag indicators (`catalog/redflags.json`) with severity weights and legal bases.
+- `prototypes/`: Standalone HTML + Tailwind CSS mockups/prototypes for fast UI testing and web slicing reference.
+  - **Public / Landing:** `index.html`
+  - **Job Check Flow:** `cekloker.html` (upload & text input), `hasil-pemeriksaan.html` (comprehensive risk analysis & legal actions), `result.html` (interactive 2-way red flag bounding boxes), `riwayat-pemeriksaan.html`
+  - **Auth Flow:** `login.html`, `daftar-akun.html` (canonical registration), `lupa-password-a.html` to `lupa-password-d.html`, `tautan-kedaluwarsa.html`
+  - **Reporting & Database:** `laporkan-loker-ini.html`, `database-loker.html`
+  - **Admin Moderation:** `laporan-masuk.html` (queue), `tinjau-laporan.html` (review & decision)
+  - **Legal:** `kebijakan-privasi.html`, `syarat-layanan.html`
 - `apps/web/`: Web application frontend & backend.
 - `services/ai/`: FastAPI microservice for AI scam detection and OCR analysis.
 - `docs/`: Product documentation and SRS files.
@@ -98,6 +106,7 @@ Aturan berikut berasal langsung dari SRS dan **HARUS** dipatuhi. Melanggar atura
 ### Privacy — Blur PII Sebelum Dikirim ke AI (FR-PRI-01)
 
 Sebelum gambar dikirim ke Gemini AI, **wajib blur** data pribadi sensitif:
+
 - NIK, foto KTP, KK, Paspor, Ijazah
 - Nomor rekening, alamat lengkap
 
@@ -112,7 +121,7 @@ Sebelum gambar dikirim ke Gemini AI, **wajib blur** data pribadi sensitif:
 
 Setiap halaman hasil **harus** menampilkan disclaimer. Teks resmi (dari `analyzer.py`):
 
-> *"Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."*
+> _"Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum dan bukan jaminan lowongan pasti aman atau pasti penipuan."_
 
 - Jangan mengubah teks ini tanpa diskusi tim.
 - Layer web JUGA harus menampilkannya — bukan hanya dari API.
@@ -145,7 +154,7 @@ Jangan salin atau hardcode kontrak di sini — selalu mengacu ke:
 
 ### Endpoint
 
-`POST /analyze` — menerima `files` (JPG/PNG/WEBP, maks 5 file, maks 5 MB/file) dan `teks` (opsional).
+`POST /analyze` — menerima `files` (JPG/PNG/WEBP/PDF, maks 5 file, maks 5 MB/file) dan `teks` (opsional).
 
 Kalau input tidak bisa dianalisis (bukan lowongan, OCR kosong, gambar buram): kembalikan **HTTP 422** dengan `AnalysisError` yang berisi `error_code` (`no_text_found` / `not_a_job_posting` / `low_quality_image`). UI yang menerjemahkan kode ini ke pesan ramah — jangan kembalikan hasil palsu.
 
@@ -162,6 +171,7 @@ Kalau input tidak bisa dianalisis (bukan lowongan, OCR kosong, gambar buram): ke
    ```
    [Gambar masuk] → pHash dihitung dari ORIGINAL → [PII Blur] → [Kirim ke Gemini]
    ```
+
    - `image_phash` di `Fingerprint` berasal dari **gambar asli** (sebelum blur).
    - `raw_text` dan `normalized_text` berasal dari gambar **post-blur**.
    - Blur tidak boleh mengubah dimensi gambar (koordinat bbox akan meleset).
@@ -186,7 +196,7 @@ Jangan tulis tipe TypeScript untuk kontrak ini secara manual — selalu generate
 
 Semua halaman UI mengacu pada `prototypes/DESAIN.md`. Aturan wajib saat membuat atau memodifikasi halaman HTML:
 
-1. **Salin `<head>` dari halaman yang sudah ada.** Dua blok harus selalu identik di semua halaman:
+1. **Salin `<head>` dari halaman acuan standar terbaru** (gunakan `index.html` atau `cekloker.html`). Dua blok harus selalu identik di semua halaman:
    - `<style id="ck-design-system">` — token warna dan kelas komponen
    - `<script id="ck-tailwind-config">` — konfigurasi Tailwind
 
@@ -199,6 +209,10 @@ Semua halaman UI mengacu pada `prototypes/DESAIN.md`. Aturan wajib saat membuat 
 5. **Merah hanya untuk red flag dan error form.** Bukan untuk dekorasi atau penekanan biasa.
 
 6. **Aksesibilitas tidak boleh turun** — setiap `<input>` harus punya `<label>`, kontras WCAG AA, dan dukungan `prefers-reduced-motion`.
+
+7. **Halaman acuan implementasi (prototypes):**
+   - Registrasi: gunakan `daftar-akun.html` sebagai acuan utama (bukan `register.html` yang bersifat legacy).
+   - Halaman hasil: gabungkan struktur pelaporan komprehensif dari `hasil-pemeriksaan.html` dan visualisasi interaktif bounding box dari `result.html`.
 
 ---
 
