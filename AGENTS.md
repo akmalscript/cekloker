@@ -137,7 +137,7 @@ Setiap halaman hasil **harus** menampilkan disclaimer. Di layer web/UI, teks dis
 
 ### Retensi Penyimpanan Hasil Pemeriksaan (FR-AKN, FR-PRI)
 
-- **Mode Tamu (Tanpa Login):** Hasil pemeriksaan disimpan secara lokal/sesi selama **24 jam**. Setelahnya, data kedaluwarsa kecuali pengguna mendaftar akun.
+- **Mode Tamu (Tanpa Login):** Hasil pemeriksaan tersimpan di server selama **24 jam** (terikat pada token sesi/cookie tamu). Pengguna tamu dapat mengakses kembali halaman hasil selama tautan/sesi aktif dalam kurun waktu 24 jam. Setelah 24 jam, data otomatis kedaluwarsa dan dibersihkan dari server (*privacy compliance*) kecuali pengguna mendaftar akun untuk mengklaim riwayatnya.
 - **Akun Terdaftar:** Hasil pemeriksaan tersimpan permanen di riwayat akun pengguna hingga pengguna menghapusnya secara mandiri sesuai hak privasi (FR-PRI-02).
 
 ### Tidak Boleh Kata "Pasti" (FR-LOK-09)
@@ -149,8 +149,16 @@ Aturan ini berlaku di semua layer: prompt AI, UI copy, komentar kode, dan dokume
 
 ### Rate Limit Pengguna Tanpa Login (FR-AKN-02)
 
-Pengguna tanpa akun dibatasi **maksimal 3 kali cek** (UI copy: *"Tamu bisa cek 3 kali per hari"* / *"Sisa jatah cek tanpa login: 3 dari 3"*). Implementasi ada di layer `apps/web/` (bukan di `services/ai/`).
-- Jika kuota habis, form menonaktifkan proses submit dan memunculkan status/modal ajakan masuk (`login.html`) atau mendaftar (`daftar-akun.html`).
+Pengguna tanpa akun dibatasi **maksimal 3 kali cek per hari** (UI copy: *"Tamu bisa cek 3 kali per hari"* / *"Sisa jatah cek tanpa login: 3 dari 3"*). Implementasi ditegakkan di layer `apps/web/` (bukan di `services/ai/`).
+
+- **Penegakan di Sisi Server (Strict Server-Side Enforcement):**
+  - Validasi tidak boleh hanya mengandalkan *client-side storage* (localStorage/sessionStorage).
+  - Wajib ditegakkan di server `apps/web/` menggunakan kombinasi **cookie penanda unik** (`guest_session_id`, `HttpOnly`, `SameSite=Lax`, TTL 24 jam) dan **pembatasan berbasis IP/Subnet** (sebagai *secondary anti-abuse* untuk mencegah bypass via penghapusan cookie atau manipulasi klien).
+- **Aturan Pemotongan Jatah (*Commit on Success*):**
+  - Pemotongan kuota hanya dilakukan setelah proses analisis AI berhasil selesai (**HTTP 200**).
+  - Jika terjadi **error sistem** (HTTP 500, timeout) atau kesalahan berkas/input (HTTP 422: dokumen buram / bukan loker), **jatah cek tamu TIDAK boleh berkurang**.
+- **Penanganan Kuota Habis:**
+  - Jika kuota habis, server menolak request submit berikutnya (HTTP 429), form submit dinonaktifkan, dan UI memunculkan status/modal ajakan masuk (`login.html`) atau mendaftar akun (`daftar-akun.html`).
 
 ### CORS Production (bukan dev)
 
