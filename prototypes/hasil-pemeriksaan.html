@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hasil Pemeriksaan — CekLoker</title>
+  <meta name="description" content="Hasil pemeriksaan lowongan di CekLoker: tingkat risiko, tanda bahaya beserta buktinya, dan langkah yang perlu diambil.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231E3A8A'/%3E%3Cpath d='M9 13V9h4M19 9h4v4M23 19v4h-4M13 23H9v-4' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M12.5 16.2l2.4 2.4 4.6-4.6' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Design system: token + komponen (lihat DESAIN.md) -->
+  <style id="ck-design-system">
+    /* =====================================================================
+       CekLoker — design system (token + komponen)
+       Blok ini IDENTIK di index.html dan login.html. Ubah di keduanya.
+       Harus berada SEBELUM <script src="https://cdn.tailwindcss.com">.
+
+       Catatan spesifisitas: Tailwind CDN menyuntikkan reset (preflight) dan
+       utilitasnya SETELAH blok ini. Karena itu:
+       - Gaya dasar elemen memakai `html body` / `html :is(h1,h2,h3)` agar
+         menang dari reset, tetapi tetap kalah dari kelas utilitas.
+       - Varian tombol memakai `.btn.btn-*` agar warna latarnya tidak
+         dihapus reset `button, [type='submit'] { background-color: transparent }`.
+       - Komponen lain cukup satu kelas, jadi utilitas Tailwind di elemen
+         yang sama (mis. `hidden`, `w-full`) tetap bisa menimpanya.
+       ===================================================================== */
+
+    /* ---------- Token ---------- */
+    :root {
+      --ck-navy: #1E3A8A;
+      --ck-navy-hover: #172F70;
+      --ck-navy-tint: #EEF2FB;
+      --ck-navy-soft: #DCE4F5;
+      --ck-bg: #F8FAFC;
+      --ck-surface: #FFFFFF;
+      --ck-ink: #0F172A;
+      --ck-muted: #475569;
+      --ck-line: #E2E8F0;
+      --ck-field: #8792A6;          /* border input, kontras >= 3:1 */
+
+      --ck-aman: #16A34A;    --ck-aman-ink: #15803D;    --ck-aman-tint: #F0FDF4;    --ck-aman-line: #BBF7D0;
+      --ck-waspada: #D97706; --ck-waspada-ink: #B45309; --ck-waspada-tint: #FFFBEB; --ck-waspada-line: #FDE68A;
+      --ck-bahaya: #DC2626;  --ck-bahaya-ink: #B91C1C;  --ck-bahaya-tint: #FEF2F2;  --ck-bahaya-line: #FECACA;
+
+      --ck-font: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+      --ck-radius: 12px;
+      --ck-radius-ctl: 10px;
+      --ck-shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 2px 6px rgba(15, 23, 42, .03);
+      --ck-shadow-lift: 0 2px 4px rgba(15, 23, 42, .05), 0 10px 24px rgba(15, 23, 42, .08);
+      --ck-ease: cubic-bezier(.2, .8, .2, 1);
+      --ck-dur: 180ms;
+    }
+
+    /* ---------- Dasar ---------- */
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    html body {
+      background-color: var(--ck-bg);
+      font-family: var(--ck-font);
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--ck-ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    html :is(h1, h2, h3) {
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      color: var(--ck-ink);
+    }
+    :focus-visible { outline: 2px solid var(--ck-navy); outline-offset: 2px; border-radius: 6px; }
+    .on-navy :focus-visible { outline-color: #fff; }
+    ::selection { background: var(--ck-navy-soft); }
+
+    /* ---------- Tata letak ---------- */
+    .container-page { width: 100%; max-width: 1152px; margin-inline: auto; padding-inline: 1rem; }
+    @media (min-width: 640px)  { .container-page { padding-inline: 1.5rem; } }
+    @media (min-width: 1024px) { .container-page { padding-inline: 2rem; } }
+
+    .skip-link {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
+    }
+    .skip-link:focus {
+      position: fixed; left: 1rem; top: 1rem; z-index: 60;
+      width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal;
+      padding: .5rem 1rem; border-radius: var(--ck-radius-ctl);
+      background: #fff; color: var(--ck-navy); font-weight: 600; box-shadow: var(--ck-shadow-lift);
+    }
+
+    /* ---------- Tombol ---------- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+      min-height: 48px; padding-inline: 1.5rem;
+      border-radius: var(--ck-radius-ctl);
+      font-size: 1rem; font-weight: 600; line-height: 1;
+      text-decoration: none; user-select: none;
+      transition: background-color var(--ck-dur) var(--ck-ease), border-color var(--ck-dur) var(--ck-ease),
+                  color var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease);
+    }
+    .btn:disabled, .btn[aria-disabled="true"] { cursor: not-allowed; opacity: .7; }
+    .btn-sm { min-height: 40px; padding-inline: 1rem; font-size: 15px; }
+
+    .btn.btn-primary { background-color: var(--ck-navy); color: #fff; }
+    .btn.btn-primary:hover { background-color: var(--ck-navy-hover); }
+    .btn.btn-secondary { border: 1px solid var(--ck-field); background-color: #fff; color: var(--ck-navy); }
+    .btn.btn-secondary:hover { border-color: var(--ck-navy); background-color: var(--ck-navy-tint); }
+    .btn.btn-ghost { color: var(--ck-navy); }
+    .btn.btn-ghost:hover { background-color: var(--ck-navy-tint); }
+    .btn.btn-white { background-color: #fff; color: var(--ck-navy); }   /* hanya di atas latar navy */
+    .btn.btn-white:hover { background-color: var(--ck-navy-tint); }
+
+    /* Indikator loading di dalam tombol */
+    .spinner {
+      width: 20px; height: 20px; border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, .35); border-top-color: #fff;
+      animation: ck-spin .8s linear infinite;
+    }
+    @keyframes ck-spin { to { transform: rotate(360deg); } }
+
+    /* ---------- Input ---------- */
+    .input {
+      display: block; width: 100%; height: 3rem; padding-inline: 1rem;
+      border: 1px solid var(--ck-field); border-radius: var(--ck-radius-ctl);
+      background-color: #fff; color: var(--ck-ink);
+      font-size: 1rem; line-height: 1.5rem;
+      transition: border-color var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease);
+    }
+    .input::placeholder { color: #64748B; opacity: 1; }
+    .input:hover { border-color: #475569; }
+    .input:focus, .input:focus-visible { border-color: var(--ck-navy); outline: none; box-shadow: 0 0 0 3px var(--ck-navy-soft); }
+    .input[aria-invalid="true"] { border-color: var(--ck-bahaya-ink); }
+    .input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px var(--ck-bahaya-line); }
+
+    .field-label { display: block; font-size: 15px; font-weight: 600; color: var(--ck-ink); }
+    .field-error {
+      display: flex; align-items: flex-start; gap: .375rem; margin-top: .5rem;
+      font-size: .875rem; line-height: 1.25rem; font-weight: 600; color: var(--ck-bahaya-ink);
+    }
+    .field-error svg { flex-shrink: 0; width: 1rem; height: 1rem; margin-top: .125rem; }
+
+    /* ---------- Kartu ---------- */
+    .card {
+      border: 1px solid var(--ck-line); border-radius: var(--ck-radius);
+      background-color: #fff; box-shadow: var(--ck-shadow);
+    }
+    .card-hover { transition: transform var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease); }
+    .card-hover:hover { transform: translateY(-2px); box-shadow: var(--ck-shadow-lift); }
+
+    /* ---------- Badge status risiko: warna + ikon + teks ---------- */
+    .badge {
+      display: inline-flex; align-items: center; gap: .375rem; white-space: nowrap;
+      padding: .25rem .625rem; border: 1px solid; border-radius: 9999px;
+      font-size: 13px; font-weight: 700; line-height: 1;
+    }
+    .badge svg { width: .875rem; height: .875rem; stroke-width: 2.5; }
+    .badge-aman    { border-color: var(--ck-aman-line);    background-color: var(--ck-aman-tint);    color: var(--ck-aman-ink); }
+    .badge-waspada { border-color: var(--ck-waspada-line); background-color: var(--ck-waspada-tint); color: var(--ck-waspada-ink); }
+    .badge-bahaya  { border-color: var(--ck-bahaya-line);  background-color: var(--ck-bahaya-tint);  color: var(--ck-bahaya-ink); }
+
+    /* ---------- Motif "penanda bukti" ---------- */
+    .evidence { position: relative; display: inline-block; }
+    .evidence-box {
+      pointer-events: none; position: absolute; inset: -.375rem -.5rem;
+      border: 2px solid var(--ck-bahaya); border-radius: .375rem;
+      background: rgba(220, 38, 38, .05);
+    }
+    .evidence-label {
+      position: absolute; top: -11px; left: .375rem; white-space: nowrap;
+      padding: 3px .375rem; border-radius: .25rem; background: var(--ck-bahaya);
+      font-size: 11px; font-weight: 700; line-height: 1; color: #fff;
+    }
+    .evidence-box.is-roomy { inset: -.5rem -.625rem; }
+    .evidence-box.is-waspada { border-color: var(--ck-waspada); background: rgba(217, 119, 6, .06); }
+    .evidence-box.is-waspada .evidence-label { background: var(--ck-waspada-ink); }
+    .evidence-box.is-aman { border-color: var(--ck-aman); background: rgba(22, 163, 74, .05); }
+    .evidence-box.is-aman .evidence-label { background: var(--ck-aman-ink); }
+
+    /* Bracket bidik (viewfinder) untuk ikon */
+    .viewfinder {
+      position: relative; display: grid; place-items: center; width: 3rem; height: 3rem;
+      border-radius: var(--ck-radius-ctl); background-color: var(--ck-navy-tint); color: var(--ck-navy);
+    }
+    .viewfinder::before, .viewfinder::after {
+      content: ""; position: absolute; width: .75rem; height: .75rem;
+      border: 0 solid var(--ck-navy);
+    }
+    .viewfinder::before { left: -.25rem; top: -.25rem; border-left-width: 2px; border-top-width: 2px; border-top-left-radius: .375rem; }
+    .viewfinder::after { right: -.25rem; bottom: -.25rem; border-right-width: 2px; border-bottom-width: 2px; border-bottom-right-radius: .375rem; }
+
+    /* ---------- Kotak peringatan ---------- */
+    .alert {
+      display: flex; gap: .75rem; padding: 1rem;
+      border: 1px solid; border-radius: var(--ck-radius);
+      font-size: 15px; line-height: 1.625;
+    }
+    .alert-info    { border-color: var(--ck-navy-soft);   background-color: var(--ck-navy-tint);   color: var(--ck-ink); }
+    .alert-success { border-color: var(--ck-aman-line);   background-color: var(--ck-aman-tint);   color: var(--ck-ink); }
+    .alert-error   { border-color: var(--ck-bahaya-line); background-color: var(--ck-bahaya-tint); color: var(--ck-ink); }
+
+    /* ---------- Pola, teks kecil, navigasi ---------- */
+    .grid-paper {
+      background-image:
+        linear-gradient(to right, rgba(15, 23, 42, .035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(15, 23, 42, .035) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .grid-paper-navy {
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, .06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, .06) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    .eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ck-navy); }
+    .skeleton { display: block; height: .5rem; border-radius: 9999px; background-color: #E2E8F0; }
+    .nav-link {
+      padding: .5rem .75rem; border-radius: var(--ck-radius-ctl);
+      font-size: 15px; font-weight: 600; color: var(--ck-muted);
+      transition: background-color var(--ck-dur) var(--ck-ease), color var(--ck-dur) var(--ck-ease);
+    }
+    .nav-link:hover { background-color: var(--ck-navy-tint); color: var(--ck-navy); }
+
+    /* ---------- Gerak dikurangi ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 1ms !important; }
+      .card-hover:hover { transform: none; }
+      .spinner { animation-duration: 2.4s; }
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="ck-tailwind-config">
+    /* Konfigurasi Tailwind CekLoker — IDENTIK di index.html dan login.html.
+       Warna utilitas (bg-navy, text-muted, dst.) merujuk ke token di blok ck-design-system. */
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: { DEFAULT: 'var(--ck-navy)', hover: 'var(--ck-navy-hover)', tint: 'var(--ck-navy-tint)', soft: 'var(--ck-navy-soft)' },
+            canvas: 'var(--ck-bg)',
+            ink: 'var(--ck-ink)',
+            muted: 'var(--ck-muted)',
+            line: 'var(--ck-line)',
+            field: 'var(--ck-field)',
+            aman: { DEFAULT: 'var(--ck-aman)', ink: 'var(--ck-aman-ink)', tint: 'var(--ck-aman-tint)', line: 'var(--ck-aman-line)' },
+            waspada: { DEFAULT: 'var(--ck-waspada)', ink: 'var(--ck-waspada-ink)', tint: 'var(--ck-waspada-tint)', line: 'var(--ck-waspada-line)' },
+            bahaya: { DEFAULT: 'var(--ck-bahaya)', ink: 'var(--ck-bahaya-ink)', tint: 'var(--ck-bahaya-tint)', line: 'var(--ck-bahaya-line)' }
+          },
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+          borderRadius: { card: 'var(--ck-radius)', ctl: 'var(--ck-radius-ctl)' },
+          boxShadow: { card: 'var(--ck-shadow)', lift: 'var(--ck-shadow-lift)' },
+          maxWidth: { page: '1152px' }
+        },
+        screens: {
+          sm: '640px', md: '768px', lg: '1024px', xl: '1280px', '2xl': '1536px',
+          short: { raw: '(min-width: 640px) and (max-height: 820px)' }   /* laptop pendek, mis. 1366×768 */
+        }
+      }
+    };
+  </script>
+
+  <!-- Gaya khusus halaman ini (galeri bukti + penanda, akordeon temuan) -->
+  <style>
+    /* ----- Galeri bukti: kertas fiktif dibangun dari HTML/CSS, bukan foto ----- */
+    .shot { container-type: inline-size; }
+    .paper {
+      position: absolute; overflow: visible;
+      background-color: var(--ck-surface); border-radius: 2px;
+      box-shadow: 0 .6cqw 2cqw rgba(15, 23, 42, .25);
+      font-size: 2.3cqw; line-height: 1.35; color: var(--ck-ink);
+    }
+    .paper-head { padding: .7em .8em; background-color: var(--ck-ink); color: var(--ck-surface); font-weight: 700; }
+    .paper-body { padding: .8em; }
+    .paper-title { font-size: 1.5em; font-weight: 800; line-height: 1.15; }
+    .paper-line { margin-top: 1em; font-weight: 600; }
+    .paper .skeleton { height: .6em; margin-top: .9em; }
+    .paper .mt-marker { margin-top: 3.4em; }
+    .shot .evidence-box { inset: -3px -5px; }
+
+    /* Penanda yang bisa diketuk: nomor merah + label */
+    .marker {
+      position: absolute; left: 0; top: calc(100% + 10px); z-index: 2;
+      display: inline-flex; align-items: center; gap: .375rem;
+      min-height: 24px; padding: 2px 10px 2px 2px;
+      border: 1px solid var(--ck-bahaya); border-radius: 9999px;
+      background-color: var(--ck-surface); color: var(--ck-bahaya-ink);
+      box-shadow: var(--ck-shadow-lift);
+      font-size: 12px; font-weight: 700; line-height: 1; white-space: nowrap; cursor: pointer;
+      transition: background-color var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease);
+    }
+    .marker .marker-no {
+      display: grid; place-items: center; width: 20px; height: 20px; border-radius: 9999px;
+      background-color: var(--ck-bahaya); color: var(--ck-surface); font-size: 12px;
+    }
+    .marker:hover, .marker.is-active { background-color: var(--ck-bahaya-tint); box-shadow: 0 0 0 3px var(--ck-bahaya-line); }
+
+    /* Bilah pager di atas gambar (latar gelap -> fokus putih) */
+    .shot-bar :focus-visible { outline-color: var(--ck-surface); }
+    .dot { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 9999px; }
+    .dot span { display: block; width: 6px; height: 6px; border-radius: 9999px; background-color: rgba(255, 255, 255, .5); transition: background-color var(--ck-dur) var(--ck-ease), transform var(--ck-dur) var(--ck-ease); }
+    .dot[aria-current="true"] span { background-color: var(--ck-surface); transform: scale(1.25); }
+
+    /* ----- Akordeon temuan ----- */
+    .acc-panel { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 200ms var(--ck-ease), visibility 200ms; }
+    .acc-panel > div { overflow: hidden; }
+    .finding.is-open .acc-panel { grid-template-rows: 1fr; visibility: visible; }
+    .finding .acc-icon { transition: transform 200ms var(--ck-ease); }
+    .finding.is-open .acc-icon { transform: rotate(180deg); }
+    .finding { transition: background-color 400ms var(--ck-ease); }
+    .finding.is-flash { background-color: var(--ck-navy-tint); }
+  </style>
+</head>
+
+<body class="flex min-h-screen flex-col">
+  <a href="#konten" class="skip-link">Lewati ke konten utama</a>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="sticky top-0 z-50 border-b border-line bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+    <nav class="container-page flex h-16 items-center justify-between gap-4" aria-label="Navigasi utama">
+      <a href="index.html" class="flex items-center gap-2 rounded-ctl text-lg font-extrabold tracking-tight text-ink" aria-label="CekLoker, ke beranda">
+        <svg class="h-8 w-8 shrink-0" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8" fill="#1E3A8A"/>
+          <path d="M9 13V9h4M19 9h4v4M23 19v4h-4M13 23H9v-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12.5 16.2l2.4 2.4 4.6-4.6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        CekLoker
+      </a>
+
+      <div class="hidden items-center gap-2 md:flex">
+        <a href="cekloker.html" class="nav-link !text-navy">Cek Loker</a>
+        <a href="#" class="nav-link !text-navy">Riwayat</a>
+        <div class="relative ml-2">
+          <button id="user-btn" type="button" class="flex items-center gap-1 rounded-full p-1 hover:bg-navy-tint" aria-expanded="false" aria-controls="user-menu" aria-label="Menu akun">
+            <span class="grid h-8 w-8 place-items-center rounded-full border border-navy-soft bg-navy-tint text-navy" aria-hidden="true"><i data-lucide="user" class="h-4 w-4"></i></span>
+            <i data-lucide="chevron-down" class="h-4 w-4 text-muted" aria-hidden="true"></i>
+          </button>
+          <div id="user-menu" class="absolute right-0 top-full mt-2 hidden w-48 rounded-card border border-line bg-white p-2 shadow-lift">
+            <a href="login.html" class="nav-link flex items-center gap-2 !py-2">
+              <i data-lucide="log-out" class="h-4 w-4" aria-hidden="true"></i>
+              Keluar
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <button id="menu-btn" type="button" class="btn btn-ghost btn-sm !px-2.5 md:hidden" aria-expanded="false" aria-controls="mobile-menu" aria-label="Buka menu">
+        <span data-icon-open><i data-lucide="menu" class="h-6 w-6" aria-hidden="true"></i></span>
+        <span data-icon-close class="hidden"><i data-lucide="x" class="h-6 w-6" aria-hidden="true"></i></span>
+      </button>
+    </nav>
+
+    <div id="mobile-menu" class="hidden border-t border-line bg-white md:hidden">
+      <div class="container-page flex flex-col gap-1 py-4">
+        <a href="cekloker.html" class="nav-link !py-3 !text-base">Cek Loker</a>
+        <a href="#" class="nav-link !py-3 !text-base">Riwayat</a>
+        <a href="login.html" class="nav-link !py-3 !text-base">Keluar</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="konten" class="grid-paper flex-1 border-b border-line">
+    <div class="container-page py-8 sm:py-10 lg:pb-16">
+
+      <!-- Judul halaman -->
+      <a href="cekloker.html" class="inline-flex items-center gap-2 rounded py-1 text-sm font-semibold text-muted hover:text-navy">
+        <i data-lucide="arrow-left" class="h-4 w-4" aria-hidden="true"></i>
+        Kembali
+      </a>
+      <h1 class="mt-4 text-[32px] sm:text-[40px]">Hasil pemeriksaan</h1>
+      <ul class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] font-semibold text-ink">
+        <li><span class="rounded-md bg-navy-tint px-2 py-1 font-bold text-navy">ID: CL-98231</span></li>
+        <li class="flex items-center gap-2">
+          <i data-lucide="calendar" class="h-4 w-4 text-muted" aria-hidden="true"></i>
+          <time datetime="2023-10-24T14:20:00+07:00">24 Okt 2023, 14:20 WIB</time>
+        </li>
+        <li class="flex items-center gap-2">
+          <i data-lucide="folder" class="h-4 w-4 text-muted" aria-hidden="true"></i>
+          Jenis: Lowongan
+        </li>
+      </ul>
+
+      <!-- Dua kolom di desktop. Di HP urutannya mengikuti kelas order-*. -->
+      <div class="mt-8 flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] lg:items-start">
+
+        <!-- ===== Kolom kiri ===== -->
+        <div class="contents lg:flex lg:flex-col lg:gap-6">
+
+          <!-- Bukti tangkapan layar -->
+          <section class="card order-1 overflow-hidden" aria-labelledby="bukti-title">
+            <div class="flex items-center justify-between gap-4 border-b border-line px-4 py-4 sm:px-6">
+              <h2 id="bukti-title" class="text-[13px] font-bold uppercase tracking-wider text-muted md:text-ink md:normal-case md:tracking-normal">Bukti Tangkapan Layar</h2>
+              <p class="hidden text-[13px] text-muted md:block">Ketuk penanda untuk melihat detail</p>
+            </div>
+
+            <div class="shot relative aspect-[6/5] bg-slate-300" role="region" aria-roledescription="carousel" aria-label="Gambar bukti yang diunggah">
+              <!-- Gambar 1: poster dengan dua penanda -->
+              <div data-slide class="absolute inset-0" role="group" aria-roledescription="slide" aria-label="Gambar 1 dari 3">
+                <p class="sr-only">Poster lowongan fiktif dengan dua penanda: 1 Visa turis dan 2 Penahanan paspor.</p>
+                <div class="paper" style="left:5%;top:8%;width:43%;height:80%">
+                  <div class="paper-head">PT Contoh Kerja Fiktif</div>
+                  <div class="paper-body">
+                    <p class="paper-title">Dibutuhkan Staf Operasional Gudang</p>
+                    <p class="paper-line">Lokasi: Kamboja</p>
+                    <p class="paper-line">Gaji USD 800 – 1.200</p>
+                    <p class="paper-line">
+                      <span class="evidence">Berangkat dengan visa turis<span class="evidence-box"></span>
+                        <button type="button" class="marker" data-finding="1" aria-controls="temuan-1" aria-label="Penanda 1: Visa turis. Buka detail temuan."><span class="marker-no" aria-hidden="true">1</span>Visa turis</button>
+                      </span>
+                    </p>
+                    <span class="skeleton mt-marker w-full"></span>
+                    <span class="skeleton w-4/5"></span>
+                    <span class="skeleton w-3/5"></span>
+                  </div>
+                </div>
+                <div class="paper" style="left:51%;top:12%;width:44%;height:76%">
+                  <div class="paper-body">
+                    <p class="paper-title">Syarat &amp; Ketentuan</p>
+                    <p class="paper-line">Pria/Wanita, usia 18–35 tahun</p>
+                    <p class="paper-line">Min. SMA, siap ditempatkan segera</p>
+                    <p class="paper-line">
+                      <span class="evidence">Paspor dan ijazah asli dititipkan ke perusahaan<span class="evidence-box"></span>
+                        <button type="button" class="marker" data-finding="2" aria-controls="temuan-2" aria-label="Penanda 2: Penahanan paspor. Buka detail temuan."><span class="marker-no" aria-hidden="true">2</span>Penahanan paspor</button>
+                      </span>
+                    </p>
+                    <span class="skeleton mt-marker w-full"></span>
+                    <span class="skeleton w-3/5"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Gambar 2: tanpa penanda -->
+              <div data-slide class="absolute inset-0" role="group" aria-roledescription="slide" aria-label="Gambar 2 dari 3" hidden>
+                <p class="sr-only">Halaman lanjutan poster. Tidak ada penanda pada gambar ini.</p>
+                <div class="paper" style="left:23%;top:8%;width:54%;height:82%">
+                  <div class="paper-head">PT Contoh Kerja Fiktif</div>
+                  <div class="paper-body">
+                    <span class="skeleton w-2/3 !bg-slate-300"></span>
+                    <span class="skeleton w-full"></span>
+                    <span class="skeleton w-11/12"></span>
+                    <span class="skeleton w-4/5"></span>
+                    <span class="skeleton w-full"></span>
+                    <span class="skeleton w-3/5"></span>
+                    <span class="skeleton w-full"></span>
+                    <span class="skeleton w-2/3"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Gambar 3: tanpa penanda -->
+              <div data-slide class="absolute inset-0" role="group" aria-roledescription="slide" aria-label="Gambar 3 dari 3" hidden>
+                <p class="sr-only">Halaman penutup poster. Tidak ada penanda pada gambar ini.</p>
+                <div class="paper" style="left:23%;top:8%;width:54%;height:82%">
+                  <div class="paper-body">
+                    <p class="paper-title">Informasi Tambahan</p>
+                    <span class="skeleton w-full"></span>
+                    <span class="skeleton w-5/6"></span>
+                    <span class="skeleton w-full"></span>
+                    <span class="skeleton w-2/3"></span>
+                    <span class="skeleton w-full"></span>
+                    <span class="skeleton w-4/5"></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pager -->
+              <div class="shot-bar absolute inset-x-0 bottom-0 z-10 flex items-center justify-between gap-2 bg-slate-900/70 px-4 py-2 text-white md:inset-x-auto md:bottom-4 md:left-1/2 md:-translate-x-1/2 md:justify-center md:rounded-full md:py-1">
+                <span class="text-[12px] font-medium leading-snug md:hidden">Ketuk penanda untuk melihat detail</span>
+                <div class="flex shrink-0 items-center gap-2">
+                  <span id="slide-counter" class="whitespace-nowrap text-[12px] font-semibold" aria-live="polite" aria-atomic="true">1 dari 3</span>
+                  <div class="flex items-center" role="group" aria-label="Pilih gambar">
+                    <button type="button" class="dot" data-dot="0" aria-label="Gambar 1 dari 3" aria-current="true"><span></span></button>
+                    <button type="button" class="dot" data-dot="1" aria-label="Gambar 2 dari 3" aria-current="false"><span></span></button>
+                    <button type="button" class="dot" data-dot="2" aria-label="Gambar 3 dari 3" aria-current="false"><span></span></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Daftar temuan red flag -->
+          <section class="card order-3 overflow-hidden" aria-labelledby="temuan-title">
+            <div class="flex items-center gap-3 border-b border-line px-4 py-4 sm:px-6">
+              <i data-lucide="triangle-alert" class="h-5 w-5 shrink-0 text-bahaya" aria-hidden="true"></i>
+              <h2 id="temuan-title" class="text-base sm:text-[17px]">Daftar Temuan Red Flag</h2>
+            </div>
+            <ol class="divide-y divide-line">
+              <li id="temuan-1" class="finding is-open scroll-mt-24 px-4 py-6 sm:px-6">
+                <div class="flex items-start gap-4">
+                  <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-bahaya text-[13px] font-bold leading-none text-white" aria-hidden="true">1</span>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <span class="badge badge-bahaya !text-[12px] uppercase tracking-wider"><i data-lucide="octagon-alert"></i>Bahaya</span>
+                      <span class="rounded-md border border-line bg-canvas px-2 py-1 text-[12px] font-medium leading-none text-muted">Sumber: Gambar</span>
+                    </div>
+                    <h3 class="mt-2 text-[17px] sm:text-lg">
+                      <button id="temuan-1-btn" type="button" class="acc-btn flex w-full items-center justify-between gap-2 rounded text-left font-bold text-ink hover:text-navy" aria-expanded="true" aria-controls="temuan-1-panel">
+                        <span><span class="sr-only">Temuan 1: </span>Penggunaan Visa Tidak Sesuai</span>
+                        <i data-lucide="chevron-down" class="acc-icon h-5 w-5 shrink-0 text-muted" aria-hidden="true"></i>
+                      </button>
+                    </h3>
+                    <div id="temuan-1-panel" class="acc-panel" role="region" aria-labelledby="temuan-1-btn">
+                      <div>
+                        <p class="mt-4 text-[12px] font-bold uppercase tracking-wider text-muted">Mengapa berisiko</p>
+                        <p class="mt-2 text-[15px] leading-relaxed text-muted">Lowongan menyebutkan keberangkatan menggunakan Visa Turis untuk bekerja. Ini adalah pelanggaran berat prosedur migrasi.</p>
+                        <div class="mt-4 rounded-r-ctl border-l-4 border-bahaya bg-bahaya-tint px-4 py-4">
+                          <p class="text-[12px] font-bold uppercase tracking-wider text-bahaya-ink">Dasar hukum &amp; risiko</p>
+                          <p class="mt-2 text-[14px] font-medium leading-relaxed text-bahaya-ink">UU No. 18 Tahun 2017. Bekerja tanpa Visa Kerja resmi berisiko deportasi, penahanan di negara tujuan, dan pemerasan oleh sindikat TPPO.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              <li id="temuan-2" class="finding is-open scroll-mt-24 px-4 py-6 sm:px-6">
+                <div class="flex items-start gap-4">
+                  <span class="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-bahaya text-[13px] font-bold leading-none text-white" aria-hidden="true">2</span>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                      <span class="badge badge-bahaya !text-[12px] uppercase tracking-wider"><i data-lucide="octagon-alert"></i>Bahaya</span>
+                      <span class="rounded-md border border-line bg-canvas px-2 py-1 text-[12px] font-medium leading-none text-muted">Sumber: Teks Lowongan</span>
+                    </div>
+                    <h3 class="mt-2 text-[17px] sm:text-lg">
+                      <button id="temuan-2-btn" type="button" class="acc-btn flex w-full items-center justify-between gap-2 rounded text-left font-bold text-ink hover:text-navy" aria-expanded="true" aria-controls="temuan-2-panel">
+                        <span><span class="sr-only">Temuan 2: </span>Klausul Penahanan Dokumen Asli</span>
+                        <i data-lucide="chevron-down" class="acc-icon h-5 w-5 shrink-0 text-muted" aria-hidden="true"></i>
+                      </button>
+                    </h3>
+                    <div id="temuan-2-panel" class="acc-panel" role="region" aria-labelledby="temuan-2-btn">
+                      <div>
+                        <p class="mt-4 text-[12px] font-bold uppercase tracking-wider text-muted">Mengapa berisiko</p>
+                        <p class="mt-2 text-[15px] leading-relaxed text-muted">Persyaratan menyebutkan paspor dan ijazah asli akan disimpan oleh perusahaan selama masa kontrak.</p>
+                        <div class="mt-4 rounded-r-ctl border-l-4 border-bahaya bg-bahaya-tint px-4 py-4">
+                          <p class="text-[12px] font-bold uppercase tracking-wider text-bahaya-ink">Dasar hukum &amp; risiko</p>
+                          <p class="mt-2 text-[14px] font-medium leading-relaxed text-bahaya-ink">Penahanan paspor membatasi ruang gerak pekerja dan merupakan ciri utama eksploitasi tenaga kerja serta kerja paksa.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          <!-- Langkah yang harus diambil -->
+          <section class="order-6" aria-labelledby="langkah-title">
+            <h2 id="langkah-title" class="text-[22px]">Langkah yang harus diambil:</h2>
+            <ol class="mt-4 space-y-3">
+              <li class="card flex items-start gap-4 p-4">
+                <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-navy text-sm font-bold text-white" aria-hidden="true">1</span>
+                <p class="pt-0.5 text-[15px] leading-relaxed text-ink sm:text-base"><span class="sr-only">Langkah 1: </span>Hentikan komunikasi dengan pihak pemasang lowongan ini segera.</p>
+              </li>
+              <li class="card flex items-start gap-4 p-4">
+                <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-navy text-sm font-bold text-white" aria-hidden="true">2</span>
+                <p class="pt-0.5 text-[15px] leading-relaxed text-ink sm:text-base"><span class="sr-only">Langkah 2: </span>Jangan kirim dokumen asli (Paspor, KTP, Ijazah) atau uang dalam bentuk apapun.</p>
+              </li>
+              <li class="card flex items-start gap-4 p-4">
+                <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-navy text-sm font-bold text-white" aria-hidden="true">3</span>
+                <p class="pt-0.5 text-[15px] leading-relaxed text-ink sm:text-base"><span class="sr-only">Langkah 3: </span>Laporkan temuan ini ke pihak berwajib melalui kanal pengaduan resmi.</p>
+              </li>
+            </ol>
+          </section>
+        </div>
+
+        <!-- ===== Kolom kanan ===== -->
+        <div class="contents lg:flex lg:flex-col lg:gap-6">
+
+          <!-- Hasil / tingkat risiko -->
+          <section class="card order-2 p-6 text-center" aria-labelledby="risiko-title">
+            <span class="mx-auto grid h-20 w-20 place-items-center rounded-2xl bg-bahaya-tint text-bahaya" aria-hidden="true"><i data-lucide="octagon-alert" class="h-10 w-10"></i></span>
+            <p class="mt-4"><span class="badge badge-bahaya uppercase tracking-wider"><i data-lucide="octagon-alert"></i>Bahaya</span></p>
+            <h2 id="risiko-title" class="mt-3 text-[12px] font-bold uppercase tracking-wider text-muted">Indikasi risiko</h2>
+            <p class="mx-auto mt-2 max-w-sm text-lg font-semibold leading-relaxed text-ink">Indikasi risiko TPPO: tawaran kerja memakai visa turis dan paspor ditahan perusahaan.</p>
+
+            <div class="mt-6 border-t border-line pt-6 text-left">
+              <div class="flex items-end justify-between gap-4">
+                <p id="keyakinan-label" class="text-[13px] font-semibold uppercase tracking-wide text-ink lg:normal-case lg:tracking-normal">Tingkat Keyakinan</p>
+                <p class="text-2xl font-extrabold leading-none text-ink">82%</p>
+              </div>
+              <div class="mt-2 h-2 rounded-full bg-line" role="progressbar" aria-labelledby="keyakinan-label" aria-valuemin="0" aria-valuemax="100" aria-valuenow="82" aria-valuetext="82 persen, tinggi">
+                <div class="h-full rounded-full bg-navy" style="width:82%"></div>
+              </div>
+              <div class="mt-2 flex items-center justify-between gap-4">
+                <span class="text-[12px] font-bold uppercase tracking-wider text-navy">Tinggi</span>
+                <a href="#catatan" class="rounded text-[13px] font-bold text-navy underline-offset-4 hover:underline">Baca batasan hasil</a>
+              </div>
+            </div>
+          </section>
+
+          <!-- Informasi lowongan -->
+          <section class="card order-4 p-6" aria-labelledby="info-title">
+            <h2 id="info-title" class="text-[13px] font-bold uppercase tracking-wider text-muted">Informasi lowongan</h2>
+            <dl class="mt-6 space-y-6">
+              <div class="flex items-start gap-4">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-canvas text-muted" aria-hidden="true"><i data-lucide="briefcase" class="h-5 w-5"></i></span>
+                <div class="min-w-0">
+                  <dt class="text-[12px] font-semibold uppercase tracking-wider text-muted lg:normal-case lg:tracking-normal">Posisi</dt>
+                  <dd class="font-bold leading-snug text-ink">Staf Operasional Gudang</dd>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-canvas text-muted" aria-hidden="true"><i data-lucide="building-2" class="h-5 w-5"></i></span>
+                <div class="min-w-0">
+                  <dt class="text-[12px] font-semibold uppercase tracking-wider text-muted lg:normal-case lg:tracking-normal">Perusahaan</dt>
+                  <dd class="leading-snug text-muted">Tidak tersedia</dd>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-canvas text-muted" aria-hidden="true"><i data-lucide="globe" class="h-5 w-5"></i></span>
+                <div class="min-w-0">
+                  <dt class="text-[12px] font-semibold uppercase tracking-wider text-muted lg:normal-case lg:tracking-normal">Negara / Lokasi</dt>
+                  <dd class="font-bold leading-snug text-ink">Kamboja</dd>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-canvas text-muted" aria-hidden="true"><i data-lucide="tag" class="h-5 w-5"></i></span>
+                <div class="min-w-0">
+                  <dt class="text-[12px] font-semibold uppercase tracking-wider text-muted lg:normal-case lg:tracking-normal">Gaji</dt>
+                  <dd class="font-bold leading-snug text-ink">USD 800 - 1.200</dd>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-canvas text-muted" aria-hidden="true"><i data-lucide="clipboard-list" class="h-5 w-5"></i></span>
+                <div class="min-w-0">
+                  <dt class="text-[12px] font-semibold uppercase tracking-wider text-muted lg:normal-case lg:tracking-normal">Persyaratan</dt>
+                  <dd class="text-[15px] leading-snug text-ink">Pria/Wanita, 18-35 thn, Min. SMA, Bersedia ditempatkan segera.</dd>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-canvas text-muted" aria-hidden="true"><i data-lucide="phone" class="h-5 w-5"></i></span>
+                <div class="min-w-0">
+                  <dt class="text-[12px] font-semibold uppercase tracking-wider text-muted lg:normal-case lg:tracking-normal">Kontak</dt>
+                  <!-- Sengaja bukan tautan: alamat dari lowongan mencurigakan tidak boleh bisa diklik. -->
+                  <dd class="break-all text-[14px] font-bold leading-snug text-navy">bit.ly/loker-luarnegeri-2023</dd>
+                </div>
+              </div>
+              <div class="flex items-start gap-4">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-canvas text-muted" aria-hidden="true"><i data-lucide="receipt" class="h-5 w-5"></i></span>
+                <div class="min-w-0">
+                  <dt class="text-[12px] font-semibold uppercase tracking-wider text-muted lg:normal-case lg:tracking-normal">Biaya</dt>
+                  <dd class="leading-snug text-muted">Tidak tersedia</dd>
+                </div>
+              </div>
+            </dl>
+          </section>
+
+          <!-- Verifikasi kanal resmi -->
+          <section class="order-5 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 rounded-card border border-navy-soft bg-navy-tint p-4 sm:p-6" aria-labelledby="verifikasi-title">
+            <span class="grid h-10 w-10 place-items-center rounded-full bg-white text-navy shadow-card" aria-hidden="true"><i data-lucide="search-check" class="h-5 w-5"></i></span>
+            <div class="min-w-0">
+              <h2 id="verifikasi-title" class="text-base">Verifikasi Kanal Resmi</h2>
+              <p class="mt-1 text-sm leading-relaxed text-muted">Perusahaan ini tidak ditemukan dalam basis data P3MI resmi BP2MI per 24 Okt 2023.</p>
+            </div>
+            <!-- href masih placeholder: ganti dengan tautan resmi yang sudah diverifikasi -->
+            <a href="#" class="btn btn-secondary btn-sm col-span-2 mt-4 w-full !border-2 !border-navy lg:col-span-1 lg:col-start-2 lg:w-auto lg:justify-self-start">
+              Periksa di kanal resmi
+              <i data-lucide="external-link" class="h-4 w-4" aria-hidden="true"></i>
+            </a>
+          </section>
+
+          <!-- Kanal resmi & pengaduan -->
+          <section class="on-navy order-7 rounded-card bg-navy p-6 text-white" aria-labelledby="kanal-title">
+            <h2 id="kanal-title" class="flex items-center gap-3 text-lg !text-white">
+              <i data-lucide="headset" class="h-5 w-5 shrink-0" aria-hidden="true"></i>
+              Kanal Resmi &amp; Pengaduan
+            </h2>
+            <!-- href masih placeholder: ganti dengan tautan resmi yang sudah diverifikasi -->
+            <ul class="mt-6 space-y-3">
+              <li><a href="#" class="flex items-center justify-between gap-4 rounded-ctl border border-white/20 bg-white/10 px-4 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-white/20">Crisis Center BP2MI<i data-lucide="chevron-right" class="h-4 w-4 shrink-0" aria-hidden="true"></i></a></li>
+              <li><a href="#" class="flex items-center justify-between gap-4 rounded-ctl border border-white/20 bg-white/10 px-4 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-white/20">Portal Siap Kerja Kemnaker<i data-lucide="chevron-right" class="h-4 w-4 shrink-0" aria-hidden="true"></i></a></li>
+              <li><a href="#" class="flex items-center justify-between gap-4 rounded-ctl border border-white/20 bg-white/10 px-4 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-white/20">Satgas TPPO POLRI<i data-lucide="chevron-right" class="h-4 w-4 shrink-0" aria-hidden="true"></i></a></li>
+            </ul>
+          </section>
+        </div>
+      </div>
+
+      <!-- ===== Aksi ===== -->
+      <div class="mt-12 border-t border-line pt-8">
+        <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+          <button id="btn-pdf" type="button" class="btn btn-primary">
+            <i data-lucide="download" class="h-5 w-5" aria-hidden="true"></i>
+            Unduh PDF
+          </button>
+          <button id="btn-lapor" type="button" class="btn btn-secondary">
+            <i data-lucide="flag" class="h-5 w-5" aria-hidden="true"></i>
+            Laporkan Loker Ini
+          </button>
+          <a href="cekloker.html" class="btn btn-ghost">Cek Loker Lain<span class="sm:hidden">nya</span></a>
+        </div>
+        <p class="mt-6 text-center text-sm text-muted">Hasil tersimpan selama 24 jam. <a href="#" class="rounded font-semibold text-navy underline underline-offset-4">Daftar sekarang</a> untuk menyimpan riwayat selamanya.</p>
+        <div id="aksi-alert" class="mx-auto mt-6 max-w-xl empty:hidden"></div>
+
+        <div id="catatan" tabindex="-1" class="alert alert-info mt-8 scroll-mt-24" role="note">
+          <i data-lucide="info" class="mt-1 h-4 w-4 shrink-0 text-navy" aria-hidden="true"></i>
+          <p class="text-[14px] leading-relaxed sm:hidden"><strong class="font-bold">Penting:</strong> Hasil analisis AI merupakan alat bantu pemeriksaan dan bukan jaminan bahwa suatu lowongan pasti aman.</p>
+          <p class="hidden text-[14px] leading-relaxed sm:block"><strong class="font-bold">Penting:</strong> Hasil pemeriksaan ini dihasilkan oleh sistem analisis cerdas berbasis pola indikasi TPPO. Gunakan hasil ini sebagai referensi awal. Keputusan akhir mengenai keamanan lowongan kerja sepenuhnya berada di tangan pengguna. Kami sangat menyarankan untuk selalu memverifikasi informasi melalui kanal resmi pemerintah.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-white">
+    <div class="container-page">
+      <div class="mx-auto flex max-w-[896px] flex-col items-center gap-6 border-t border-line py-10 text-center">
+        <a href="index.html" class="flex items-center gap-2 rounded-ctl text-[15px] font-extrabold tracking-tight text-navy" aria-label="CekLoker, ke beranda">
+          <svg class="h-6 w-6 shrink-0" viewBox="0 0 32 32" aria-hidden="true">
+            <rect width="32" height="32" rx="8" fill="#1E3A8A"/>
+            <path d="M9 13V9h4M19 9h4v4M23 19v4h-4M13 23H9v-4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12.5 16.2l2.4 2.4 4.6-4.6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          CekLoker
+        </a>
+        <nav aria-label="Tautan footer">
+          <ul class="grid grid-cols-2 gap-x-8 gap-y-2 text-[15px] font-semibold sm:flex sm:flex-wrap sm:justify-center sm:gap-x-8">
+            <li><a href="#" class="block rounded py-2 text-muted underline-offset-4 hover:text-navy hover:underline">Tentang Kami</a></li>
+            <li><a href="#" class="block rounded py-2 text-muted underline-offset-4 hover:text-navy hover:underline">Kebijakan Privasi</a></li>
+            <li><a href="#" class="block rounded py-2 text-muted underline-offset-4 hover:text-navy hover:underline">Syarat &amp; Ketentuan</a></li>
+            <li><a href="#" class="block rounded py-2 text-muted underline-offset-4 hover:text-navy hover:underline">Hubungi Kami</a></li>
+          </ul>
+        </nav>
+        <p class="text-sm text-muted">© 2026 CekLoker. Seluruh hak cipta dilindungi.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/lucide@1.66.0/dist/umd/lucide.min.js"></script>
+  <script>
+    lucide.createIcons();
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    // ---------- Menu hamburger ----------
+    (function () {
+      const btn = document.getElementById('menu-btn');
+      const menu = document.getElementById('mobile-menu');
+      function setOpen(open) {
+        btn.setAttribute('aria-expanded', String(open));
+        btn.setAttribute('aria-label', open ? 'Tutup menu' : 'Buka menu');
+        btn.querySelector('[data-icon-open]').classList.toggle('hidden', open);
+        btn.querySelector('[data-icon-close]').classList.toggle('hidden', !open);
+        menu.classList.toggle('hidden', !open);
+      }
+      btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+      menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setOpen(false)));
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') { setOpen(false); btn.focus(); }
+      });
+      window.matchMedia('(min-width: 768px)').addEventListener('change', e => { if (e.matches) setOpen(false); });
+    })();
+
+    // ---------- Menu akun (desktop) ----------
+    (function () {
+      const btn = document.getElementById('user-btn');
+      const menu = document.getElementById('user-menu');
+      function setOpen(open) {
+        btn.setAttribute('aria-expanded', String(open));
+        menu.classList.toggle('hidden', !open);
+      }
+      btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+      document.addEventListener('click', e => {
+        if (!btn.contains(e.target) && !menu.contains(e.target)) setOpen(false);
+      });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') { setOpen(false); btn.focus(); }
+      });
+    })();
+
+    // ---------- Galeri bukti ----------
+    const slides = Array.from(document.querySelectorAll('[data-slide]'));
+    const dots = Array.from(document.querySelectorAll('[data-dot]'));
+    const counter = document.getElementById('slide-counter');
+    function showSlide(i) {
+      slides.forEach((s, k) => { s.hidden = k !== i; });
+      dots.forEach((d, k) => d.setAttribute('aria-current', k === i ? 'true' : 'false'));
+      counter.textContent = (i + 1) + ' dari ' + slides.length;
+    }
+    dots.forEach((d, i) => d.addEventListener('click', () => showSlide(i)));
+
+    // ---------- Temuan: akordeon + penanda ----------
+    const markers = Array.from(document.querySelectorAll('.marker'));
+    function setActiveMarker(n) {
+      markers.forEach(m => m.classList.toggle('is-active', m.dataset.finding === String(n)));
+    }
+    function setOpen(item, open) {
+      item.classList.toggle('is-open', open);
+      item.querySelector('.acc-btn').setAttribute('aria-expanded', String(open));
+    }
+    document.querySelectorAll('.finding').forEach(item => {
+      const n = item.id.replace('temuan-', '');
+      item.querySelector('.acc-btn').addEventListener('click', () => {
+        const open = !item.classList.contains('is-open');
+        setOpen(item, open);
+        setActiveMarker(open ? n : '');
+      });
+    });
+    markers.forEach(m => m.addEventListener('click', () => {
+      const n = m.dataset.finding;
+      const item = document.getElementById('temuan-' + n);
+      setOpen(item, true);
+      setActiveMarker(n);
+      item.scrollIntoView({ block: 'center', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      item.querySelector('.acc-btn').focus({ preventScroll: true });
+      item.classList.add('is-flash');
+      setTimeout(() => item.classList.remove('is-flash'), 1800);
+    }));
+
+    // ---------- Aksi (simulasi) ----------
+    const aksiAlert = document.getElementById('aksi-alert');
+    const AKSI = {
+      pdf:   { title: 'Belum tersedia di prototipe', text: 'Di aplikasi final, tombol ini mengunduh laporan hasil pemeriksaan sebagai PDF.' },
+      lapor: { title: 'Belum tersedia di prototipe', text: 'Di aplikasi final, tombol ini membuka formulir untuk melaporkan lowongan yang mencurigakan.' }
+    };
+    function showAksi(kind) {
+      const a = AKSI[kind];
+      const box = document.createElement('div');
+      box.className = 'alert alert-info';
+      box.setAttribute('role', 'status');
+      const icon = document.createElement('i');
+      icon.setAttribute('data-lucide', 'info');
+      icon.setAttribute('class', 'mt-0.5 h-5 w-5 shrink-0 text-navy');
+      icon.setAttribute('aria-hidden', 'true');
+      const body = document.createElement('div');
+      const t = document.createElement('p'); t.className = 'font-bold text-ink'; t.textContent = a.title;
+      const p = document.createElement('p'); p.className = 'text-muted'; p.textContent = a.text;
+      body.append(t, p);
+      box.append(icon, body);
+      aksiAlert.replaceChildren(box);
+      lucide.createIcons();
+      const r = box.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > window.innerHeight) box.scrollIntoView({ block: 'center', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    }
+    document.getElementById('btn-pdf').addEventListener('click', () => showAksi('pdf'));
+    document.getElementById('btn-lapor').addEventListener('click', () => showAksi('lapor'));
+  </script>
+</body>
+</html>
