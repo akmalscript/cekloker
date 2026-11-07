@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { Menu, X, LogOut, History, User } from "lucide-react";
+import { Menu, X, LogOut, History, User, Shield } from "lucide-react";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -60,6 +60,16 @@ export function Navbar() {
             <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
               <History className="h-4 w-4" aria-hidden="true" />
               Riwayat
+            </Link>
+          )}
+          {Boolean(
+            session?.user?.role === "ADMIN" ||
+              session?.user?.role === "MODERATOR" ||
+              session?.user?.email?.startsWith("admin@")
+          ) && (
+            <Link href="/admin" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
+              <Shield className="h-4 w-4" aria-hidden="true" />
+              Admin
             </Link>
           )}
         </div>
@@ -147,6 +157,19 @@ export function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Riwayat Pemeriksaan
+              </Link>
+            )}
+            {Boolean(
+              session?.user?.role === "ADMIN" ||
+                session?.user?.role === "MODERATOR" ||
+                session?.user?.email?.startsWith("admin@")
+            ) && (
+              <Link
+                href="/admin"
+                className="nav-link w-full py-2 font-bold text-navy"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Panel Administrasi
               </Link>
             )}
             <div className="mt-2 flex flex-col gap-2 border-t border-line pt-3">

@@ -14,6 +14,7 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  role          String    @default("USER") // "USER" | "ADMIN" | "MODERATOR"
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -97,15 +98,22 @@ model JobScan {
 
 model Report {
   id                  String   @id @default(cuid())
+  reportCode          String?  @unique // e.g. "CK-2026-0142"
   scanId              String?
   userId              String?
   jobTitle            String?
   companyName         String?
+  type                String   @default("lowongan") // "lowongan" | "chat"
+  urgency             String   @default("reguler")  // "darurat_tppo" | "reguler"
   perpetratorContact  String?  // Kontak pelaku (WA / Telegram)
   financialLoss       Float?   // Nominal kerugian
   chronology          String   @db.Text
   evidenceUrl         String?  // URL atau path gambar bukti
   status              String   @default("pending") // pending | approved | rejected
+  adminNotes          String?  @db.Text
+  reviewedBy          String?
+  reviewedAt          DateTime?
+  isAnonymous         Boolean  @default(false)
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
@@ -113,6 +121,7 @@ model Report {
   scan                JobScan? @relation(fields: [scanId], references: [id], onDelete: SetNull)
 
   @@index([status])
+  @@index([urgency])
   @@index([createdAt])
 }
 
@@ -124,6 +133,7 @@ model VerifiedScam {
   destination String?  // Negara tujuan (Kamboja, Myanmar, Filipina, dll.)
   redFlags    String[] // Array tag red flag
   reportCount Int      @default(1)
+  imagePhash  String?  // pHash poster bukti penipuan
   verifiedAt  DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
