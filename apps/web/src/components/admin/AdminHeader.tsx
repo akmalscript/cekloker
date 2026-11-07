@@ -20,12 +20,12 @@ export function AdminHeader({ user }: AdminHeaderProps) {
   const isLaporanActive = pathname.startsWith("/admin/laporan");
 
   return (
-    <header className="border-b border-line bg-white">
-      <div className="mx-auto flex w-full max-w-[1248px] flex-wrap items-center px-4 sm:px-6 md:flex-nowrap">
+    <header className="sticky top-0 z-50 border-b border-line bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+      <div className="mx-auto flex w-full max-w-[1248px] flex-wrap items-center px-4 sm:px-6 md:h-16 md:flex-nowrap">
         {/* Brand */}
         <Link
           href="/admin"
-          className="mr-auto flex h-[64px] items-center gap-2 rounded-ctl text-2xl font-bold tracking-tight text-navy md:mr-0 md:h-20"
+          className="mr-auto flex h-[60px] items-center gap-2 rounded-ctl text-xl font-bold tracking-tight text-ink md:mr-0 md:h-16"
           aria-label="CekLoker, ke dashboard admin"
         >
           <svg className="h-7 w-7 shrink-0" viewBox="0 0 32 32" aria-hidden="true">
