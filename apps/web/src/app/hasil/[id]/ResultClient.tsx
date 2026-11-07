@@ -27,32 +27,78 @@ import { FeedbackModal } from "@/components/result/FeedbackModal";
 import type { AnalysisResult, RedFlag } from "@/types";
 import type { StoredScan } from "@/lib/store";
 
+interface OfficialCheckUI {
+  found: boolean;
+  p3mi_name?: string;
+  sip2mi_code?: string;
+  license_status?: string;
+  countries?: string[];
+  job_types?: string[];
+  is_exact?: boolean;
+  similarity_score?: number;
+  detail: string;
+  link: string;
+  mandatory_disclaimer?: string;
+}
+
+interface ScamMatchItemUI {
+  posterId?: string;
+  jobTitle?: string;
+  companyName?: string;
+  destination?: string;
+  reportCount?: number;
+  distance?: number;
+  similarityPercent?: number;
+}
+
+interface ScamDetailsUI {
+  matched?: boolean;
+  matchedCount?: number;
+  bestDistance?: number | null;
+  bestSimilarity?: number | null;
+  findingLabel?: string | null;
+  matches?: ScamMatchItemUI[];
+}
+
+interface DatasetItem {
+  name: string;
+  image: string;
+  official_check: OfficialCheckUI;
+  scam_matches: number;
+  scam_details?: ScamDetailsUI;
+  result: AnalysisResult;
+}
+
 // Preset evaluation datasets from services/ai evaluation
-const PRESET_DATASETS: Record<
-  string,
-  {
-    name: string;
-    image: string;
-    official_check: {
-      found: boolean;
-      p3mi_name?: string;
-      sip2mi_code?: string;
-      detail: string;
-      link: string;
-    };
-    scam_matches: number;
-    result: AnalysisResult;
-  }
-> = {
+const PRESET_DATASETS: Record<string, DatasetItem> = {
   kamboja: {
     name: "Contoh 1: CS Kamboja (Bahaya TPPO)",
     image: "/img/scam_kamboja.png",
     scam_matches: 4,
+    scam_details: {
+      matched: true,
+      matchedCount: 4,
+      bestDistance: 0,
+      bestSimilarity: 100,
+      findingLabel: "Cocok dengan 4 laporan penipuan terverifikasi",
+      matches: [
+        {
+          jobTitle: "Customer Service Online Phnom Penh",
+          companyName: "Anonim / Sindikat Penipuan Daring Kamboja",
+          destination: "Phnom Penh, Kamboja",
+          reportCount: 4,
+          distance: 0,
+          similarityPercent: 100,
+        },
+      ],
+    },
     official_check: {
       found: false,
       detail:
-        "Nama perusahaan tidak ditemukan pada data resmi P3MI Kementerian Ketenagakerjaan maupun SISKOP2MI BP2MI.",
+        "Nama entitas tidak dicantumkan dan tidak ditemukan pada data resmi P3MI Kementerian Ketenagakerjaan maupun SISKOP2MI BP2MI.",
       link: "https://siskop2mi.bp2mi.go.id/",
+      mandatory_disclaimer:
+        'Catatan penting: Status "tidak ditemukan" pada basis data resmi bukan bukti bahwa suatu perusahaan otomatis ilegal/kriminal, melainkan menunjukkan ketiadaan jaminan pelindungan hukum ketenagakerjaan resmi dari negara RI.',
     },
     result: {
       schema_version: "1.0",
@@ -148,6 +194,11 @@ const PRESET_DATASETS: Record<
       found: true,
       p3mi_name: "PT OS SELNAJAYA INDONESIA",
       sip2mi_code: "SIP2MI-JPN-2026-0812",
+      license_status: "Aktif",
+      countries: ["Jepang"],
+      job_types: ["Caregiver (Perawat Lansia)", "Manufaktur"],
+      is_exact: true,
+      similarity_score: 1.0,
       detail:
         "Perusahaan terdaftar aktif sebagai P3MI berizin resmi pada basis data BP2MI dan Kemnaker RI.",
       link: "https://siskop2mi.bp2mi.go.id/",
@@ -195,10 +246,32 @@ const PRESET_DATASETS: Record<
     name: "Contoh 3: Pabrik Taiwan (Waspada Biaya)",
     image: "/img/scam_taiwan.png",
     scam_matches: 1,
+    scam_details: {
+      matched: true,
+      matchedCount: 1,
+      bestDistance: 4,
+      bestSimilarity: 94,
+      findingLabel: "Cocok dengan 1 laporan penipuan terverifikasi",
+      matches: [
+        {
+          jobTitle: "Operator Pabrik Elektronik Taiwan",
+          companyName: "PT Taiwan Mandiri Jaya (Pungutan Biaya Di Muka)",
+          destination: "Taichung, Taiwan",
+          reportCount: 1,
+          distance: 4,
+          similarityPercent: 94,
+        },
+      ],
+    },
     official_check: {
       found: true,
       p3mi_name: "PT TAIWAN MANDIRI JAYA",
       sip2mi_code: "SIP2MI-TWN-2025-0144",
+      license_status: "Aktif",
+      countries: ["Taiwan"],
+      job_types: ["Operator Pabrik Elektronik", "Manufaktur Logam"],
+      is_exact: true,
+      similarity_score: 1.0,
       detail:
         "Perusahaan terdaftar, namun ditemukan klausa potongan gaji dan biaya proses di muka yang melebihi standar ketentuan Kemnaker.",
       link: "https://siskop2mi.bp2mi.go.id/",
@@ -360,15 +433,22 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
             found: dynamicScan.officialCheck.found,
             p3mi_name: dynamicScan.officialCheck.p3miName,
             sip2mi_code: dynamicScan.officialCheck.sip2miCode,
+            license_status: dynamicScan.officialCheck.licenseStatus,
+            countries: dynamicScan.officialCheck.countries,
+            job_types: dynamicScan.officialCheck.jobTypes,
+            is_exact: dynamicScan.officialCheck.isExact,
+            similarity_score: dynamicScan.officialCheck.similarityScore,
             detail: dynamicScan.officialCheck.detail,
             link: dynamicScan.officialCheck.link,
+            mandatory_disclaimer: dynamicScan.officialCheck.mandatoryDisclaimer,
           },
           scam_matches: dynamicScan.scamMatches,
+          scam_details: dynamicScan.scamDetails as ScamDetailsUI | undefined,
           result: dynamicScan.result,
         }
       : PRESET_DATASETS[selectedKey] ?? PRESET_DATASETS.kamboja;
 
-  const { result, image, official_check, scam_matches } = currentDataset;
+  const { result, image, official_check, scam_matches, scam_details } = currentDataset;
 
   return (
     <>
@@ -521,7 +601,60 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
 
             {/* Kolom Kanan: Rincian Red Flags & Verifikasi Resmi (7/12) */}
             <div className="lg:col-span-7 space-y-6">
-              {/* Verifikasi Sumber Resmi Pemerintah (BP2MI / Kemnaker) */}
+              {/* Notifikasi Pencocokan Poster Scam Terverifikasi (M4 - FR-PST-01 s/d 03) */}
+              {scam_matches > 0 && (
+                <div className="card p-5 bg-white border border-bahaya-line space-y-3">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <h3 className="font-bold text-base text-ink flex items-center gap-2">
+                      <AlertOctagon className="h-5 w-5 text-bahaya" />
+                      <span>Pencocokan Poster Scam (dHash 64-bit)</span>
+                    </h3>
+                    <span className="badge badge-bahaya">
+                      Mirip {scam_matches} Laporan Penipuan
+                    </span>
+                  </div>
+
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    Sistem mendeteksi kemiripan visual tinggi (selisih bit &le; 10) antara poster yang diunggah dengan arsip poster penipuan yang telah diverifikasi oleh tim peninjau CekLoker.
+                  </p>
+
+                  {scam_details?.matches && scam_details.matches.length > 0 && (
+                    <div className="space-y-2 pt-1">
+                      <div className="text-xs font-semibold text-muted">Laporan Terverifikasi Terkait:</div>
+                      <div className="space-y-1.5">
+                        {scam_details.matches.map((m, idx) => (
+                          <div
+                            key={idx}
+                            className="rounded bg-bahaya-tint/60 border border-bahaya-line/60 p-2.5 text-xs text-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5"
+                          >
+                            <div>
+                              <strong className="text-bahaya-ink">{m.jobTitle || "Lowongan Terindikasi"}</strong>
+                              <span className="text-muted ml-1.5">({m.companyName || "Anonim"})</span>
+                              {m.destination && (
+                                <span className="text-slate-600 ml-1.5">&bull; {m.destination}</span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              {m.distance !== undefined && (
+                                <span className="font-mono bg-white px-2 py-0.5 rounded border text-[11px] text-slate-600">
+                                  Jarak: {m.distance}/64 bit
+                                </span>
+                              )}
+                              {m.similarityPercent !== undefined && (
+                                <span className="font-bold text-bahaya-ink text-[11px]">
+                                  Kemiripan {m.similarityPercent}%
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Verifikasi Sumber Resmi Pemerintah (BP2MI / Kemnaker - FR-RSM-01 s/d 04) */}
               <div className="card p-5 bg-white space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold text-base text-ink flex items-center gap-2">
@@ -541,14 +674,41 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   {official_check.detail}
                 </p>
 
-                {official_check.p3mi_name && (
-                  <div className="rounded bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200">
-                    <div>
-                      <strong>Nama P3MI Terdaftar:</strong> {official_check.p3mi_name}
+                {official_check.found && official_check.p3mi_name && (
+                  <div className="rounded bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200 space-y-1.5">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div>
+                        <strong>Nama P3MI Terdaftar:</strong> {official_check.p3mi_name}
+                      </div>
+                      {official_check.license_status && (
+                        <span className="inline-flex items-center gap-1 font-semibold text-aman-ink bg-aman-tint px-2 py-0.5 rounded text-[11px] border border-aman-line">
+                          <span className="h-1.5 w-1.5 rounded-full bg-aman"></span>
+                          Status Izin: {official_check.license_status}
+                        </span>
+                      )}
                     </div>
+
                     {official_check.sip2mi_code && (
-                      <div className="mt-1">
-                        <strong>Nomor Izin SIP2MI:</strong> {official_check.sip2mi_code}
+                      <div>
+                        <strong>Nomor Izin SIP2MI / KEP:</strong> {official_check.sip2mi_code}
+                      </div>
+                    )}
+
+                    {official_check.countries && official_check.countries.length > 0 && (
+                      <div>
+                        <strong>Negara Penempatan Resmi:</strong> {official_check.countries.join(", ")}
+                      </div>
+                    )}
+
+                    {official_check.job_types && official_check.job_types.length > 0 && (
+                      <div>
+                        <strong>Sektor Pekerjaan Resmi:</strong> {official_check.job_types.join(", ")}
+                      </div>
+                    )}
+
+                    {!official_check.is_exact && official_check.similarity_score !== undefined && (
+                      <div className="text-[11px] text-muted italic pt-0.5">
+                        * Pencarian toleran salah ketik: terdeteksi kecocokan fonetik/ejaan dengan kemiripan {Math.round(official_check.similarity_score * 100)}%.
                       </div>
                     )}
                   </div>
@@ -558,16 +718,19 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   <DisclaimerBanner variant="official_unfound" />
                 )}
 
-                <div className="pt-2">
+                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
                   <a
-                    href={official_check.link}
+                    href={official_check.link || "https://siskop2mi.bp2mi.go.id/"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-navy hover:underline"
+                    className="inline-flex items-center gap-1.5 font-semibold text-navy hover:underline"
                   >
                     <span>Periksa mandiri di SISKOP2MI BP2MI</span>
                     <ExternalLink className="h-3.5 w-3.5" />
                   </a>
+                  <span className="text-muted">
+                    Call Center BP2MI: <strong className="text-ink">1500-117</strong> (Bebas Pulsa 24 Jam)
+                  </span>
                 </div>
               </div>
 
