@@ -92,3 +92,4 @@ model JobScan {
   @@index([createdAt])
   @@index([riskLevel])
 }
+

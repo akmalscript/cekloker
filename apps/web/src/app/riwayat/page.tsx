@@ -92,15 +92,15 @@ export default function RiwayatPage() {
             const dateStr = d.toISOString().split("T")[0];
             const timeStr = d.toTimeString().slice(0, 5);
             const title =
-              item.result.extracted?.job_title?.trim() ||
-              item.result.extracted?.company_name?.trim() ||
+              item.result.extracted?.position?.trim() ||
+              item.result.extracted?.company?.trim() ||
               "Pemeriksaan Lowongan";
 
             return {
               id: item.id,
               title,
-              companyName: item.result.extracted?.company_name || "Tidak tersedia",
-              kind: item.result.fingerprint?.ocr_applied ? "Lowongan" : "Lowongan",
+              companyName: item.result.extracted?.company || "Tidak tersedia",
+              kind: "Lowongan",
               date: dateStr,
               time: timeStr,
               timestamp: item.createdAt,
@@ -670,3 +670,4 @@ export default function RiwayatPage() {
     </div>
   );
 }
+

@@ -45,8 +45,8 @@ export async function saveScan(scan: StoredScan): Promise<void> {
   scansMap.set(scan.id, scan);
 
   try {
-    const jobTitle = scan.result.extracted?.job_title?.trim() || "Lowongan Tanpa Judul";
-    const company = scan.result.extracted?.company_name?.trim() || "Tidak tersedia";
+    const jobTitle = scan.result.extracted?.position?.trim() || "Lowongan Tanpa Judul";
+    const company = scan.result.extracted?.company?.trim() || "Tidak tersedia";
     const primaryFlag = inferPrimaryRedFlag(scan.result.red_flags);
 
     await prisma.jobScan.upsert({

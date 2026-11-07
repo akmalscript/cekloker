@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "typegen": "python ../../services/ai/export_openapi.py && openapi-typescript ../../services/ai/openapi.json -o src/types/api.ts"

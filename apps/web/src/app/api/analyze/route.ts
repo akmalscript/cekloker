@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Pasang cookie sesi tamu jika baru
-    if (isNewGuest) {
+    if (isNewGuest && guestId) {
       response.cookies.set("ck_guest_session", guestId, {
         path: "/",
         httpOnly: true,
