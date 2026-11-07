@@ -335,4 +335,31 @@ html :is(h1, h2, h3) {
 .db-thumb-in b { font-size: 9px; letter-spacing: .08em; color: var(--ck-navy); font-weight: 800; }
 .db-thumb-in span { font-weight: 700; color: var(--ck-ink); font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* ---------- Formal Print Media Styles (FR-HSL-02) ---------- */
+@media print {
+  .no-print, nav, header, footer, .preset-bar { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 10pt !important; }
+  .container-page { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+  .card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; page-break-inside: avoid; }
+  a { text-decoration: none !important; color: inherit !important; }
+  
+  .watermark-print {
+    display: block !important;
+    position: fixed;
+    top: 50%;
+    left: 5%;
+    transform: translateY(-50%) rotate(-35deg);
+    font-size: 26pt;
+    font-weight: 800;
+    color: rgba(15, 23, 42, 0.08) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    pointer-events: none;
+    z-index: 9999;
+    user-select: none;
+    text-align: center;
+    width: 90%;
+  }
+}
+
 
