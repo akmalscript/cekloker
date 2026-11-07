@@ -20,6 +20,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   jobScans      JobScan[]
+  reports       Report[]
 }
 
 model Account {
@@ -86,6 +87,7 @@ model JobScan {
   expiresAt      DateTime? // null jika akun terdaftar (permanen), atau 24 jam untuk tamu
 
   user           User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reports        Report[]
 
   @@index([userId])
   @@index([guestSessionId])
@@ -93,3 +95,39 @@ model JobScan {
   @@index([riskLevel])
 }
 
+model Report {
+  id                  String   @id @default(cuid())
+  scanId              String?
+  userId              String?
+  jobTitle            String?
+  companyName         String?
+  perpetratorContact  String?  // Kontak pelaku (WA / Telegram)
+  financialLoss       Float?   // Nominal kerugian
+  chronology          String   @db.Text
+  evidenceUrl         String?  // URL atau path gambar bukti
+  status              String   @default("pending") // pending | approved | rejected
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user                User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  scan                JobScan? @relation(fields: [scanId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model VerifiedScam {
+  id          String   @id @default(cuid())
+  code        String   @unique // e.g. "DB-2026-0001"
+  jobTitle    String   // Posisi pekerjaan
+  companyName String   // Nama perusahaan fiktif / terduga
+  destination String?  // Negara tujuan (Kamboja, Myanmar, Filipina, dll.)
+  redFlags    String[] // Array tag red flag
+  reportCount Int      @default(1)
+  verifiedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([destination])
+  @@index([verifiedAt])
+}
