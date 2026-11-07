@@ -157,6 +157,45 @@ html :is(h1, h2, h3) {
 }
 .field-error svg { flex-shrink: 0; width: 1rem; height: 1rem; margin-top: .125rem; }
 
+/* ---------- Pilihan Jenis Pemeriksaan (CekLoker) ---------- */
+.type-option {
+  position: relative; display: flex; align-items: center; gap: 1rem;
+  min-height: 72px; padding: .75rem 1rem;
+  border: 1px solid var(--ck-line); border-radius: var(--ck-radius);
+  background-color: var(--ck-surface); cursor: pointer;
+  transition: border-color var(--ck-dur) var(--ck-ease), background-color var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease);
+}
+.type-option:hover { border-color: var(--ck-field); }
+.type-option .type-icon {
+  display: grid; place-items: center; flex-shrink: 0; width: 2.5rem; height: 2.5rem;
+  border-radius: 9999px; background-color: var(--ck-line); color: var(--ck-muted);
+  transition: background-color var(--ck-dur) var(--ck-ease), color var(--ck-dur) var(--ck-ease);
+}
+.type-option .type-check { display: none; flex-shrink: 0; color: var(--ck-navy); }
+/* Terpilih: garis navy 2 px (border + inset, supaya tata letak tidak bergeser) */
+.type-option:has(input:checked),
+.type-option.is-checked {
+  border-color: var(--ck-navy); background-color: var(--ck-navy-tint);
+  box-shadow: inset 0 0 0 1px var(--ck-navy);
+}
+.type-option:has(input:checked) .type-icon,
+.type-option.is-checked .type-icon { background-color: var(--ck-navy); color: var(--ck-surface); }
+.type-option:has(input:checked) .type-title,
+.type-option.is-checked .type-title { color: var(--ck-navy); }
+.type-option:has(input:checked) .type-check,
+.type-option.is-checked .type-check { display: block; }
+.type-option:has(input:focus-visible),
+.type-option:focus-within { outline: 2px solid var(--ck-navy); outline-offset: 2px; }
+@media (min-width: 768px) {
+  .type-option .type-check,
+  .type-option:has(input:checked) .type-check,
+  .type-option.is-checked .type-check { display: none !important; }
+}
+
+/* Area seret-dan-lepas */
+.dropzone { transition: border-color var(--ck-dur) var(--ck-ease), background-color var(--ck-dur) var(--ck-ease); }
+.dropzone.is-drag { border-color: var(--ck-navy); background-color: var(--ck-navy-tint); }
+
 /* ---------- Kartu ---------- */
 .card {
   border: 1px solid var(--ck-line); border-radius: var(--ck-radius);

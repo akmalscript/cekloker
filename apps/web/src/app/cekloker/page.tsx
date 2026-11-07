@@ -260,9 +260,8 @@ export default function CekLokerPage() {
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                   <label
                     className={cn(
-                      "type-option cursor-pointer",
-                      jenis === "lowongan" &&
-                        "!border-navy !bg-navy-tint shadow-[inset_0_0_0_1px_var(--ck-navy)]"
+                      "type-option",
+                      jenis === "lowongan" && "is-checked"
                     )}
                   >
                     <input
@@ -273,40 +272,27 @@ export default function CekLokerPage() {
                       checked={jenis === "lowongan"}
                       onChange={() => setJenis("lowongan")}
                     />
-                    <span
-                      className={cn(
-                        "type-icon",
-                        jenis === "lowongan" && "!bg-navy !text-white"
-                      )}
-                    >
+                    <span className="type-icon">
                       <FileCheck className="h-5 w-5" aria-hidden="true" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span
-                        className={cn(
-                          "type-title block text-[17px] font-bold leading-tight text-ink",
-                          jenis === "lowongan" && "!text-navy"
-                        )}
-                      >
+                      <span className="type-title block text-[17px] font-bold leading-tight text-ink">
                         Lowongan
                       </span>
                       <span className="mt-1 block text-[13px] leading-snug text-muted">
-                        Cek deskripsi &amp; poster
+                        Cek deskripsi &amp; poster<span className="md:hidden"> lowongan</span>
                       </span>
                     </span>
-                    {jenis === "lowongan" && (
-                      <CircleCheck
-                        className="h-6 w-6 text-navy shrink-0 md:hidden"
-                        aria-hidden="true"
-                      />
-                    )}
+                    <CircleCheck
+                      className="type-check h-6 w-6"
+                      aria-hidden="true"
+                    />
                   </label>
 
                   <label
                     className={cn(
-                      "type-option cursor-pointer",
-                      jenis === "chat" &&
-                        "!border-navy !bg-navy-tint shadow-[inset_0_0_0_1px_var(--ck-navy)]"
+                      "type-option",
+                      jenis === "chat" && "is-checked"
                     )}
                   >
                     <input
@@ -317,33 +303,21 @@ export default function CekLokerPage() {
                       checked={jenis === "chat"}
                       onChange={() => setJenis("chat")}
                     />
-                    <span
-                      className={cn(
-                        "type-icon",
-                        jenis === "chat" && "!bg-navy !text-white"
-                      )}
-                    >
+                    <span className="type-icon">
                       <MessageCircle className="h-5 w-5" aria-hidden="true" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span
-                        className={cn(
-                          "type-title block text-[17px] font-bold leading-tight text-ink",
-                          jenis === "chat" && "!text-navy"
-                        )}
-                      >
+                      <span className="type-title block text-[17px] font-bold leading-tight text-ink">
                         Chat perekrut
                       </span>
                       <span className="mt-1 block text-[13px] leading-snug text-muted">
-                        Cek pesan WhatsApp / Email
+                        Cek chat WhatsApp<span className="md:hidden"> </span>/<span className="md:hidden"> </span>Email
                       </span>
                     </span>
-                    {jenis === "chat" && (
-                      <CircleCheck
-                        className="h-6 w-6 text-navy shrink-0 md:hidden"
-                        aria-hidden="true"
-                      />
-                    )}
+                    <CircleCheck
+                      className="type-check h-6 w-6"
+                      aria-hidden="true"
+                    />
                   </label>
                 </div>
               </fieldset>
