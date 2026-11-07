@@ -83,6 +83,8 @@ model JobScan {
   imageUrl       String?
   resultJson     Json
   officialCheck  Json?
+  scamMatches    Int       @default(0)
+  scamDetails    Json?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   expiresAt      DateTime? // null jika akun terdaftar (permanen), atau 24 jam untuk tamu
@@ -140,4 +142,39 @@ model VerifiedScam {
 
   @@index([destination])
   @@index([verifiedAt])
+}
+
+model ScamPoster {
+  id             String   @id @default(cuid())
+  imagePhash     String   // 16 hex chars (64-bit dHash)
+  jobTitle       String?
+  companyName    String?
+  destination    String?
+  reportCount    Int      @default(1)
+  sourceReportId String?
+  verifiedScamId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([imagePhash])
+  @@index([createdAt])
+}
+
+model OfficialP3MI {
+  id             String   @id @default(cuid())
+  name           String   // Nama resmi PT P3MI
+  normalizedName String   // Nama normalisasi untuk pencarian fuzzy cepat
+  licenseNumber  String   // Nomor izin SIP2MI / KEP
+  status         String   @default("Aktif") // "Aktif" | "Kedaluwarsa" | "Dibekukan"
+  countries      String[] // Daftar negara penempatan resmi
+  jobTypes       String[] // Sektor pekerjaan yang diizinkan
+  address        String?
+  contact        String?
+  officialUrl    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([name])
+  @@index([normalizedName])
+  @@index([licenseNumber])
 }
