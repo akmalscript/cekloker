@@ -12,6 +12,8 @@ export async function POST(request: NextRequest) {
       scanId,
       jobTitle,
       companyName,
+      type,
+      urgency,
       perpetratorContact,
       financialLoss,
       chronology,
@@ -31,16 +33,36 @@ export async function POST(request: NextRequest) {
       if (!isNaN(num)) parsedLoss = num;
     }
 
+    // Auto-detect TPPO emergency indicators if not explicitly specified
+    const textCorpus = `${chronology} ${jobTitle || ""} ${companyName || ""}`.toLowerCase();
+    const isTppoEmergency =
+      urgency === "darurat_tppo" ||
+      textCorpus.includes("tppo") ||
+      textCorpus.includes("kamboja") ||
+      textCorpus.includes("myanmar") ||
+      textCorpus.includes("disandera") ||
+      textCorpus.includes("disekap") ||
+      textCorpus.includes("paspor ditahan");
+
+    const reportUrgency = isTppoEmergency ? "darurat_tppo" : "reguler";
+    const reportType = type === "chat" ? "chat" : "lowongan";
+    const year = new Date().getFullYear();
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    const reportCode = `CK-${year}-${randomSuffix}`;
+
     let reportId = "rep_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
     try {
       const record = await prisma.report.create({
         data: {
           id: reportId,
+          reportCode,
           scanId: scanId || null,
           userId,
           jobTitle: jobTitle?.trim() || null,
           companyName: companyName?.trim() || null,
+          type: reportType,
+          urgency: reportUrgency,
           perpetratorContact: perpetratorContact?.trim() || null,
           financialLoss: parsedLoss,
           chronology: chronology.trim(),
