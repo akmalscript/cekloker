@@ -35,22 +35,6 @@ export function Footer() {
           <ul className="flex flex-wrap gap-x-6 gap-y-2 text-[15px] font-semibold">
             <li>
               <Link
-                href="/database-loker"
-                className="rounded text-muted underline-offset-4 hover:text-navy hover:underline"
-              >
-                Database Loker
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/lapor"
-                className="rounded text-muted underline-offset-4 hover:text-navy hover:underline"
-              >
-                Lapor Loker
-              </Link>
-            </li>
-            <li>
-              <Link
                 href="/kebijakan-privasi"
                 className="rounded text-muted underline-offset-4 hover:text-navy hover:underline"
               >

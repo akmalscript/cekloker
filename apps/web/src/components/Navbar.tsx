@@ -45,18 +45,24 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Links (di sebelah kanan logo) */}
-          <div className="hidden items-center gap-1 md:flex">
-            <Link href="/#cara-kerja" className="nav-link">
+          <div className="hidden items-center gap-0.5 md:flex md:gap-1">
+            <Link href="/#cara-kerja" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
               Cara Kerja
             </Link>
-            <Link href="/#fitur" className="nav-link">
+            <Link href="/#fitur" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
               Fitur Utama
             </Link>
-            <Link href="/#faq" className="nav-link">
+            <Link href="/#faq" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
               FAQ
             </Link>
+            <Link href="/database-loker" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
+              Database Loker
+            </Link>
+            <Link href="/lapor" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
+              Lapor Loker
+            </Link>
             {session?.user && (
-              <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
+              <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 !px-2 text-sm font-bold text-navy lg:!px-3 lg:text-[15px]">
                 <History className="h-4 w-4" aria-hidden="true" />
                 Riwayat
               </Link>
@@ -66,7 +72,7 @@ export function Navbar() {
                 session?.user?.role === "MODERATOR" ||
                 session?.user?.email?.startsWith("admin@")
             ) && (
-              <Link href="/admin" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
+              <Link href="/admin" className="nav-link inline-flex items-center gap-1.5 !px-2 text-sm font-bold text-navy lg:!px-3 lg:text-[15px]">
                 <Shield className="h-4 w-4" aria-hidden="true" />
                 Admin
               </Link>
@@ -151,6 +157,20 @@ export function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
             >
               FAQ
+            </Link>
+            <Link
+              href="/database-loker"
+              className="nav-link w-full py-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Database Loker
+            </Link>
+            <Link
+              href="/lapor"
+              className="nav-link w-full py-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Lapor Loker
             </Link>
             {session?.user && (
               <Link
