@@ -29,7 +29,7 @@ export default function HomePage() {
           className="grid-paper relative scroll-mt-16 overflow-hidden border-b border-line"
           aria-labelledby="hero-title"
         >
-          <div className="container-page grid items-center gap-8 pt-8 pb-12 sm:pt-10 sm:pb-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-12 lg:pt-10 lg:pb-20">
+          <div className="container-page grid items-center gap-8 pt-8 pb-12 sm:pt-10 sm:pb-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-12 lg:pt-8 lg:pb-20">
             <div className="max-w-xl">
               <h1 id="hero-title" className="text-[40px] sm:text-5xl lg:text-[56px]">
                 Cek dulu sebelum melamar
