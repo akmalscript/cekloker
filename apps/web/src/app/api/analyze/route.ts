@@ -12,6 +12,12 @@ const MAX_FILES = 5;
 const MAX_FILE_SIZE_MB = 10;
 const MAX_TOTAL_SIZE_MB = 25;
 const MAX_TEXT_LENGTH = 10000;
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "application/pdf",
+]);
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,6 +82,15 @@ export async function POST(request: NextRequest) {
     let previewDataUrl: string | undefined = undefined;
 
     for (const file of files) {
+      if (!ALLOWED_MIME_TYPES.has(file.type.toLowerCase())) {
+        return NextResponse.json(
+          {
+            error: `Format berkas ${file.name} tidak didukung. Format yang diizinkan adalah JPG, PNG, WEBP, atau PDF.`,
+          },
+          { status: 400 }
+        );
+      }
+
       if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
         return NextResponse.json(
           { error: `Berkas ${file.name} melebihi batas ${MAX_FILE_SIZE_MB} MB.` },
@@ -91,6 +106,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
       const arrayBuf = await file.arrayBuffer();
       const rawBuf = Buffer.from(arrayBuf);
 
@@ -101,7 +117,7 @@ export async function POST(request: NextRequest) {
         );
         processedFiles.push({
           buffer: processedBuffer,
-          name: file.name,
+          name: sanitizedName,
           type: mimeType,
           phash: originalPhash,
         });
@@ -114,7 +130,7 @@ export async function POST(request: NextRequest) {
         // PDF dsb
         processedFiles.push({
           buffer: rawBuf,
-          name: file.name,
+          name: sanitizedName,
           type: file.type,
           phash: "0000000000000000",
         });

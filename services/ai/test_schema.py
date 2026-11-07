@@ -152,12 +152,10 @@ class TestLevelCoherence:
 class TestOpenAPI:
     def test_analysis_result_in_openapi(self):
         """AnalysisResult harus muncul di schema OpenAPI FastAPI."""
-        from fastapi.testclient import TestClient
         from main import app
-        client = TestClient(app)
-        resp = client.get("/openapi.json")
-        assert resp.status_code == 200
-        schemas = resp.json().get("components", {}).get("schemas", {})
+        openapi_schema = app.openapi()
+        assert openapi_schema is not None
+        schemas = openapi_schema.get("components", {}).get("schemas", {})
         assert "AnalysisResult" in schemas or any(
             "AnalysisResult" in str(v) for v in schemas.values()
         ), "AnalysisResult tidak ditemukan di OpenAPI schema"

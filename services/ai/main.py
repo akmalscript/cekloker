@@ -3,14 +3,31 @@
 Jalankan: uvicorn main:app --reload --port 8000
 Uji     : buka http://localhost:8000/docs
 """
+import os
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from analyzer import analisis
+from schema import AnalysisResult
+
+# Domain resmi produksi dan pengembangan (AGENTS.md §4)
+# TODO: kunci saat deploy ke domain resmi produksi
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "ALLOWED_ORIGINS",
+        "https://cekloker.id,https://www.cekloker.id,http://localhost:3000,http://127.0.0.1:3000",
+    ).split(",")
+    if origin.strip()
+]
 
 app = FastAPI(title="CekLoker AI")
-app.add_middleware(  # longgar untuk pengembangan; kunci domainnya saat deploy
-    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 FORMAT_OK = {"image/jpeg", "image/png", "image/webp"}
@@ -22,11 +39,11 @@ def health():
     return {"ok": True}
 
 
-@app.post("/analyze")
+@app.post("/analyze", response_model=AnalysisResult)
 async def analyze(
     files: list[UploadFile] = File(default=[]),
     teks: str | None = Form(default=None),
-):
+) -> AnalysisResult:
     if not files and not teks:
         raise HTTPException(400, "Kirim minimal satu gambar atau teks.")
     if len(files) > 5:
