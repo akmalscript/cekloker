@@ -53,6 +53,9 @@ export function Navbar() {
           <Link href="/#faq" className="nav-link">
             FAQ
           </Link>
+          <Link href="/database-loker" className="nav-link">
+            Database Loker
+          </Link>
           {session?.user && (
             <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
               <History className="h-4 w-4" aria-hidden="true" />
