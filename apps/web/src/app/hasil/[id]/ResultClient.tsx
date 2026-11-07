@@ -408,7 +408,7 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
             <div className="card p-8 bg-white shadow-card space-y-4">
               <AlertCircle className="mx-auto h-12 w-12 text-bahaya stroke-[2]" />
               <h2 className="text-xl font-bold text-ink">Hasil Tidak Ditemukan</h2>
-              <p className="text-sm text-muted leading-relaxed">
+              <p className="text-sm text-muted leading-relaxed whitespace-pre-line">
                 {error ?? "Sesi pemeriksaan tamu telah melewati batas retensi 24 jam atau tautan tidak valid."}
               </p>
               <div className="pt-2">
