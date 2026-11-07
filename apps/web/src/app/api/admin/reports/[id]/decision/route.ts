@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { registerScamPoster } from "@/lib/matching/poster-matcher";
 
 export async function POST(
   request: NextRequest,
@@ -86,9 +87,18 @@ export async function POST(
 
           // Extract pHash if available
           let imagePhash: string | null = null;
+          let candidatePhashes: string[] = [];
           if (report.scan?.resultJson) {
             const json: any = report.scan.resultJson;
-            imagePhash = json.fingerprint?.image_phash || null;
+            if (Array.isArray(json.fingerprint?.image_phash)) {
+              candidatePhashes = json.fingerprint.image_phash.filter((h: any) => typeof h === "string");
+              if (candidatePhashes.length > 0) {
+                imagePhash = candidatePhashes[0];
+              }
+            } else if (typeof json.fingerprint?.image_phash === "string") {
+              imagePhash = json.fingerprint.image_phash;
+              candidatePhashes = [imagePhash];
+            }
           }
           if (!imagePhash) {
             imagePhash = "phash_" + Math.random().toString(16).slice(2, 18);
@@ -98,7 +108,7 @@ export async function POST(
             destination?.trim() ||
             (report.urgency === "darurat_tppo" ? "Kamboja / Myanmar" : "Indonesia");
 
-          await prisma.verifiedScam.create({
+          const verifiedScamRecord = await prisma.verifiedScam.create({
             data: {
               code: randomCode,
               jobTitle: report.jobTitle || "Lowongan Terindikasi Penipuan",
@@ -110,6 +120,21 @@ export async function POST(
               verifiedAt: new Date(),
             },
           });
+
+          // Simpan poster penipuan ke ScamPoster untuk pencocokan visual dHash 64-bit (FR-PST-01 s/d 03)
+          for (const ph of candidatePhashes) {
+            if (/^[0-9a-fA-F]{16}$/.test(ph)) {
+              await registerScamPoster({
+                imagePhash: ph.toLowerCase(),
+                jobTitle: report.jobTitle || "Lowongan Terindikasi Penipuan",
+                companyName: report.companyName || "Perusahaan Anonim / Fiktif",
+                destination: targetDestination,
+                reportCount: 1,
+                sourceReportId: report.id,
+                verifiedScamId: verifiedScamRecord.id,
+              }).catch((e) => console.warn("Failed registering scam poster:", e));
+            }
+          }
         }
       }
     } catch (dbErr) {
