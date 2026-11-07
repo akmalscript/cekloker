@@ -97,7 +97,7 @@ export async function POST(
               }
             } else if (typeof json.fingerprint?.image_phash === "string") {
               imagePhash = json.fingerprint.image_phash;
-              candidatePhashes = [imagePhash];
+              candidatePhashes = [json.fingerprint.image_phash];
             }
           }
           if (!imagePhash) {
