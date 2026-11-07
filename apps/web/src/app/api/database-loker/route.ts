@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
     const to = searchParams.get("sampai") || "";
     const sort = searchParams.get("urut") || "terbaru";
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-    const limit = Math.max(1, parseInt(searchParams.get("limit") || "10"));
+    const limit = Math.max(1, parseInt(searchParams.get("limit") || "5"));
 
     let entries: DatabaseLokerEntry[] = [...SEED_DATA];
 
