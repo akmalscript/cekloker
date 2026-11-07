@@ -324,7 +324,7 @@ export default function CekLokerPage() {
 
               <p className="mt-4 hidden items-center gap-2 text-[13px] text-muted md:flex">
                 <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
-                Chat dan lowongan diperiksa terpisah untuk akurasi pola indikasi.
+                Chat dan lowongan diperiksa terpisah.
               </p>
 
               {/* Area Unggah Berkas */}

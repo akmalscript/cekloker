@@ -184,8 +184,7 @@ html :is(h1, h2, h3) {
 .type-option.is-checked .type-title { color: var(--ck-navy); }
 .type-option:has(input:checked) .type-check,
 .type-option.is-checked .type-check { display: block; }
-.type-option:has(input:focus-visible),
-.type-option:focus-within { outline: 2px solid var(--ck-navy); outline-offset: 2px; }
+.type-option:has(input:focus-visible) { outline: 2px solid var(--ck-navy); outline-offset: 2px; }
 @media (min-width: 768px) {
   .type-option .type-check,
   .type-option:has(input:checked) .type-check,
