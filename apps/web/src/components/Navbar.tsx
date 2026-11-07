@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { Menu, X, LogOut, History, User } from "lucide-react";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
@@ -51,16 +53,40 @@ export function Navbar() {
           <Link href="/#faq" className="nav-link">
             FAQ
           </Link>
-          <Link href="/database-loker" className="nav-link">
-            Database Loker
-          </Link>
+          {session?.user && (
+            <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
+              <History className="h-4 w-4" aria-hidden="true" />
+              Riwayat
+            </Link>
+          )}
         </div>
 
         {/* Desktop CTA */}
         <div className="flex items-center gap-2">
-          <Link href="/login" className="nav-link hidden md:inline-flex">
-            Masuk
-          </Link>
+          {status === "loading" ? (
+            <div className="h-9 w-20 animate-pulse rounded-ctl bg-navy-tint hidden md:block" />
+          ) : session?.user ? (
+            <div className="hidden items-center gap-3 md:flex">
+              <span className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+                <User className="h-4 w-4 text-muted" aria-hidden="true" />
+                {session.user.name || session.user.email?.split("@")[0]}
+              </span>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/" })}
+                className="btn btn-ghost btn-sm !px-2.5 text-muted hover:text-navy"
+                title="Keluar dari akun"
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                <span className="text-xs">Keluar</span>
+              </button>
+            </div>
+          ) : (
+            <Link href="/login" className="nav-link hidden md:inline-flex">
+              Masuk
+            </Link>
+          )}
+
           <Link href="/cekloker" className="btn btn-primary btn-sm hidden md:inline-flex">
             Cek Loker
           </Link>
@@ -111,21 +137,42 @@ export function Navbar() {
             >
               FAQ
             </Link>
-            <Link
-              href="/database-loker"
-              className="nav-link w-full py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Database Loker
-            </Link>
-            <div className="mt-2 flex flex-col gap-2 border-t border-line pt-3">
+            {session?.user && (
               <Link
-                href="/login"
-                className="btn btn-secondary w-full"
+                href="/riwayat"
+                className="nav-link w-full py-2 font-bold text-navy"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Masuk
+                Riwayat Pemeriksaan
               </Link>
+            )}
+            <div className="mt-2 flex flex-col gap-2 border-t border-line pt-3">
+              {session?.user ? (
+                <>
+                  <div className="px-3 py-1 text-sm text-muted">
+                    Masuk sebagai <strong>{session.user.name || session.user.email}</strong>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      signOut({ callbackUrl: "/" });
+                    }}
+                    className="btn btn-secondary w-full"
+                  >
+                    <LogOut className="h-4 w-4" aria-hidden="true" />
+                    Keluar
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className="btn btn-secondary w-full"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Masuk
+                </Link>
+              )}
               <Link
                 href="/cekloker"
                 className="btn btn-primary w-full"
@@ -140,4 +187,3 @@ export function Navbar() {
     </header>
   );
 }
-

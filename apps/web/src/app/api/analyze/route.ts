@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { checkGuestQuota, consumeGuestQuota } from "@/lib/rate-limit";
 import { processImageForAI } from "@/lib/image/pii-blur";
 import { saveScan } from "@/lib/store";
@@ -12,26 +13,31 @@ const MAX_TEXT_LENGTH = 10000;
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Cek Kuota Tamu (FR-AKN-02)
+    const session = await auth();
+    const userId = session?.user?.id;
+
+    // 1. Cek Kuota Tamu (FR-AKN-02) - hanya untuk pengguna tanpa login
     let guestId = request.cookies.get("ck_guest_session")?.value;
     let isNewGuest = false;
 
-    if (!guestId) {
-      guestId = "guest_" + Math.random().toString(36).slice(2, 10);
-      isNewGuest = true;
-    }
+    if (!userId) {
+      if (!guestId) {
+        guestId = "guest_" + Math.random().toString(36).slice(2, 10);
+        isNewGuest = true;
+      }
 
-    const quota = checkGuestQuota(guestId);
-    if (!quota.allowed) {
-      return NextResponse.json(
-        {
-          error: "Kuota pemeriksaan tamu telah habis.",
-          message:
-            "Tamu dapat melakukan maksimal 3 kali pemeriksaan per hari. Silakan masuk atau daftarkan akun gratis untuk melanjutkan.",
-          quota,
-        },
-        { status: 429 }
-      );
+      const quota = checkGuestQuota(guestId);
+      if (!quota.allowed) {
+        return NextResponse.json(
+          {
+            error: "Kuota pemeriksaan tamu telah habis.",
+            message:
+              "Tamu dapat melakukan maksimal 3 kali pemeriksaan per hari. Silakan masuk atau daftarkan akun gratis untuk melanjutkan.",
+            quota,
+          },
+          { status: 429 }
+        );
+      }
     }
 
     // 2. Baca FormData
@@ -223,17 +229,18 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // 5. Potong Kuota Tamu Hanya Saat Pemeriksaan Berhasil (HTTP 200)
-    const updatedQuota = consumeGuestQuota(guestId);
+    // 5. Potong Kuota Tamu Hanya Saat Pemeriksaan Berhasil (HTTP 200) untuk tamu
+    const updatedQuota = (!userId && guestId) ? consumeGuestQuota(guestId) : { allowed: true, remaining: 999, total: 999 };
 
-    // 6. Simpan Hasil Pemeriksaan Sementara (Retensi 24 Jam untuk Tamu)
+    // 6. Simpan Hasil Pemeriksaan (Permanen untuk User, 24 Jam untuk Tamu)
     const scanId = "ck_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     const now = Date.now();
-    const expiresAt = now + 24 * 60 * 60 * 1000;
+    const expiresAt = userId ? null : now + 24 * 60 * 60 * 1000;
 
     await saveScan({
       id: scanId,
-      guestId,
+      guestId: guestId ?? undefined,
+      userId: userId ?? undefined,
       createdAt: now,
       expiresAt,
       imageUrl: previewDataUrl ?? "/img/scam_kamboja.png",
