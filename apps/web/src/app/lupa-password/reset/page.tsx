@@ -144,7 +144,6 @@ function ResetContent() {
                   className="input !pr-32 short:h-10"
                   aria-describedby="password-hint"
                   autoComplete="new-password"
-                  placeholder="Minimal 8 karakter"
                   required
                 />
                 <button
@@ -183,7 +182,6 @@ function ResetContent() {
                 onChange={(e) => setPassword2(e.target.value)}
                 className="input mt-2 short:mt-1 short:h-10"
                 autoComplete="new-password"
-                placeholder="Minimal 8 karakter"
                 required
               />
             </div>

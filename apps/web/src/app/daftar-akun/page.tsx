@@ -183,7 +183,7 @@ export default function RegisterPage() {
           >
             <div>
               <label htmlFor="nama" className="field-label">
-                Nama lengkap
+                Nama pengguna
               </label>
               <input
                 id="nama"
@@ -192,8 +192,7 @@ export default function RegisterPage() {
                 value={nama}
                 onChange={(e) => setNama(e.target.value)}
                 className="input mt-2 short:mt-1 short:h-10"
-                autoComplete="name"
-                placeholder="Nama Anda"
+                autoComplete="username"
               />
             </div>
 
@@ -229,7 +228,6 @@ export default function RegisterPage() {
                   className="input !pr-32 short:h-10"
                   aria-describedby="password-hint"
                   autoComplete="new-password"
-                  placeholder="Minimal 8 karakter"
                   required
                 />
                 <button
@@ -268,7 +266,6 @@ export default function RegisterPage() {
                 onChange={(e) => setPassword2(e.target.value)}
                 className="input mt-2 short:mt-1 short:h-10"
                 autoComplete="new-password"
-                placeholder="Ketik ulang password"
                 required
               />
             </div>
