@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
+    "test": "tsx src/tests/matching.test.ts",
     "lint": "eslint",
     "typegen": "python ../../services/ai/export_openapi.py && openapi-typescript ../../services/ai/openapi.json -o src/types/api.ts"
   },
@@ -33,6 +34,7 @@
     "openapi-typescript": "^7.13.0",
     "prisma": "^6.19.3",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }

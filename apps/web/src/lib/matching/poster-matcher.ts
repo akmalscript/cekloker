@@ -90,6 +90,10 @@ const memoryScamPosters = new Map<string, ScamPosterItem>(
  * digabungkan dengan seed awal jika database kosong/offline.
  */
 export async function getAllScamPosters(): Promise<ScamPosterItem[]> {
+  if (!process.env.DATABASE_URL) {
+    return Array.from(memoryScamPosters.values());
+  }
+
   try {
     const dbPosters = await prisma.scamPoster.findMany({
       orderBy: { createdAt: "desc" },

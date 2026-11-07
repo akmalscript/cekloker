@@ -208,6 +208,29 @@ export function calculateTrigramSimilarity(a: string, b: string): number {
 }
 
 /**
+ * Menghitung kemiripan antara dua kata tunggal (token).
+ */
+export function calculateTokenSimilarity(w1: string, w2: string): number {
+  if (w1 === w2) return 1.0;
+  if (!w1 || !w2) return 0;
+
+  const lev = calculateLevenshteinDistance(w1, w2);
+  const maxLen = Math.max(w1.length, w2.length);
+
+  // Jika typo hanya 1 karakter (misal 'tiwan' vs 'taiwan', 'selnajya' vs 'selnajaya')
+  if (lev === 1 && maxLen >= 4) {
+    return 0.9;
+  }
+  if (lev <= 2 && maxLen >= 6) {
+    return 0.8;
+  }
+
+  const tri = calculateTrigramSimilarity(w1, w2);
+  const levScore = Math.max(0, 1 - lev / maxLen);
+  return Math.max(tri, levScore);
+}
+
+/**
  * Menghitung skor kemiripan komposit toleran salah ketik (Fuzzy Similarity).
  * Menggabungkan kecocokan subset token, Trigram similarity, dan Levenshtein distance.
  */
@@ -218,37 +241,46 @@ export function calculateFuzzySimilarity(query: string, target: string): number 
   if (!q || !t) return 0;
   if (q === t) return 1.0;
 
-  // 1. Cek apakah query merupakan substring atau subset token lengkap
-  const qTokens = q.split(" ").filter((w) => w.length > 1);
-  const tTokens = t.split(" ").filter((w) => w.length > 1);
+  // 1. Pencocokan berbasis token kata
+  const qTokens = q.split(" ").filter((w) => w.length > 0);
+  const tTokens = t.split(" ").filter((w) => w.length > 0);
 
-  if (qTokens.length > 0 && tTokens.length > 0) {
-    const matchedTokens = qTokens.filter((token) =>
-      tTokens.some((tt) => tt === token || calculateTrigramSimilarity(token, tt) >= 0.8)
-    );
-    const tokenScore = matchedTokens.length / Math.max(qTokens.length, 1);
-    if (tokenScore === 1.0 && qTokens.length >= 2) {
-      return 0.95;
+  let tokenScoreSum = 0;
+  for (const qWord of qTokens) {
+    let bestWordMatch = 0;
+    for (const tWord of tTokens) {
+      const sim = calculateTokenSimilarity(qWord, tWord);
+      if (sim > bestWordMatch) {
+        bestWordMatch = sim;
+      }
     }
+    tokenScoreSum += bestWordMatch;
   }
+  const avgTokenScore = qTokens.length > 0 ? tokenScoreSum / qTokens.length : 0;
 
-  // 2. Trigram similarity
+  // 2. Trigram similarity seluruh string
   const trigramScore = calculateTrigramSimilarity(q, t);
 
-  // 3. Levenshtein normalized
+  // 3. Levenshtein normalized seluruh string
   const maxLen = Math.max(q.length, t.length);
   const levDist = calculateLevenshteinDistance(q, t);
   const levScore = Math.max(0, 1 - levDist / maxLen);
 
-  // Bobot komposit: 65% Trigram + 35% Levenshtein
-  const compositeScore = trigramScore * 0.65 + levScore * 0.35;
-  return Math.round(compositeScore * 100) / 100;
+  const stringScore = trigramScore * 0.65 + levScore * 0.35;
+
+  // Skor komposit mengambil nilai terbaik antara token matching dan full string
+  const finalScore = Math.max(avgTokenScore, stringScore);
+  return Math.round(finalScore * 100) / 100;
 }
 
 /**
  * Mengambil daftar seluruh P3MI berizin dari database atau fallback seed.
  */
 export async function getAllOfficialP3MI(): Promise<OfficialP3MIItem[]> {
+  if (!process.env.DATABASE_URL) {
+    return Array.from(memoryP3MIMap.values());
+  }
+
   try {
     const dbItems = await prisma.officialP3MI.findMany();
     if (dbItems && dbItems.length > 0) {
