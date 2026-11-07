@@ -3,6 +3,8 @@ import { auth } from "@/auth";
 import { checkGuestQuota, consumeGuestQuota } from "@/lib/rate-limit";
 import { processImageForAI } from "@/lib/image/pii-blur";
 import { saveScan } from "@/lib/store";
+import { matchScamPosters } from "@/lib/matching/poster-matcher";
+import { verifyOfficialP3MI } from "@/lib/matching/p3mi-verifier";
 import type { AnalysisResult } from "@/types";
 
 const FASTAPI_URL = process.env.AI_SERVICE_URL || "http://127.0.0.1:8000";
@@ -157,6 +159,18 @@ export async function POST(request: NextRequest) {
         teks.toLowerCase().includes("turis") ||
         files.length > 0;
 
+      let inferredCompany = "Tidak Dicantumkan Resmi";
+      const lowerTeks = teks.toLowerCase();
+      if (lowerTeks.includes("selnajaya") || lowerTeks.includes("selna jaya")) {
+        inferredCompany = "PT OS Selnajaya Indonesia";
+      } else if (lowerTeks.includes("taiwan mandiri") || lowerTeks.includes("tiwan mandiri")) {
+        inferredCompany = "PT Taiwan Mandiri Jaya";
+      } else if (lowerTeks.includes("samudra")) {
+        inferredCompany = "PT Samudra Penempatan Indonesia";
+      } else if (lowerTeks.includes("binawan")) {
+        inferredCompany = "PT Binawan Inti Utama";
+      }
+
       analysisResult = {
         schema_version: "1.0",
         input_type: jenis === "chat" ? "chat" : "lowongan",
@@ -168,7 +182,7 @@ export async function POST(request: NextRequest) {
           : "Lowongan ini memerlukan verifikasi lebih lanjut terhadap keabsahan kontrak dan izin penempatan.",
         extracted: {
           position: "Staf Rekrutmen / Operasional",
-          company: "Tidak Dicantumkan Resmi",
+          company: inferredCompany,
           country: "Luar Negeri",
           salary: "Menjanjikan Upah Tinggi",
           fees: "Terdapat indikasi biaya",
@@ -229,10 +243,51 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // 5. Potong Kuota Tamu Hanya Saat Pemeriksaan Berhasil (HTTP 200) untuk tamu
+    // 5. Pencocokan Poster Scam Terverifikasi (M4 - FR-PST-01 s/d 03)
+    const allInputHashes = [
+      ...phashes,
+      ...(Array.isArray(analysisResult.fingerprint?.image_phash)
+        ? analysisResult.fingerprint.image_phash
+        : []),
+    ];
+    const posterMatchResult = await matchScamPosters(allInputHashes);
+
+    // 6. Verifikasi Sumber Resmi P3MI & SIP2MI (M5 - FR-RSM-01 s/d 04)
+    const companyQuery = analysisResult.extracted?.company;
+    const rawTextCombined = `${teks} ${analysisResult.fingerprint?.raw_text || ""}`;
+    const p3miVerification = await verifyOfficialP3MI({
+      companyQuery,
+      rawText: rawTextCombined,
+    });
+
+    const officialCheckData = {
+      found: p3miVerification.found,
+      p3miName: p3miVerification.p3miName,
+      sip2miCode: p3miVerification.sip2miCode,
+      licenseStatus: p3miVerification.licenseStatus,
+      countries: p3miVerification.countries,
+      jobTypes: p3miVerification.jobTypes,
+      isExact: p3miVerification.isExact,
+      similarityScore: p3miVerification.similarityScore,
+      detail: p3miVerification.detail,
+      link: p3miVerification.link,
+      mandatoryDisclaimer: p3miVerification.mandatoryDisclaimer,
+    };
+
+    // Jika cocok dengan poster scam terverifikasi, tandai temuan pada hasil analisis
+    if (posterMatchResult.matched) {
+      if (analysisResult.risk_level === "aman") {
+        analysisResult.risk_level = "bahaya";
+      }
+      if (posterMatchResult.findingLabel && !analysisResult.summary.includes("Cocok dengan")) {
+        analysisResult.summary = `${posterMatchResult.findingLabel}. ${analysisResult.summary}`;
+      }
+    }
+
+    // 7. Potong Kuota Tamu Hanya Saat Pemeriksaan Berhasil (HTTP 200) untuk tamu
     const updatedQuota = (!userId && guestId) ? consumeGuestQuota(guestId) : { allowed: true, remaining: 999, total: 999 };
 
-    // 6. Simpan Hasil Pemeriksaan (Permanen untuk User, 24 Jam untuk Tamu)
+    // 8. Simpan Hasil Pemeriksaan (Permanen untuk User, 24 Jam untuk Tamu)
     const scanId = "ck_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     const now = Date.now();
     const expiresAt = userId ? null : now + 24 * 60 * 60 * 1000;
@@ -245,21 +300,18 @@ export async function POST(request: NextRequest) {
       expiresAt,
       imageUrl: previewDataUrl ?? "/img/scam_kamboja.png",
       result: analysisResult,
-      officialCheck: {
-        found: analysisResult.risk_level === "aman",
-        detail:
-          analysisResult.risk_level === "aman"
-            ? "Perusahaan terdaftar resmi pada data penempatan BP2MI."
-            : "Nama entitas tidak ditemukan pada pangkalan data resmi P3MI Kementerian Ketenagakerjaan.",
-        link: "https://siskop2mi.bp2mi.go.id/",
-      },
-      scamMatches: analysisResult.risk_level === "bahaya" ? 3 : 0,
+      officialCheck: officialCheckData,
+      scamMatches: posterMatchResult.matchedCount,
+      scamDetails: posterMatchResult,
     });
 
     const response = NextResponse.json({
       ok: true,
       id: scanId,
       result: analysisResult,
+      officialCheck: officialCheckData,
+      scamMatches: posterMatchResult.matchedCount,
+      scamDetails: posterMatchResult,
       quota: updatedQuota,
     });
 

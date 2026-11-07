@@ -14,10 +14,17 @@ export interface StoredScan {
     found: boolean;
     p3miName?: string;
     sip2miCode?: string;
+    licenseStatus?: string;
+    countries?: string[];
+    jobTypes?: string[];
+    isExact?: boolean;
+    similarityScore?: number;
     detail: string;
     link: string;
+    mandatoryDisclaimer?: string;
   };
   scamMatches: number;
+  scamDetails?: unknown;
 }
 
 // In-memory store global untuk sesi dev / runtime fallback
@@ -65,6 +72,8 @@ export async function saveScan(scan: StoredScan): Promise<void> {
         imageUrl: scan.imageUrl ?? null,
         resultJson: scan.result as unknown as Prisma.InputJsonValue,
         officialCheck: scan.officialCheck as unknown as Prisma.InputJsonValue,
+        scamMatches: scan.scamMatches,
+        scamDetails: (scan.scamDetails ?? null) as unknown as Prisma.InputJsonValue,
         createdAt: new Date(scan.createdAt),
         expiresAt: scan.expiresAt ? new Date(scan.expiresAt) : null,
       },
@@ -105,7 +114,8 @@ export async function getScan(id: string): Promise<StoredScan | null> {
           detail: "Data pengecekan resmi tidak tersedia.",
           link: "https://siskop2mi.bp2mi.go.id/",
         },
-        scamMatches: r.redFlagCount,
+        scamMatches: r.scamMatches ?? 0,
+        scamDetails: (r.scamDetails as unknown) ?? undefined,
       };
     }
   } catch (err) {
@@ -173,7 +183,8 @@ export async function getUserScans(userId: string): Promise<StoredScan[]> {
           detail: "Data verifikasi resmi tidak tersedia.",
           link: "https://siskop2mi.bp2mi.go.id/",
         },
-        scamMatches: r.redFlagCount,
+        scamMatches: r.scamMatches ?? 0,
+        scamDetails: (r.scamDetails as unknown) ?? undefined,
       }));
     }
   } catch (err) {
