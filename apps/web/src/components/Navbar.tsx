@@ -92,7 +92,7 @@ export function Navbar() {
               </button>
             </div>
           ) : (
-            <Link href="/login" className="nav-link hidden md:inline-flex">
+            <Link href="/login" className="btn btn-primary btn-sm hidden md:inline-flex">
               Masuk
             </Link>
           )}
@@ -186,7 +186,7 @@ export function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="btn btn-secondary w-full"
+                  className="btn btn-primary w-full"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Masuk
