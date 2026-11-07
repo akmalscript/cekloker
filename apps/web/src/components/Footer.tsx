@@ -31,6 +31,8 @@ export function Footer() {
           <span>CekLoker</span>
         </Link>
 
+        <p className="text-sm text-muted">© 2026 Tim CekLoker</p>
+
         <nav aria-label="Tautan footer">
           <ul className="flex flex-wrap gap-x-6 gap-y-2 text-[15px] font-semibold">
             <li>
@@ -51,8 +53,6 @@ export function Footer() {
             </li>
           </ul>
         </nav>
-
-        <p className="text-sm text-muted">© 2026 Tim CekLoker</p>
       </div>
     </footer>
   );
