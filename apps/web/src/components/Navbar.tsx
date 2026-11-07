@@ -92,9 +92,14 @@ export function Navbar() {
               </button>
             </div>
           ) : (
-            <Link href="/login" className="btn btn-primary btn-sm hidden md:inline-flex">
-              Masuk
-            </Link>
+            <>
+              <Link href="/login" className="btn btn-primary btn-sm hidden md:inline-flex">
+                Masuk
+              </Link>
+              <Link href="/daftar-akun" className="btn btn-secondary btn-sm hidden md:inline-flex">
+                Daftar
+              </Link>
+            </>
           )}
 
           {/* Mobile menu trigger */}
@@ -184,13 +189,22 @@ export function Navbar() {
                   </button>
                 </>
               ) : (
-                <Link
-                  href="/login"
-                  className="btn btn-primary w-full"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Masuk
-                </Link>
+                <>
+                  <Link
+                    href="/login"
+                    className="btn btn-primary w-full"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Masuk
+                  </Link>
+                  <Link
+                    href="/daftar-akun"
+                    className="btn btn-secondary w-full"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Daftar
+                  </Link>
+                </>
               )}
             </div>
           </div>
