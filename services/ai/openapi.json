@@ -1,0 +1,436 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CekLoker AI",
+    "version": "1.0.0",
+    "description": "Layanan Analisis Cerdas CekLoker berbasis Gemini AI"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "operationId": "health_check",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analyze": {
+      "post": {
+        "summary": "Analyze Job Posting",
+        "operationId": "analyze_posting",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "description": "Maksimal 5 berkas (JPG/PNG/WEBP/PDF)"
+                  },
+                  "teks": {
+                    "type": "string",
+                    "description": "Teks lowongan atau percakapan (opsional)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Hasil evaluasi risiko dan red flag",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Input tidak valid"
+          },
+          "422": {
+            "description": "Analysis Error"
+          },
+          "502": {
+            "description": "Layanan AI gagal"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BBox": {
+        "additionalProperties": false,
+        "description": "Bounding box dinormalisasi 0\u20131, format {x, y, w, h}.",
+        "properties": {
+          "x": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Y",
+            "type": "number"
+          },
+          "w": {
+            "exclusiveMinimum": 0,
+            "maximum": 1,
+            "title": "W",
+            "type": "number"
+          },
+          "h": {
+            "exclusiveMinimum": 0,
+            "maximum": 1,
+            "title": "H",
+            "type": "number"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "w",
+          "h"
+        ],
+        "title": "BBox",
+        "type": "object"
+      },
+      "Extracted": {
+        "additionalProperties": false,
+        "description": "Informasi yang diekstrak dari lowongan. Selalu ada, field opsional boleh null.",
+        "properties": {
+          "position": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Position"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Company"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Country"
+          },
+          "salary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Salary"
+          },
+          "requirements": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Requirements",
+            "type": "array"
+          },
+          "contact": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Contact",
+            "type": "array"
+          },
+          "fees": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Fees"
+          }
+        },
+        "title": "Extracted",
+        "type": "object"
+      },
+      "Fingerprint": {
+        "additionalProperties": false,
+        "description": "Data untuk scam matching. pHash dari gambar ASLI (sebelum PII blur);\nraw_text dan normalized_text dari gambar post-blur.",
+        "properties": {
+          "image_phash": {
+            "description": "pHash hex 16 karakter per gambar, urut image_index, dari gambar ASLI",
+            "items": {
+              "type": "string"
+            },
+            "title": "Image Phash",
+            "type": "array"
+          },
+          "raw_text": {
+            "title": "Raw Text",
+            "type": "string"
+          },
+          "normalized_text": {
+            "title": "Normalized Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "raw_text",
+          "normalized_text"
+        ],
+        "title": "Fingerprint",
+        "type": "object"
+      },
+      "Meta": {
+        "additionalProperties": false,
+        "description": "Metadata teknis untuk debugging dan tuning. Tidak ditampilkan ke pengguna.",
+        "properties": {
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "catalog_version": {
+            "title": "Catalog Version",
+            "type": "string"
+          },
+          "normalization_version": {
+            "title": "Normalization Version",
+            "type": "string"
+          },
+          "risk_score": {
+            "minimum": 0,
+            "title": "Risk Score",
+            "type": "integer"
+          },
+          "latency_ms": {
+            "minimum": 0,
+            "title": "Latency Ms",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "model",
+          "prompt_version",
+          "catalog_version",
+          "normalization_version",
+          "risk_score",
+          "latency_ms"
+        ],
+        "title": "Meta",
+        "type": "object"
+      },
+      "RedFlag": {
+        "additionalProperties": false,
+        "description": "Satu red flag yang sudah diperkaya dari katalog. Label, severity, legal_basis\nTIDAK diisi oleh model \u2014 selalu diambil dari catalog.py berdasarkan code.",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "waspada",
+              "bahaya"
+            ],
+            "title": "Severity",
+            "type": "string"
+          },
+          "quote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Quote"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "legal_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Legal Basis"
+          },
+          "regions": {
+            "items": {
+              "$ref": "#/components/schemas/Region"
+            },
+            "title": "Regions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "code",
+          "label",
+          "severity",
+          "reason"
+        ],
+        "title": "RedFlag",
+        "type": "object"
+      },
+      "Region": {
+        "additionalProperties": false,
+        "properties": {
+          "image_index": {
+            "maximum": 4,
+            "minimum": 0,
+            "title": "Image Index",
+            "type": "integer"
+          },
+          "bbox": {
+            "$ref": "#/components/schemas/BBox"
+          }
+        },
+        "required": [
+          "image_index",
+          "bbox"
+        ],
+        "title": "Region",
+        "type": "object"
+      },
+      "AnalysisResult": {
+        "additionalProperties": false,
+        "description": "Kontrak publik output AI service. Versi dikunci di schema_version.",
+        "properties": {
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "input_type": {
+            "enum": [
+              "lowongan",
+              "chat",
+              "gabungan"
+            ],
+            "title": "Input Type",
+            "type": "string"
+          },
+          "risk_level": {
+            "enum": [
+              "aman",
+              "waspada",
+              "bahaya"
+            ],
+            "title": "Risk Level",
+            "type": "string"
+          },
+          "confidence": {
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "needs_manual_check": {
+            "title": "Needs Manual Check",
+            "type": "boolean"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "extracted": {
+            "$ref": "#/components/schemas/Extracted"
+          },
+          "red_flags": {
+            "items": {
+              "$ref": "#/components/schemas/RedFlag"
+            },
+            "title": "Red Flags",
+            "type": "array"
+          },
+          "fingerprint": {
+            "$ref": "#/components/schemas/Fingerprint"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/Meta"
+          }
+        },
+        "required": [
+          "input_type",
+          "risk_level",
+          "confidence",
+          "needs_manual_check",
+          "summary",
+          "extracted",
+          "red_flags",
+          "fingerprint",
+          "meta"
+        ],
+        "title": "AnalysisResult",
+        "type": "object"
+      }
+    }
+  }
+}

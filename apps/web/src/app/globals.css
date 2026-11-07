@@ -1,0 +1,287 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #1E3A8A;
+  --color-navy-hover: #172F70;
+  --color-navy-tint: #EEF2FB;
+  --color-navy-soft: #DCE4F5;
+
+  --color-canvas: #F8FAFC;
+  --color-ink: #0F172A;
+  --color-muted: #475569;
+  --color-line: #E2E8F0;
+  --color-field: #8792A6;
+
+  --color-aman: #16A34A;
+  --color-aman-ink: #15803D;
+  --color-aman-tint: #F0FDF4;
+  --color-aman-line: #BBF7D0;
+
+  --color-waspada: #D97706;
+  --color-waspada-ink: #B45309;
+  --color-waspada-tint: #FFFBEB;
+  --color-waspada-line: #FDE68A;
+
+  --color-bahaya: #DC2626;
+  --color-bahaya-ink: #B91C1C;
+  --color-bahaya-tint: #FEF2F2;
+  --color-bahaya-line: #FECACA;
+
+  --font-sans: var(--font-plus-jakarta-sans), "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 12px;
+  --radius-ctl: 10px;
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 2px 6px rgba(15, 23, 42, 0.03);
+  --shadow-lift: 0 2px 4px rgba(15, 23, 42, 0.05), 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+@custom-variant short (@media (min-width: 640px) and (max-height: 820px));
+
+/* =====================================================================
+   CekLoker — Design System Tokens & Komponen (prototypes/DESAIN.md)
+   ===================================================================== */
+
+:root {
+  --ck-navy: #1E3A8A;
+  --ck-navy-hover: #172F70;
+  --ck-navy-tint: #EEF2FB;
+  --ck-navy-soft: #DCE4F5;
+  --ck-bg: #F8FAFC;
+  --ck-surface: #FFFFFF;
+  --ck-ink: #0F172A;
+  --ck-muted: #475569;
+  --ck-line: #E2E8F0;
+  --ck-field: #8792A6;
+
+  --ck-aman: #16A34A;    --ck-aman-ink: #15803D;    --ck-aman-tint: #F0FDF4;    --ck-aman-line: #BBF7D0;
+  --ck-waspada: #D97706; --ck-waspada-ink: #B45309; --ck-waspada-tint: #FFFBEB; --ck-waspada-line: #FDE68A;
+  --ck-bahaya: #DC2626;  --ck-bahaya-ink: #B91C1C;  --ck-bahaya-tint: #FEF2F2;  --ck-bahaya-line: #FECACA;
+
+  --ck-font: var(--font-plus-jakarta-sans), "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --ck-radius: 12px;
+  --ck-radius-ctl: 10px;
+  --ck-shadow: 0 1px 2px rgba(15, 23, 42, .04), 0 2px 6px rgba(15, 23, 42, .03);
+  --ck-shadow-lift: 0 2px 4px rgba(15, 23, 42, .05), 0 10px 24px rgba(15, 23, 42, .08);
+  --ck-ease: cubic-bezier(.2, .8, .2, 1);
+  --ck-dur: 180ms;
+}
+
+/* ---------- Dasar ---------- */
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html body {
+  background-color: var(--ck-bg);
+  font-family: var(--ck-font);
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--ck-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+html :is(h1, h2, h3) {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--ck-ink);
+}
+:focus-visible { outline: 2px solid var(--ck-navy); outline-offset: 2px; border-radius: 6px; }
+.on-navy :focus-visible { outline-color: #fff; }
+::selection { background: var(--ck-navy-soft); }
+
+/* ---------- Tata Letak ---------- */
+.container-page { width: 100%; max-width: 1152px; margin-inline: auto; padding-inline: 1rem; }
+@media (min-width: 640px)  { .container-page { padding-inline: 1.5rem; } }
+@media (min-width: 1024px) { .container-page { padding-inline: 2rem; } }
+
+.skip-link {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
+}
+.skip-link:focus {
+  position: fixed; left: 1rem; top: 1rem; z-index: 60;
+  width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal;
+  padding: .5rem 1rem; border-radius: var(--ck-radius-ctl);
+  background: #fff; color: var(--ck-navy); font-weight: 600; box-shadow: var(--ck-shadow-lift);
+}
+
+/* ---------- Tombol ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 48px; padding-inline: 1.5rem;
+  border-radius: var(--ck-radius-ctl);
+  font-size: 1rem; font-weight: 600; line-height: 1;
+  text-decoration: none; user-select: none;
+  transition: background-color var(--ck-dur) var(--ck-ease), border-color var(--ck-dur) var(--ck-ease),
+              color var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease),
+              transform var(--ck-dur) var(--ck-ease);
+}
+.btn:disabled, .btn[aria-disabled="true"] { cursor: not-allowed; opacity: .7; }
+.btn-sm { min-height: 40px; padding-inline: 1rem; font-size: 15px; }
+.btn-xs { min-height: 32px; padding-inline: 0.75rem; font-size: 13px; }
+
+.btn.btn-primary { background-color: var(--ck-navy); color: #fff; }
+.btn.btn-primary:hover { background-color: var(--ck-navy-hover); }
+.btn.btn-secondary { border: 1px solid var(--ck-field); background-color: #fff; color: var(--ck-navy); }
+.btn.btn-secondary:hover { border-color: var(--ck-navy); background-color: var(--ck-navy-tint); }
+.btn.btn-ghost { color: var(--ck-navy); }
+.btn.btn-ghost:hover { background-color: var(--ck-navy-tint); }
+.btn.btn-white { background-color: #fff; color: var(--ck-navy); }
+.btn.btn-white:hover { background-color: var(--ck-navy-tint); }
+
+/* Indikator Loading */
+.spinner {
+  width: 20px; height: 20px; border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, .35); border-top-color: #fff;
+  animation: ck-spin .8s linear infinite;
+}
+@keyframes ck-spin { to { transform: rotate(360deg); } }
+
+/* ---------- Input ---------- */
+.input {
+  display: block; width: 100%; height: 3rem; padding-inline: 1rem;
+  border: 1px solid var(--ck-field); border-radius: var(--ck-radius-ctl);
+  background-color: #fff; color: var(--ck-ink);
+  font-size: 1rem; line-height: 1.5rem;
+  transition: border-color var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease);
+}
+.input::placeholder { color: #64748B; opacity: 1; }
+.input:hover { border-color: #475569; }
+.input:focus, .input:focus-visible { border-color: var(--ck-navy); outline: none; box-shadow: 0 0 0 3px var(--ck-navy-soft); }
+.input[aria-invalid="true"] { border-color: var(--ck-bahaya-ink); }
+.input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px var(--ck-bahaya-line); }
+
+.field-label { display: block; font-size: 15px; font-weight: 600; color: var(--ck-ink); }
+.field-error {
+  display: flex; align-items: flex-start; gap: .375rem; margin-top: .5rem;
+  font-size: .875rem; line-height: 1.25rem; font-weight: 600; color: var(--ck-bahaya-ink);
+}
+.field-error svg { flex-shrink: 0; width: 1rem; height: 1rem; margin-top: .125rem; }
+
+/* ---------- Kartu ---------- */
+.card {
+  border: 1px solid var(--ck-line); border-radius: var(--ck-radius);
+  background-color: #fff; box-shadow: var(--ck-shadow);
+}
+.card-hover { transition: transform var(--ck-dur) var(--ck-ease), box-shadow var(--ck-dur) var(--ck-ease); }
+.card-hover:hover { transform: translateY(-2px); box-shadow: var(--ck-shadow-lift); }
+
+/* ---------- Badge Status Risiko: Warna + Ikon + Teks ---------- */
+.badge {
+  display: inline-flex; align-items: center; gap: .375rem; white-space: nowrap;
+  padding: .25rem .625rem; border: 1px solid; border-radius: 9999px;
+  font-size: 13px; font-weight: 700; line-height: 1;
+}
+.badge svg { width: .875rem; height: .875rem; stroke-width: 2.5; }
+.badge-aman    { border-color: var(--ck-aman-line);    background-color: var(--ck-aman-tint);    color: var(--ck-aman-ink); }
+.badge-waspada { border-color: var(--ck-waspada-line); background-color: var(--ck-waspada-tint); color: var(--ck-waspada-ink); }
+.badge-bahaya  { border-color: var(--ck-bahaya-line);  background-color: var(--ck-bahaya-tint);  color: var(--ck-bahaya-ink); }
+
+/* ---------- Motif Penanda Bukti (Evidence) ---------- */
+.evidence { position: relative; display: inline-block; }
+.evidence-box {
+  pointer-events: none; position: absolute; inset: -.375rem -.5rem;
+  border: 2px solid var(--ck-bahaya); border-radius: .375rem;
+  background: rgba(220, 38, 38, .05);
+}
+.evidence-label {
+  position: absolute; top: -11px; left: .375rem; white-space: nowrap;
+  padding: 3px .375rem; border-radius: .25rem; background: var(--ck-bahaya);
+  font-size: 11px; font-weight: 700; line-height: 1; color: #fff;
+}
+.evidence-box.is-roomy { inset: -.5rem -.625rem; }
+.evidence-box.is-waspada { border-color: var(--ck-waspada); background: rgba(217, 119, 6, .06); }
+.evidence-box.is-waspada .evidence-label { background: var(--ck-waspada-ink); }
+.evidence-box.is-aman { border-color: var(--ck-aman); background: rgba(22, 163, 74, .05); }
+.evidence-box.is-aman .evidence-label { background: var(--ck-aman-ink); }
+
+/* Bracket Bidik (Viewfinder) */
+.viewfinder {
+  position: relative; display: grid; place-items: center; width: 3rem; height: 3rem;
+  border-radius: var(--ck-radius-ctl); background-color: var(--ck-navy-tint); color: var(--ck-navy);
+}
+.viewfinder::before, .viewfinder::after {
+  content: ""; position: absolute; width: .75rem; height: .75rem;
+  border: 0 solid var(--ck-navy);
+}
+.viewfinder::before { left: -.25rem; top: -.25rem; border-left-width: 2px; border-top-width: 2px; border-top-left-radius: .375rem; }
+.viewfinder::after { right: -.25rem; bottom: -.25rem; border-right-width: 2px; border-bottom-width: 2px; border-bottom-right-radius: .375rem; }
+
+/* ---------- Kotak Peringatan (Alert) ---------- */
+.alert {
+  display: flex; gap: .75rem; padding: 1rem;
+  border: 1px solid; border-radius: var(--ck-radius);
+  font-size: 15px; line-height: 1.625;
+}
+.alert-info    { border-color: var(--ck-navy-soft);   background-color: var(--ck-navy-tint);   color: var(--ck-ink); }
+.alert-success { border-color: var(--ck-aman-line);   background-color: var(--ck-aman-tint);   color: var(--ck-ink); }
+.alert-error   { border-color: var(--ck-bahaya-line); background-color: var(--ck-bahaya-tint); color: var(--ck-ink); }
+
+/* ---------- Pola, Eyebrow, Skeleton, Nav-link ---------- */
+.grid-paper {
+  background-image:
+    linear-gradient(to right, rgba(15, 23, 42, .035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, .035) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.grid-paper-navy {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, .06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, .06) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ck-navy); }
+.skeleton { display: block; height: .5rem; border-radius: 9999px; background-color: #E2E8F0; }
+.nav-link {
+  padding: .5rem .75rem; border-radius: var(--ck-radius-ctl);
+  font-size: 15px; font-weight: 600; color: var(--ck-muted);
+  transition: background-color var(--ck-dur) var(--ck-ease), color var(--ck-dur) var(--ck-ease);
+}
+.nav-link:hover { background-color: var(--ck-navy-tint); color: var(--ck-navy); }
+
+/* ---------- Media Print (PDF / Cetak) ---------- */
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .card { box-shadow: none !important; border: 1px solid #ccc !important; }
+}
+
+/* ---------- Animasi Pindai Hero ---------- */
+.scan-line {
+  position: absolute; left: 0; right: 0; top: 0; height: 2px; z-index: 3; opacity: 0;
+  background: var(--ck-navy);
+  box-shadow: 0 0 0 1px rgba(30, 58, 138, .06), 0 6px 20px rgba(30, 58, 138, .25);
+}
+.scan-line::before {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 2px; height: 56px;
+  background: linear-gradient(to bottom, rgba(30, 58, 138, 0), rgba(30, 58, 138, .07));
+}
+.state-stack { display: grid; }
+.state-stack > * { grid-area: 1 / 1; }
+.state-scanning { visibility: hidden; }
+
+.scan-run .scan-line { animation: ck-scan 3.6s linear .4s both; }
+.scan-run .anim-in { animation: ck-in .35s var(--ck-ease) both; animation-delay: var(--d, 0s); }
+.scan-run .state-scanning { visibility: visible; animation: ck-out .2s 4.1s both; }
+.scan-run .state-done { animation: ck-in .35s var(--ck-ease) 4.2s both; }
+
+@keyframes ck-scan {
+  0%   { top: 0%;   opacity: 0; }
+  4%   { opacity: 1; }
+  96%  { top: 100%; opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+@keyframes ck-in  { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: scale(1); } }
+@keyframes ck-out { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+
+.pulse-dot { width: 6px; height: 6px; border-radius: 999px; background: var(--ck-navy); animation: ck-pulse 1.6s ease-in-out infinite; }
+@keyframes ck-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+
+/* ---------- Gerak Dikurangi (A11y) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: 1ms !important; }
+  .card-hover:hover { transform: none; }
+  .spinner { animation-duration: 2.4s; }
+  .scan-run .scan-line { display: none; }
+  .scan-run .anim-in, .scan-run .state-done { animation: none !important; }
+  .scan-run .state-scanning { animation: none !important; visibility: hidden; }
+}
