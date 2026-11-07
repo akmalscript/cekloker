@@ -13,9 +13,9 @@ interface FaqItem {
 const FAQS: FaqItem[] = [
   {
     id: "faq-1",
-    question: "Apakah hasil CekLoker pasti benar?",
+    question: "Apakah hasil analisis CekLoker merupakan jaminan mutlak?",
     answer:
-      "Tidak. CekLoker memberi indikasi risiko beserta buktinya. Keputusan tetap di tanganmu, dan untuk lowongan luar negeri selalu cek ke jalur resmi.",
+      "Tidak. Hasil analisis CekLoker merupakan indikasi risiko awal (preliminary risk assessment) berbasis AI beserta penanda buktinya, bukan keputusan hukum atau jaminan mutlak. Selalu lakukan verifikasi mandiri melalui kanal resmi pemerintah sebelum mengambil keputusan kerja.",
   },
   {
     id: "faq-2",
