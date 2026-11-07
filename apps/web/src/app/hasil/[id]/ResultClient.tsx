@@ -437,7 +437,7 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   <span>Cetak PDF</span>
                 </button>
                 <Link
-                  href="/lapor"
+                  href={`/lapor?scan_id=${rawId}`}
                   className="btn btn-secondary btn-sm !text-bahaya-ink !border-bahaya-line hover:!bg-bahaya-tint cursor-pointer"
                 >
                   <Flag className="h-4 w-4" />
