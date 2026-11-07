@@ -52,14 +52,14 @@ export function Navbar() {
             <Link href="/#fitur" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
               Fitur Utama
             </Link>
-            <Link href="/#faq" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
-              FAQ
-            </Link>
             <Link href="/database-loker" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
-              Database Loker
+              Database
             </Link>
             <Link href="/lapor" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
-              Lapor Loker
+              Laporkan
+            </Link>
+            <Link href="/#faq" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
+              FAQ
             </Link>
             {session?.user && (
               <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 !px-2 text-sm font-bold text-navy lg:!px-3 lg:text-[15px]">
@@ -152,25 +152,25 @@ export function Navbar() {
               Fitur Utama
             </Link>
             <Link
-              href="/#faq"
-              className="nav-link w-full py-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              FAQ
-            </Link>
-            <Link
               href="/database-loker"
               className="nav-link w-full py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Database Loker
+              Database
             </Link>
             <Link
               href="/lapor"
               className="nav-link w-full py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Lapor Loker
+              Laporkan
+            </Link>
+            <Link
+              href="/#faq"
+              className="nav-link w-full py-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              FAQ
             </Link>
             {session?.user && (
               <Link
