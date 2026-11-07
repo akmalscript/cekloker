@@ -191,35 +191,6 @@ function LoginForm() {
               {loading && <span className="spinner" aria-hidden="true" />}
               <span>{loading ? "Memproses..." : "Masuk"}</span>
             </button>
-
-            {/* Quick-fill untuk Demo Pengujian / Juri */}
-            <div className="rounded-lg border border-dashed border-line bg-surface-muted/60 p-3 text-xs">
-              <div className="mb-2 flex items-center justify-between text-muted">
-                <span className="font-medium">Akun Demo Pengujian:</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail("admin@cekloker.id");
-                    setPassword("admin123");
-                  }}
-                  className="rounded border border-navy-soft bg-navy-tint px-2.5 py-1 text-xs font-semibold text-navy hover:bg-navy-soft transition-colors"
-                >
-                  ⚡ Isi Akun Admin
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail("user@cekloker.id");
-                    setPassword("user12345");
-                  }}
-                  className="rounded border border-line bg-white px-2.5 py-1 text-xs font-semibold text-ink hover:bg-surface-muted transition-colors"
-                >
-                  Isi Akun Pengguna
-                </button>
-              </div>
-            </div>
           </form>
 
           <div className="my-6 flex items-center gap-4 text-sm font-medium text-muted">
