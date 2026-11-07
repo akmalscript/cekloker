@@ -11,6 +11,7 @@ Pengaturan lewat .env (semuanya opsional, ada nilai bawaan yang aman):
   CEKLOKER_RATE_PER_MIN   batas permintaan per alamat IP per menit (bawaan 10)
   CEKLOKER_DAILY_CAP      batas total analisis per hari untuk semua pengguna (bawaan 200)
   CEKLOKER_TRUST_PROXY    1 bila API berada di belakang proxy/hosting yang mengisi X-Forwarded-For
+  CEKLOKER_MAX_GAMBAR     jumlah gambar maksimal per permintaan (bawaan 3)
   CEKLOKER_MAX_SISI       sisi terpanjang gambar dalam piksel sebelum dikirim ke AI (bawaan 1600, 0 = mati)
   CEKLOKER_DEBUG          1 untuk menampilkan field internal (_model, _detik, _dari_cache)
 """
@@ -46,6 +47,7 @@ RATE_PER_MIN = int(os.getenv("CEKLOKER_RATE_PER_MIN", "10"))
 DAILY_CAP = int(os.getenv("CEKLOKER_DAILY_CAP", "200"))
 TRUST_PROXY = os.getenv("CEKLOKER_TRUST_PROXY", "0") == "1"
 MAX_SISI = int(os.getenv("CEKLOKER_MAX_SISI", "1600"))
+MAKS_GAMBAR = int(os.getenv("CEKLOKER_MAX_GAMBAR", "3"))
 DEBUG = os.getenv("CEKLOKER_DEBUG", "0") == "1"
 
 FORMAT_OK = {"image/jpeg", "image/png", "image/webp"}
@@ -132,8 +134,8 @@ def analyze(  # sengaja bukan async: analisis memakai panggilan blocking, FastAP
     _cek_kunci(x_api_key)
     if not files and not teks:
         raise HTTPException(400, "Kirim minimal satu gambar atau teks.")
-    if len(files) > 5:
-        raise HTTPException(400, "Maksimal 5 gambar.")
+    if len(files) > MAKS_GAMBAR:
+        raise HTTPException(400, f"Maksimal {MAKS_GAMBAR} gambar.")
     if teks and len(teks) > MAKS_TEKS:
         raise HTTPException(400, f"Teks maksimal {MAKS_TEKS} karakter.")
 
