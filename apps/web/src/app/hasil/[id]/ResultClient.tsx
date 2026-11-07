@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Printer,
+  Download,
   Flag,
   RotateCcw,
   Building2,
@@ -455,6 +456,10 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
       <Navbar />
 
       <main className="flex-1 bg-canvas py-8 sm:py-12">
+        {/* Cap air saat dicetak via browser print (FR-HSL-02) */}
+        <div className="watermark-print hidden print:block" aria-hidden="true">
+          DOKUMEN EVALUASI RESMI CEKLOKER — HANYA UNTUK PELAPORAN
+        </div>
         <div className="container-page space-y-6">
           {/* Preset Selector Bar (Pengujian Prototipe) */}
           <div className="card p-3 bg-white flex flex-wrap items-center justify-between gap-3 no-print">
@@ -507,6 +512,15 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-2 shrink-0 no-print">
+                <a
+                  href={`/api/scan/${selectedKey !== "custom" ? selectedKey : rawId}/pdf`}
+                  download
+                  className="btn btn-secondary btn-sm cursor-pointer"
+                  title="Unduh berkas PDF formal dengan cap air resmi CekLoker"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>Unduh PDF Resmi</span>
+                </a>
                 <button
                   type="button"
                   onClick={handlePrint}
@@ -514,7 +528,7 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   title="Cetak atau simpan sebagai PDF"
                 >
                   <Printer className="h-4 w-4" />
-                  <span>Cetak PDF</span>
+                  <span>Cetak</span>
                 </button>
                 <Link
                   href={`/lapor?scan_id=${rawId}`}

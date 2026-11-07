@@ -15,7 +15,7 @@ load_dotenv()
 
 # Ganti lewat .env (GEMINI_MODEL). Cek nama model terbaru di Google AI Studio.
 MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
-_client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "dummy-api-key"))
 
 DISCLAIMER = (
     "Hasil ini adalah indikasi risiko dari alat bantu AI, bukan keputusan hukum "

@@ -27,14 +27,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (chronology.length > 10000) {
+      return NextResponse.json(
+        { error: "Deskripsi kronologi maksimal 10.000 karakter." },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize evidenceUrl to prevent javascript: or malformed URLs
+    let sanitizedEvidenceUrl: string | null = null;
+    if (evidenceUrl && typeof evidenceUrl === "string") {
+      const trimmedUrl = evidenceUrl.trim();
+      if (
+        trimmedUrl.startsWith("http://") ||
+        trimmedUrl.startsWith("https://") ||
+        trimmedUrl.startsWith("/")
+      ) {
+        sanitizedEvidenceUrl = trimmedUrl.slice(0, 1000);
+      }
+    }
+
+    const cleanJobTitle = jobTitle ? String(jobTitle).trim().slice(0, 255) : null;
+    const cleanCompany = companyName ? String(companyName).trim().slice(0, 255) : null;
+    const cleanContact = perpetratorContact ? String(perpetratorContact).trim().slice(0, 255) : null;
+    const cleanChronology = chronology.trim().slice(0, 10000);
+
     let parsedLoss: number | null = null;
     if (financialLoss) {
       const num = parseFloat(String(financialLoss).replace(/[^\d.-]/g, ""));
-      if (!isNaN(num)) parsedLoss = num;
+      if (!isNaN(num) && num >= 0 && num < 1e12) parsedLoss = num;
     }
 
     // Auto-detect TPPO emergency indicators if not explicitly specified
-    const textCorpus = `${chronology} ${jobTitle || ""} ${companyName || ""}`.toLowerCase();
+    const textCorpus = `${cleanChronology} ${cleanJobTitle || ""} ${cleanCompany || ""}`.toLowerCase();
     const isTppoEmergency =
       urgency === "darurat_tppo" ||
       textCorpus.includes("tppo") ||
@@ -59,14 +84,14 @@ export async function POST(request: NextRequest) {
           reportCode,
           scanId: scanId || null,
           userId,
-          jobTitle: jobTitle?.trim() || null,
-          companyName: companyName?.trim() || null,
+          jobTitle: cleanJobTitle,
+          companyName: cleanCompany,
           type: reportType,
           urgency: reportUrgency,
-          perpetratorContact: perpetratorContact?.trim() || null,
+          perpetratorContact: cleanContact,
           financialLoss: parsedLoss,
-          chronology: chronology.trim(),
-          evidenceUrl: evidenceUrl || null,
+          chronology: cleanChronology,
+          evidenceUrl: sanitizedEvidenceUrl,
           status: "pending",
         },
       });
