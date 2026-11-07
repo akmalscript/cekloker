@@ -15,62 +15,64 @@ export function Navbar() {
         className="container-page flex h-16 items-center justify-between gap-4"
         aria-label="Navigasi utama"
       >
-        {/* Desktop Links (di sebelah kiri logo) */}
-        <div className="hidden items-center gap-1 md:flex">
-          <Link href="/#cara-kerja" className="nav-link">
-            Cara Kerja
+        {/* Brand & Left Navigation */}
+        <div className="flex items-center gap-6 md:gap-8">
+          <Link
+            href="/"
+            className="flex items-center gap-2 rounded-ctl text-lg font-extrabold tracking-tight text-navy"
+            aria-label="CekLoker, ke beranda"
+          >
+            <svg className="h-8 w-8 shrink-0" viewBox="0 0 32 32" aria-hidden="true">
+              <rect width="32" height="32" rx="8" fill="#1E3A8A" />
+              <path
+                d="M9 13V9h4M19 9h4v4M23 19v4h-4M13 23H9v-4"
+                stroke="#fff"
+                strokeWidth="2"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M12.5 16.2l2.4 2.4 4.6-4.6"
+                stroke="#fff"
+                strokeWidth="2"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>CekLoker</span>
           </Link>
-          <Link href="/#fitur" className="nav-link">
-            Fitur
-          </Link>
-          <Link href="/#faq" className="nav-link">
-            FAQ
-          </Link>
-          {session?.user && (
-            <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
-              <History className="h-4 w-4" aria-hidden="true" />
-              Riwayat
-            </Link>
-          )}
-          {Boolean(
-            session?.user?.role === "ADMIN" ||
-              session?.user?.role === "MODERATOR" ||
-              session?.user?.email?.startsWith("admin@")
-          ) && (
-            <Link href="/admin" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
-              <Shield className="h-4 w-4" aria-hidden="true" />
-              Admin
-            </Link>
-          )}
-        </div>
 
-        {/* Logo CekLoker */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 rounded-ctl text-lg font-extrabold tracking-tight text-ink"
-          aria-label="CekLoker, ke beranda"
-        >
-          <svg className="h-8 w-8 shrink-0" viewBox="0 0 32 32" aria-hidden="true">
-            <rect width="32" height="32" rx="8" fill="#1E3A8A" />
-            <path
-              d="M9 13V9h4M19 9h4v4M23 19v4h-4M13 23H9v-4"
-              stroke="#fff"
-              strokeWidth="2"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M12.5 16.2l2.4 2.4 4.6-4.6"
-              stroke="#fff"
-              strokeWidth="2"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span>CekLoker</span>
-        </Link>
+          {/* Desktop Links (di sebelah kanan logo) */}
+          <div className="hidden items-center gap-1 md:flex">
+            <Link href="/#cara-kerja" className="nav-link">
+              Cara Kerja
+            </Link>
+            <Link href="/#fitur" className="nav-link">
+              Fitur
+            </Link>
+            <Link href="/#faq" className="nav-link">
+              FAQ
+            </Link>
+            {session?.user && (
+              <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
+                <History className="h-4 w-4" aria-hidden="true" />
+                Riwayat
+              </Link>
+            )}
+            {Boolean(
+              session?.user?.role === "ADMIN" ||
+                session?.user?.role === "MODERATOR" ||
+                session?.user?.email?.startsWith("admin@")
+            ) && (
+              <Link href="/admin" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
+                <Shield className="h-4 w-4" aria-hidden="true" />
+                Admin
+              </Link>
+            )}
+          </div>
+        </div>
 
         {/* Right CTA */}
         <div className="flex items-center gap-2">
