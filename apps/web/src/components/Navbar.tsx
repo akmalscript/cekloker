@@ -53,9 +53,6 @@ export function Navbar() {
           <Link href="/#faq" className="nav-link">
             FAQ
           </Link>
-          <Link href="/database-loker" className="nav-link">
-            Database Loker
-          </Link>
           {session?.user && (
             <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
               <History className="h-4 w-4" aria-hidden="true" />
@@ -77,7 +74,7 @@ export function Navbar() {
         {/* Desktop CTA */}
         <div className="flex items-center gap-2">
           {status === "loading" ? (
-            <div className="h-9 w-20 animate-pulse rounded-ctl bg-navy-tint hidden md:block" />
+            <div className="hidden h-9 w-20 animate-pulse rounded-ctl bg-navy-tint md:block" />
           ) : session?.user ? (
             <div className="hidden items-center gap-3 md:flex">
               <span className="flex items-center gap-1.5 text-sm font-semibold text-ink">
@@ -100,14 +97,10 @@ export function Navbar() {
             </Link>
           )}
 
-          <Link href="/cekloker" className="btn btn-primary btn-sm hidden md:inline-flex">
-            Cek Loker
-          </Link>
-
           {/* Mobile menu trigger */}
           <button
             type="button"
-            className="btn btn-ghost btn-sm !px-2.5 md:hidden"
+            className="inline-flex items-center justify-center rounded-ctl p-2 text-muted hover:bg-navy-tint hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-navy md:!hidden"
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-menu"
             aria-label={mobileMenuOpen ? "Tutup menu" : "Buka menu"}
@@ -126,7 +119,7 @@ export function Navbar() {
       {mobileMenuOpen && (
         <div
           id="mobile-menu"
-          className="border-b border-line bg-white px-4 py-4 md:hidden"
+          className="border-b border-line bg-white px-4 py-4 md:!hidden"
         >
           <div className="flex flex-col gap-2">
             <Link
@@ -199,13 +192,6 @@ export function Navbar() {
                   Masuk
                 </Link>
               )}
-              <Link
-                href="/cekloker"
-                className="btn btn-primary w-full"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Cek Loker Sekarang
-              </Link>
             </div>
           </div>
         </div>
