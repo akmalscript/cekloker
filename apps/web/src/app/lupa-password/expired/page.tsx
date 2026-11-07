@@ -1,9 +1,13 @@
 import Link from "next/link";
-import { ArrowLeft, AlertOctagon } from "lucide-react";
+import { ArrowLeft, OctagonAlert } from "lucide-react";
 
 export default function ExpiredTokenPage() {
   return (
     <div className="relative flex min-h-screen flex-col grid-paper">
+      <a href="#konten" className="skip-link">
+        Lewati ke konten utama
+      </a>
+
       {/* Kembali ke halaman masuk (pojok kiri atas) */}
       <header className="px-4 pt-4 sm:absolute sm:left-0 sm:top-0 sm:px-6 sm:pt-6">
         <Link href="/login" className="btn btn-ghost btn-sm !px-3">
@@ -19,7 +23,7 @@ export default function ExpiredTokenPage() {
         {/* Logo */}
         <Link
           href="/"
-          className="mb-12 flex items-center gap-2 rounded-ctl text-xl font-extrabold tracking-tight text-ink sm:mb-20"
+          className="mb-16 flex items-center gap-2 rounded-ctl text-xl font-extrabold tracking-tight text-ink sm:mb-28"
           aria-label="CekLoker, ke beranda"
         >
           <svg className="h-9 w-9 shrink-0" viewBox="0 0 32 32" aria-hidden="true">
@@ -45,8 +49,8 @@ export default function ExpiredTokenPage() {
         </Link>
 
         {/* Kartu status */}
-        <div className="card w-full max-w-[448px] p-6 text-center sm:p-8">
-          <AlertOctagon
+        <div className="card w-full max-w-[448px] p-6 text-center">
+          <OctagonAlert
             className="mx-auto h-14 w-14 text-waspada [stroke-width:1.5]"
             aria-hidden="true"
           />
