@@ -42,36 +42,37 @@ export function Navbar() {
           <span>CekLoker</span>
         </Link>
 
-        {/* Right Navigation & CTA */}
-        <div className="flex items-center gap-1 sm:gap-2">
-          {/* Desktop Links (di samping kiri Masuk) */}
-          <div className="hidden items-center gap-1 md:flex md:mr-1">
-            <Link href="/#cara-kerja" className="nav-link">
-              Cara Kerja
+        {/* Desktop Links (di tengah) */}
+        <div className="hidden items-center gap-1 md:flex">
+          <Link href="/#cara-kerja" className="nav-link">
+            Cara Kerja
+          </Link>
+          <Link href="/#fitur" className="nav-link">
+            Fitur
+          </Link>
+          <Link href="/#faq" className="nav-link">
+            FAQ
+          </Link>
+          {session?.user && (
+            <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
+              <History className="h-4 w-4" aria-hidden="true" />
+              Riwayat
             </Link>
-            <Link href="/#fitur" className="nav-link">
-              Fitur
+          )}
+          {Boolean(
+            session?.user?.role === "ADMIN" ||
+              session?.user?.role === "MODERATOR" ||
+              session?.user?.email?.startsWith("admin@")
+          ) && (
+            <Link href="/admin" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
+              <Shield className="h-4 w-4" aria-hidden="true" />
+              Admin
             </Link>
-            <Link href="/#faq" className="nav-link">
-              FAQ
-            </Link>
-            {session?.user && (
-              <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
-                <History className="h-4 w-4" aria-hidden="true" />
-                Riwayat
-              </Link>
-            )}
-            {Boolean(
-              session?.user?.role === "ADMIN" ||
-                session?.user?.role === "MODERATOR" ||
-                session?.user?.email?.startsWith("admin@")
-            ) && (
-              <Link href="/admin" className="nav-link inline-flex items-center gap-1.5 font-bold text-navy">
-                <Shield className="h-4 w-4" aria-hidden="true" />
-                Admin
-              </Link>
-            )}
-          </div>
+          )}
+        </div>
+
+        {/* Right CTA */}
+        <div className="flex items-center gap-2">
 
           {status === "loading" ? (
             <div className="hidden h-9 w-20 animate-pulse rounded-ctl bg-navy-tint md:block" />
