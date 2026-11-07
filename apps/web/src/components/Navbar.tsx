@@ -50,7 +50,7 @@ export function Navbar() {
               Cara Kerja
             </Link>
             <Link href="/#fitur" className="nav-link">
-              Fitur
+              Fitur Utama
             </Link>
             <Link href="/#faq" className="nav-link">
               FAQ
@@ -143,7 +143,7 @@ export function Navbar() {
               className="nav-link w-full py-2"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Fitur
+              Fitur Utama
             </Link>
             <Link
               href="/#faq"
