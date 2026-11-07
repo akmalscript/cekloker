@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff, AlertCircle } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, AlertCircle } from "lucide-react";
 
 function ResetContent() {
   const router = useRouter();
@@ -66,17 +66,29 @@ function ResetContent() {
 
   return (
     <div className="relative flex min-h-screen flex-col grid-paper">
+      <a href="#form-reset" className="skip-link">
+        Lewati ke formulir password baru
+      </a>
+
+      {/* Kembali (pojok kiri atas) */}
+      <header className="px-4 pt-4 sm:absolute sm:left-0 sm:top-0 sm:px-6 sm:pt-6 short:pt-4">
+        <Link href="/login" className="btn btn-ghost btn-sm !px-3">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Kembali
+        </Link>
+      </header>
+
       <main
         id="konten"
-        className="flex flex-col items-center px-4 pb-6 pt-6 sm:px-6 sm:pt-20"
+        className="flex flex-col items-center px-4 pb-6 pt-6 sm:px-6 sm:pt-20 short:pt-8"
       >
         {/* Logo */}
         <Link
           href="/"
-          className="mb-6 flex items-center gap-2 rounded-ctl text-xl font-extrabold tracking-tight text-navy"
+          className="mb-6 flex items-center gap-2 rounded-ctl text-xl font-extrabold tracking-tight text-navy short:mb-3"
           aria-label="CekLoker, ke beranda"
         >
-          <svg className="h-9 w-9 shrink-0" viewBox="0 0 32 32" aria-hidden="true">
+          <svg className="h-9 w-9 shrink-0 short:h-8 short:w-8" viewBox="0 0 32 32" aria-hidden="true">
             <rect width="32" height="32" rx="8" fill="#1E3A8A" />
             <path
               d="M9 13V9h4M19 9h4v4M23 19v4h-4M13 23H9v-4"
@@ -98,13 +110,13 @@ function ResetContent() {
           CekLoker
         </Link>
 
-        <h1 className="text-center text-[28px] sm:text-[40px]">Buat password baru</h1>
-        <p className="mt-2 max-w-[448px] text-center text-[15px] leading-relaxed text-muted">
+        <h1 className="text-center text-[28px] sm:text-[40px] short:text-[32px]">Buat password baru</h1>
+        <p className="mt-2 max-w-[448px] text-center text-[15px] leading-relaxed text-muted short:mt-1">
           Gunakan password baru untuk melindungi akun Anda.
         </p>
 
         {/* Kartu form */}
-        <div className="card mt-6 w-full max-w-[448px] p-6 sm:p-8">
+        <div className="card mt-6 w-full max-w-[448px] p-6 short:mt-4 short:py-5">
           {error && (
             <div className="alert alert-error mb-4" role="alert">
               <AlertCircle className="h-5 w-5 shrink-0 text-bahaya" aria-hidden="true" />
@@ -112,19 +124,25 @@ function ResetContent() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+          <form
+            id="form-reset"
+            onSubmit={handleSubmit}
+            className="space-y-4 short:space-y-3"
+            noValidate
+          >
             <div>
               <label htmlFor="password" className="field-label">
                 Password baru
               </label>
-              <div className="relative mt-2">
+              <div className="relative mt-2 short:mt-1">
                 <input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input !pr-32"
+                  className="input !pr-32 short:h-10"
+                  aria-describedby="password-hint"
                   autoComplete="new-password"
                   placeholder="Minimal 8 karakter"
                   required
@@ -132,7 +150,8 @@ function ResetContent() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-1 top-1/2 inline-flex h-10 -translate-y-1/2 items-center gap-2 rounded-lg px-3 text-[13px] font-semibold text-navy hover:bg-navy-tint"
+                  className="absolute right-1 top-1/2 inline-flex h-10 -translate-y-1/2 items-center gap-2 rounded-lg px-3 text-[13px] font-semibold text-navy hover:bg-navy-tint short:h-9"
+                  aria-controls="password password2"
                 >
                   {showPassword ? (
                     <>
@@ -147,7 +166,7 @@ function ResetContent() {
                   )}
                 </button>
               </div>
-              <p className="mt-2 text-[13px] leading-snug text-muted">
+              <p id="password-hint" className="mt-2 text-[13px] leading-snug text-muted">
                 Minimal 8 karakter
               </p>
             </div>
@@ -162,18 +181,18 @@ function ResetContent() {
                 type={showPassword ? "text" : "password"}
                 value={password2}
                 onChange={(e) => setPassword2(e.target.value)}
-                className="input mt-2"
+                className="input mt-2 short:mt-1 short:h-10"
                 autoComplete="new-password"
                 placeholder="Minimal 8 karakter"
                 required
               />
             </div>
 
-            <div className="pt-2">
+            <div className="pt-2 short:pt-0">
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary w-full"
+                className="btn btn-primary w-full short:min-h-[40px]"
               >
                 {loading && <span className="spinner" aria-hidden="true" />}
                 <span>{loading ? "Menyimpan..." : "Simpan Password Baru"}</span>
@@ -183,7 +202,7 @@ function ResetContent() {
         </div>
       </main>
 
-      <footer className="mt-auto px-4 pb-8 pt-6 text-center">
+      <footer className="mt-auto px-4 pb-8 pt-6 text-center short:pb-4">
         <p className="text-[13px] text-muted">© 2026 CekLoker. Seluruh hak cipta dilindungi.</p>
       </footer>
     </div>
