@@ -114,7 +114,7 @@ export default function AdminDashboardPage() {
             <Inbox className="h-4 w-4" aria-hidden="true" />
             <span>Tinjau Laporan ({s.reports.pending})</span>
           </Link>
-          <Link href="/database-loker" target="_blank" className="btn btn-secondary btn-sm">
+          <Link href="/admin/database-loker" className="btn btn-secondary btn-sm">
             <Database className="h-4 w-4" aria-hidden="true" />
             <span>Database Publik</span>
           </Link>
@@ -235,8 +235,7 @@ export default function AdminDashboardPage() {
           <div className="mt-4 pt-3 border-t border-line flex items-center justify-between text-xs">
             <span className="text-muted">Siap dicocokkan AI</span>
             <Link
-              href="/database-loker"
-              target="_blank"
+              href="/admin/database-loker"
               className="font-bold text-navy hover:underline flex items-center gap-1"
             >
               <span>Katalog</span>
