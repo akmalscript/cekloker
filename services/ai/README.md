@@ -1,27 +1,39 @@
 # CekLoker — Layanan Analisis AI
 
-Layanan analisis cerdas CekLoker berbasis Python FastAPI.
+Layanan analisis berbasis Python FastAPI. Menerima screenshot lowongan/chat perekrut
+dan/atau teks, lalu mengembalikan `AnalysisResult` (kontrak di `schema.py`).
 
-## Fitur Layanan:
+## Alur
 
-- Ekstraksi informasi lowongan kerja (OCR & teks)
-- Deteksi indikator tanda bahaya (_red flags_) berbasis Gemini AI
-- Penentuan koordinat visual (_box_2d_) untuk penanda bukti
-- Kalkulasi skor risiko (Aman, Waspada, Bahaya)
+gambar/teks → model (`RawAnalysis`) → pengayaan dari `catalog/redflags.json`
+(label, severity, dasar hukum) → skor risiko dihitung kode (`scoring.py`) → `AnalysisResult`.
 
-## Cara Menjalankan:
+Model hanya mengisi kode red flag, kutipan, alasan, kotak bukti, dan transkripsi.
+Tingkat risiko TIDAK ditentukan model.
 
-1. Pastikan Python 3.10+ terinstal.
-2. Pasang dependensi:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Siapkan API Key Gemini di `.env`:
-   ```env
-   GEMINI_API_KEY=your_api_key_here
-   ```
-4. Jalankan server:
-   ```bash
-   uvicorn main:app --reload --port 8000
-   ```
-5. Buka dokumentasi Swagger interaktif di: `http://localhost:8000/docs`
+## Menjalankan
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env   # isi OPENROUTER_API_KEY (atau GEMINI_API_KEY)
+uvicorn main:app --reload --port 8000
+```
+
+Dokumentasi interaktif: http://localhost:8000/docs
+
+## Tes
+
+```bash
+python3 -m pytest -q
+```
+
+`test_analyzer.py` tidak memanggil model sungguhan.
+
+## Batas input
+
+Maksimal 3 gambar (JPG/PNG/WEBP), 10 MB per gambar, 10.000 karakter teks.
+Input yang tidak bisa dianalisis dijawab HTTP 422 dengan `error_code`
+(`no_text_found`, `not_a_job_posting`, `low_quality_image`).
+
+Variabel lingkungan lengkap ada di `.env.example`.

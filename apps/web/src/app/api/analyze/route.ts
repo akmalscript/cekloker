@@ -8,7 +8,7 @@ import { verifyOfficialP3MI } from "@/lib/matching/p3mi-verifier";
 import type { AnalysisResult } from "@/types";
 
 const FASTAPI_URL = process.env.AI_SERVICE_URL || "http://127.0.0.1:8000";
-const MAX_FILES = 5;
+const MAX_FILES = 3;
 const MAX_FILE_SIZE_MB = 10;
 const MAX_TOTAL_SIZE_MB = 25;
 const MAX_TEXT_LENGTH = 10000;
@@ -18,6 +18,18 @@ const ALLOWED_MIME_TYPES = new Set([
   "image/webp",
   "application/pdf",
 ]);
+
+// Pesan untuk pengguna saat layanan AI menolak input (HTTP 422, error_code di kontrak)
+const AI_REJECTION_MESSAGES: Record<string, string> = {
+  not_a_job_posting:
+    "Gambar atau teks ini tampaknya bukan lowongan kerja atau chat dari perekrut. Unggah tangkapan layar lowongan atau percakapan perekrut.",
+  no_text_found:
+    "Tidak ada teks yang terbaca. Pastikan gambar memuat tulisan lowongan, atau tempelkan teksnya.",
+  low_quality_image:
+    "Gambar terlalu buram atau kecil untuk dibaca. Coba unggah tangkapan layar yang lebih jelas.",
+};
+const AI_REJECTION_DEFAULT =
+  "Input ini tidak dapat dianalisis. Coba unggah tangkapan layar lowongan atau chat perekrut yang jelas.";
 
 export async function POST(request: NextRequest) {
   try {
@@ -163,9 +175,25 @@ export async function POST(request: NextRequest) {
       const aiResponse = await fetch(`${FASTAPI_URL}/analyze`, {
         method: "POST",
         body: fastApiFormData,
-        // Timeout 30 detik untuk pemrosesan AI
-        signal: AbortSignal.timeout(30000),
+        // Timeout 60 detik untuk pemrosesan AI
+        signal: AbortSignal.timeout(60000),
       });
+
+      if (aiResponse.status === 422) {
+        // Input tidak bisa dianalisis. Ini jawaban yang sah, bukan layanan mati,
+        // jadi jangan jatuh ke hasil fallback dan jangan potong kuota tamu.
+        const body = (await aiResponse.json().catch(() => null)) as {
+          error_code?: string;
+        } | null;
+        const kode = body?.error_code ?? "";
+        return NextResponse.json(
+          {
+            error: AI_REJECTION_MESSAGES[kode] ?? AI_REJECTION_DEFAULT,
+            error_code: kode || undefined,
+          },
+          { status: 422 },
+        );
+      }
 
       if (!aiResponse.ok) {
         const errText = await aiResponse.text();
@@ -295,6 +323,11 @@ export async function POST(request: NextRequest) {
         : []),
     ];
     const posterMatchResult = await matchScamPosters(allInputHashes);
+
+    // Kontrak: image_phash berasal dari gambar ASLI (sebelum blur), dihitung di sini.
+    if (analysisResult.fingerprint) {
+      analysisResult.fingerprint.image_phash = phashes;
+    }
 
     // 6. Verifikasi Sumber Resmi P3MI & SIP2MI (M5 - FR-RSM-01 s/d 04)
     const companyQuery = analysisResult.extracted?.company;

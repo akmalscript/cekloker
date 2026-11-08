@@ -22,7 +22,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { cn } from "@/lib/utils";
 
-const MAX_FILES = 5;
+const MAX_FILES = 3;
 const MAX_FILE_SIZE_MB = 10;
 const MAX_TOTAL_SIZE_MB = 25;
 const MAX_TEXT_LENGTH = 10000;
@@ -383,7 +383,7 @@ export default function CekLokerPage() {
                 </div>
 
                 <p id="upload-hint" className="mt-4 text-center text-[13px] leading-snug text-muted">
-                  JPG, JPEG, PNG, WEBP, PDF. Maks. 5 file, 10 MB per file, total 25 MB.
+                  JPG, JPEG, PNG, WEBP, PDF. Maks. 3 file, 10 MB per file, total 25 MB.
                 </p>
 
                 {/* Daftar Berkas Terpilih */}

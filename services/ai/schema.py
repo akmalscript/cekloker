@@ -46,12 +46,28 @@ class RawFlag(BaseModel):
     image_index: int = 0
 
 
+RejectionCode = Literal["no_text_found", "not_a_job_posting", "low_quality_image"]
+
+
+class RawExtracted(BaseModel):
+    """Info lowongan versi mentah (longgar). Divalidasi ulang menjadi Extracted."""
+    position: str | None = None
+    company: str | None = None
+    country: str | None = None
+    salary: str | None = None
+    requirements: list[str] = Field(default_factory=list)
+    contact: list[str] = Field(default_factory=list)
+    fees: str | None = None
+
+
 class RawAnalysis(BaseModel):
     """Keseluruhan output mentah Gemini sebelum pengayaan dari katalog dan scoring.py."""
     summary: str
     confidence: float
+    input_type: InputType = "lowongan"
+    rejection: RejectionCode | None = None   # terisi bila input tidak bisa dianalisis (HTTP 422)
     extracted_text: str               # transkripsi penuh → menjadi fingerprint.raw_text
-    extracted: dict                   # mapping bebas; divalidasi ulang menjadi Extracted
+    extracted: RawExtracted           # divalidasi ulang menjadi Extracted
     red_flags: list[RawFlag]
 
 
