@@ -93,9 +93,6 @@ function SentContent() {
         </Link>
 
         <h1 className="text-center text-[28px] sm:text-[40px] short:text-[32px]">Periksa email Anda</h1>
-        <p className="mt-2 max-w-[448px] text-center text-[15px] leading-relaxed text-muted short:mt-1">
-          Ikuti tautan reset di email untuk membuat password baru.
-        </p>
 
         {/* Kartu konfirmasi */}
         <div className="card mt-6 w-full max-w-[448px] p-6 short:mt-4 short:py-5">
@@ -122,9 +119,6 @@ function SentContent() {
                   : "Kirim ulang"}
               </span>
             </button>
-            <Link href="/login" className="btn btn-ghost w-full short:min-h-[40px]">
-              Kembali ke Masuk
-            </Link>
           </div>
         </div>
       </main>
