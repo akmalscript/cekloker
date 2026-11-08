@@ -4,7 +4,36 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { ArrowLeft, ArrowRight, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, CircleAlert } from "lucide-react";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function validateNama(val: string): string {
+  const v = val.trim();
+  if (!v) return "Nama pengguna wajib diisi.";
+  if (v.length < 3) return "Nama pengguna minimal 3 karakter.";
+  if (v.length > 30) return "Nama pengguna maksimal 30 karakter.";
+  return "";
+}
+
+function validateEmail(val: string): string {
+  const v = val.trim();
+  if (!v) return "Email wajib diisi.";
+  if (!EMAIL_RE.test(v)) return "Format email belum benar. Contoh: nama@email.com";
+  return "";
+}
+
+function validatePassword(val: string): string {
+  if (!val) return "Password wajib diisi.";
+  if (val.length < 8) return "Password minimal 8 karakter.";
+  return "";
+}
+
+function validatePassword2(val: string, pw: string): string {
+  if (!val) return "Ulangi password Anda.";
+  if (val !== pw) return "Password belum sama. Periksa kembali.";
+  return "";
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,25 +45,47 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{
+    nama?: string;
+    email?: string;
+    password?: string;
+    password2?: string;
+  }>({});
+  const [attempted, setAttempted] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setAttempted(true);
+    setServerError(null);
 
-    const emailTrim = email.trim();
-    if (!emailTrim) {
-      setError("Email wajib diisi.");
+    const errNama = validateNama(nama);
+    const errEmail = validateEmail(email);
+    const errPw = validatePassword(password);
+    const errPw2 = validatePassword2(password2, password);
+
+    const newErrors = {
+      nama: errNama,
+      email: errEmail,
+      password: errPw,
+      password2: errPw2,
+    };
+    setErrors(newErrors);
+
+    if (errNama) {
+      document.getElementById("nama")?.focus();
       return;
     }
-
-    if (password.length < 8) {
-      setError("Password minimal 8 karakter.");
+    if (errEmail) {
+      document.getElementById("email")?.focus();
       return;
     }
-
-    if (password !== password2) {
-      setError("Ulangi password tidak cocok.");
+    if (errPw) {
+      document.getElementById("password")?.focus();
+      return;
+    }
+    if (errPw2) {
+      document.getElementById("password2")?.focus();
       return;
     }
 
@@ -45,8 +96,8 @@ export default function RegisterPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: nama.trim() || undefined,
-          email: emailTrim,
+          name: nama.trim(),
+          email: email.trim(),
           password,
         }),
       });
@@ -54,7 +105,7 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Gagal membuat akun.");
+        setServerError(data.error || "Gagal membuat akun.");
         setLoading(false);
         return;
       }
@@ -62,7 +113,7 @@ export default function RegisterPage() {
       // Login otomatis setelah registrasi berhasil
       const loginRes = await signIn("credentials", {
         redirect: false,
-        email: emailTrim,
+        email: email.trim(),
         password,
       });
 
@@ -74,7 +125,7 @@ export default function RegisterPage() {
       }
     } catch (err) {
       console.error("Register error:", err);
-      setError("Terjadi kesalahan sistem saat mendaftar.");
+      setServerError("Terjadi kesalahan sistem saat mendaftar.");
       setLoading(false);
     }
   };
@@ -137,10 +188,13 @@ export default function RegisterPage() {
 
         {/* Kartu form */}
         <div className="card mt-8 w-full max-w-[448px] p-6 short:mt-4 short:py-5">
-          {error && (
+          {serverError && (
             <div className="alert alert-error mb-4" role="alert">
-              <AlertCircle className="h-5 w-5 shrink-0 text-bahaya" aria-hidden="true" />
-              <p className="text-sm font-semibold">{error}</p>
+              <CircleAlert className="mt-0.5 h-5 w-5 shrink-0 text-bahaya-ink" aria-hidden="true" />
+              <div>
+                <p className="font-bold text-ink">Gagal membuat akun</p>
+                <p className="text-sm text-muted">{serverError}</p>
+              </div>
             </div>
           )}
 
@@ -190,10 +244,28 @@ export default function RegisterPage() {
                 name="nama"
                 type="text"
                 value={nama}
-                onChange={(e) => setNama(e.target.value)}
+                onChange={(e) => {
+                  setNama(e.target.value);
+                  if (attempted || errors.nama) {
+                    setErrors((prev) => ({ ...prev, nama: validateNama(e.target.value) }));
+                  }
+                }}
+                onBlur={() => {
+                  if (attempted || nama) {
+                    setErrors((prev) => ({ ...prev, nama: validateNama(nama) }));
+                  }
+                }}
                 className="input mt-2 short:mt-1 short:h-10"
                 autoComplete="username"
+                aria-invalid={Boolean(errors.nama)}
+                aria-describedby={errors.nama ? "nama-error" : undefined}
               />
+              {errors.nama && (
+                <p id="nama-error" className="field-error" role="alert">
+                  <CircleAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{errors.nama}</span>
+                </p>
+              )}
             </div>
 
             <div>
@@ -205,13 +277,30 @@ export default function RegisterPage() {
                 name="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (attempted || errors.email) {
+                    setErrors((prev) => ({ ...prev, email: validateEmail(e.target.value) }));
+                  }
+                }}
+                onBlur={() => {
+                  if (attempted || email) {
+                    setErrors((prev) => ({ ...prev, email: validateEmail(email) }));
+                  }
+                }}
                 className="input mt-2 short:mt-1 short:h-10"
                 autoComplete="email"
                 inputMode="email"
                 placeholder="nama@email.com"
-                required
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? "email-error" : undefined}
               />
+              {errors.email && (
+                <p id="email-error" className="field-error" role="alert">
+                  <CircleAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{errors.email}</span>
+                </p>
+              )}
             </div>
 
             <div>
@@ -224,11 +313,35 @@ export default function RegisterPage() {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setPassword(val);
+                    if (attempted || errors.password) {
+                      setErrors((prev) => ({ ...prev, password: validatePassword(val) }));
+                    }
+                    if (password2) {
+                      setErrors((prev) => ({
+                        ...prev,
+                        password2: validatePassword2(password2, val),
+                      }));
+                    }
+                  }}
+                  onBlur={() => {
+                    if (attempted || password) {
+                      setErrors((prev) => ({ ...prev, password: validatePassword(password) }));
+                    }
+                  }}
                   className="input !pr-14 short:h-10"
-                  aria-describedby="password-hint"
                   autoComplete="new-password"
-                  required
+                  aria-invalid={Boolean(errors.password)}
+                  aria-describedby={
+                    [
+                      "password-hint",
+                      errors.password ? "password-error" : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" ")
+                  }
                 />
                 <button
                   type="button"
@@ -248,6 +361,12 @@ export default function RegisterPage() {
               <p id="password-hint" className="mt-2 text-[13px] leading-snug text-muted">
                 Minimal 8 karakter
               </p>
+              {errors.password && (
+                <p id="password-error" className="field-error" role="alert">
+                  <CircleAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{errors.password}</span>
+                </p>
+              )}
             </div>
 
             <div>
@@ -259,11 +378,35 @@ export default function RegisterPage() {
                 name="password2"
                 type={showPassword ? "text" : "password"}
                 value={password2}
-                onChange={(e) => setPassword2(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setPassword2(val);
+                  if (attempted || errors.password2) {
+                    setErrors((prev) => ({
+                      ...prev,
+                      password2: validatePassword2(val, password),
+                    }));
+                  }
+                }}
+                onBlur={() => {
+                  if (attempted || password2) {
+                    setErrors((prev) => ({
+                      ...prev,
+                      password2: validatePassword2(password2, password),
+                    }));
+                  }
+                }}
                 className="input mt-2 short:mt-1 short:h-10"
                 autoComplete="new-password"
-                required
+                aria-invalid={Boolean(errors.password2)}
+                aria-describedby={errors.password2 ? "password2-error" : undefined}
               />
+              {errors.password2 && (
+                <p id="password2-error" className="field-error" role="alert">
+                  <CircleAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{errors.password2}</span>
+                </p>
+              )}
             </div>
 
             <button
@@ -272,7 +415,7 @@ export default function RegisterPage() {
               className="btn btn-primary w-full short:min-h-[40px]"
             >
               {loading && <span className="spinner" aria-hidden="true" />}
-              <span>{loading ? "Mendaftarkan..." : "Daftar"}</span>
+              <span>{loading ? "Memproses..." : "Daftar"}</span>
             </button>
           </form>
         </div>
