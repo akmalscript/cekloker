@@ -130,7 +130,12 @@ def _openrouter(model: str, bagian: list, system_prompt: str, skema: type[BaseMo
     try:
         return skema.model_validate_json(_isi_json(isi))
     except Exception as e:
-        raise ModelError(None, f"Jawaban model bukan JSON yang sesuai skema: {isi[:300]}") from e
+        fin = data["choices"][0].get("finish_reason")
+        raise ModelError(
+            None,
+            f"Jawaban model bukan JSON yang sesuai skema (finish_reason={fin}, panjang={len(isi)}): "
+            f"{isi[:120]} ... {isi[-200:]} || galat: {str(e)[:200]}",
+        ) from e
 
 
 # ---------------------------------------------------------------- pintu masuk
