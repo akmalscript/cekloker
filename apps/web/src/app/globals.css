@@ -134,6 +134,10 @@ html :is(h1, h2, h3) {
   border: 2px solid rgba(255, 255, 255, .35); border-top-color: #fff;
   animation: ck-spin .8s linear infinite;
 }
+.spinner-navy {
+  border-color: rgba(30, 58, 138, .2);
+  border-top-color: var(--ck-navy);
+}
 @keyframes ck-spin { to { transform: rotate(360deg); } }
 
 /* ---------- Input ---------- */
