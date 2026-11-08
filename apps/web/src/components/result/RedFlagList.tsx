@@ -67,10 +67,10 @@ export function RedFlagList({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3.5">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-ink flex items-center gap-2">
-          <ShieldAlert className="h-5 w-5 text-bahaya-ink" />
+        <h3 className="text-sm sm:text-base font-bold text-ink flex items-center gap-2">
+          <ShieldAlert className="h-4 w-4 text-bahaya-ink" />
           <span>Rincian Indikasi Bahaya ({redFlags.length})</span>
         </h3>
         <span className="text-xs text-muted">
@@ -78,7 +78,7 @@ export function RedFlagList({
         </span>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {redFlags.map((flag) => {
           const isActive = activeCode === flag.code;
           const isOpen = !!expandedCodes[flag.code];
@@ -102,9 +102,9 @@ export function RedFlagList({
               key={flag.code}
               id={`flag-card-${flag.code}`}
               className={cn(
-                "card p-4 sm:p-5 transition-all duration-300 border bg-white rounded-2xl relative",
+                "card p-3 sm:p-3.5 transition-all duration-300 border bg-white rounded-xl relative",
                 isActive
-                  ? "border-navy ring-4 ring-navy/25 ring-offset-1 bg-navy-tint/20 shadow-lg scale-[1.01] -translate-y-0.5 z-10"
+                  ? "border-navy ring-4 ring-navy/25 ring-offset-1 bg-navy-tint/20 shadow-md scale-[1.005] -translate-y-0.5 z-10"
                   : "border-line hover:border-slate-300 hover:shadow-sm"
               )}
             >
@@ -114,26 +114,26 @@ export function RedFlagList({
                 onClick={() => toggleExpand(flag.code)}
               >
                 {/* Kiri: Avatar Ikon Bulat + Judul Indikasi */}
-                <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <div
                     className={cn(
-                      "h-10 w-10 sm:h-11 sm:w-11 rounded-full flex items-center justify-center shrink-0",
+                      "h-8 w-8 sm:h-8.5 sm:w-8.5 rounded-full flex items-center justify-center shrink-0",
                       circleStyle
                     )}
                   >
-                    <IconComponent className="h-5 w-5 sm:h-6 sm:w-6 stroke-[2.2]" />
+                    <IconComponent className="h-4 w-4 sm:h-4.5 sm:w-4.5 stroke-[2.2]" />
                   </div>
-                  <h4 className="font-bold text-base sm:text-lg text-ink truncate leading-tight">
+                  <h4 className="font-bold text-xs sm:text-sm text-ink truncate leading-tight">
                     {flag.label}
                   </h4>
                 </div>
 
                 {/* Kanan: Badge Tingkat Risiko & Chevron Toggle */}
-                <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-                  <RiskBadge status={flag.severity} />
+                <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                  <RiskBadge status={flag.severity} className="text-xs !py-0.5 !px-2.5" />
                   <ChevronDown
                     className={cn(
-                      "h-5 w-5 text-slate-500 transition-transform duration-200",
+                      "h-4 w-4 text-slate-400 transition-transform duration-200",
                       isOpen && "rotate-180"
                     )}
                   />
@@ -142,16 +142,16 @@ export function RedFlagList({
 
               {/* Konten Detail saat Terbuka (Collapsible Expanded) */}
               {isOpen && (
-                <div className="mt-4 pt-1 space-y-3.5">
+                <div className="mt-3 pt-1 space-y-2.5">
                   {/* Deskripsi Alasan */}
-                  <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-normal">
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
                     {flag.reason}
                   </p>
 
                   {/* Kutipan Bukti */}
                   {flag.quote && (
-                    <div className="rounded-xl bg-slate-50 p-3.5 text-sm text-slate-800 border border-slate-200/80 flex items-start gap-2.5">
-                      <MessageSquare className="h-4 w-4 shrink-0 text-muted mt-0.5" />
+                    <div className="rounded-lg bg-slate-50 p-2.5 text-xs sm:text-sm text-slate-700 border border-slate-200/80 flex items-start gap-2">
+                      <MessageSquare className="h-3.5 w-3.5 shrink-0 text-muted mt-0.5" />
                       <p className="italic font-medium text-slate-800">
                         &ldquo;{flag.quote}&rdquo;
                       </p>
@@ -161,8 +161,8 @@ export function RedFlagList({
                   {/* Badge Bukti Visual */}
                   {(flag.regions?.length ?? 0) > 0 && (
                     <div className="pt-0.5">
-                      <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-900 bg-blue-100/70 border border-blue-200/60 px-3 py-1 rounded-full">
-                        <Eye className="h-3.5 w-3.5 text-blue-800" />
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-blue-900 bg-blue-100/70 border border-blue-200/60 px-2.5 py-0.5 rounded-full">
+                        <Eye className="h-3 w-3 text-blue-800" />
                         <span>{flag.regions?.length} bukti visual</span>
                       </span>
                     </div>
@@ -170,20 +170,20 @@ export function RedFlagList({
 
                   {/* Dasar Hukum (bila ada) */}
                   {flag.legal_basis && (
-                    <div className="flex items-center gap-2 text-xs text-slate-600 font-medium pt-0.5">
-                      <BookOpen className="h-3.5 w-3.5 shrink-0 text-navy" />
+                    <div className="flex items-center gap-2 text-[11px] text-slate-600 font-medium pt-0.5">
+                      <BookOpen className="h-3 w-3 shrink-0 text-navy" />
                       <span>Dasar Rujukan: {flag.legal_basis}</span>
                     </div>
                   )}
 
                   {/* Bottom Bar: Koreksi / Sanggahan */}
-                  <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between no-print">
-                    <span className="text-xs sm:text-sm text-slate-500 font-normal">
+                  <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between no-print">
+                    <span className="text-[11px] sm:text-xs text-slate-500 font-normal">
                       Merasa tanda ini keliru?
                     </span>
                     <button
                       type="button"
-                      className="text-xs sm:text-sm font-bold text-navy hover:underline cursor-pointer"
+                      className="text-[11px] sm:text-xs font-semibold text-navy hover:underline cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         onOpenFeedback(flag);

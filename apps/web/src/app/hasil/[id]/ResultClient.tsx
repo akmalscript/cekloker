@@ -632,7 +632,7 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
           {/* Grid Layout 2 Kolom: Kiri Poster Anotasi, Kanan Informasi & Temuan */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Kolom Kiri: Visual Poster & Anotasi Bounding Box (5/12) */}
-            <div className="lg:col-span-5 sticky top-20 space-y-6">
+            <div className="lg:col-span-5 sticky top-20">
               <PosterAnnotator
                 imageSrc={image}
                 imageAlt={result.extracted?.position ?? "Poster lowongan"}
@@ -640,7 +640,10 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                 activeCode={activeFlagCode}
                 onSelectFlag={(code) => setActiveFlagCode(code)}
               />
+            </div>
 
+            {/* Kolom Kanan: Rincian Red Flags & Verifikasi Resmi (7/12) */}
+            <div className="lg:col-span-7 space-y-6">
               {/* Informasi Lowongan Diekstrak */}
               <div className="card p-5 bg-white space-y-4">
                 <h3 className="font-bold text-base text-ink flex items-center gap-2">
@@ -694,10 +697,6 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   )}
                 </div>
               </div>
-            </div>
-
-            {/* Kolom Kanan: Rincian Red Flags & Verifikasi Resmi (7/12) */}
-            <div className="lg:col-span-7 space-y-6">
               {/* Notifikasi Pencocokan Poster Scam Terverifikasi (M4 - FR-PST-01 s/d 03) */}
               {scam_matches > 0 && (
                 <div className="card p-5 bg-white border border-bahaya-line space-y-3">
@@ -857,44 +856,45 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                 onOpenFeedback={(flag) => setFeedbackFlag(flag)}
               />
 
-              {/* Rekomendasi Tindakan Keamanan */}
-              <div className="card p-6 sm:p-8 bg-white shadow-card rounded-2xl border border-line space-y-6">
-                <h3 className="font-bold text-base sm:text-lg text-ink text-center">
-                  Rekomendasi Tindakan Keamanan
-                </h3>
+            </div>
+          </div>
 
-                <div className="relative">
-                  {/* Garis Putus-Putus Penghubung (Desktop) */}
-                  <div
-                    className="hidden md:block absolute top-7 left-12 right-12 border-t-2 border-dashed border-slate-200 z-0"
-                    aria-hidden="true"
-                  />
+          {/* Rekomendasi Tindakan Keamanan (Melebar Penuh / Full Width) */}
+          <div className="card p-6 sm:p-8 bg-white shadow-card rounded-2xl border border-line space-y-6">
+            <h3 className="font-bold text-base sm:text-lg text-ink text-center">
+              Rekomendasi Tindakan Keamanan
+            </h3>
 
-                  {/* 3 Langkah Horizontal */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 relative z-10">
-                    {recommendationSteps.map((step, idx) => {
-                      const StepIcon = step.icon;
-                      return (
-                        <div key={idx} className="flex flex-col items-center text-center">
-                          <div
-                            className={cn(
-                              "h-14 w-14 rounded-full bg-white border-2 flex items-center justify-center shadow-xs transition-transform hover:scale-105",
-                              step.border
-                            )}
-                          >
-                            <StepIcon className={cn("h-6 w-6 stroke-[2]", step.textColor)} />
-                          </div>
-                          <h4 className="mt-3.5 font-bold text-sm sm:text-base text-ink">
-                            {step.title}
-                          </h4>
-                          <p className="mt-1 text-xs sm:text-sm text-slate-600 leading-relaxed max-w-xs">
-                            {step.desc}
-                          </p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+            <div className="relative">
+              {/* Garis Putus-Putus Penghubung (Desktop) */}
+              <div
+                className="hidden md:block absolute top-7 left-16 right-16 border-t-2 border-dashed border-slate-200 z-0"
+                aria-hidden="true"
+              />
+
+              {/* 3 Langkah Horizontal Melebar Penuh */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-10 relative z-10">
+                {recommendationSteps.map((step, idx) => {
+                  const StepIcon = step.icon;
+                  return (
+                    <div key={idx} className="flex flex-col items-center text-center">
+                      <div
+                        className={cn(
+                          "h-14 w-14 rounded-full bg-white border-2 flex items-center justify-center shadow-xs transition-transform hover:scale-105",
+                          step.border
+                        )}
+                      >
+                        <StepIcon className={cn("h-6 w-6 stroke-[2]", step.textColor)} />
+                      </div>
+                      <h4 className="mt-3.5 font-bold text-sm sm:text-base text-ink">
+                        {step.title}
+                      </h4>
+                      <p className="mt-1 text-xs sm:text-sm text-slate-600 leading-relaxed max-w-sm">
+                        {step.desc}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
