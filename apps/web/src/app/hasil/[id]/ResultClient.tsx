@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  Printer,
   Download,
   Flag,
   RotateCcw,
@@ -39,7 +38,6 @@ interface OfficialCheckUI {
   similarity_score?: number;
   detail: string;
   link: string;
-  mandatory_disclaimer?: string;
 }
 
 interface ScamMatchItemUI {
@@ -96,10 +94,8 @@ const PRESET_DATASETS: Record<string, DatasetItem> = {
     official_check: {
       found: false,
       detail:
-        "Nama entitas tidak dicantumkan dan tidak ditemukan pada data resmi P3MI Kementerian Ketenagakerjaan maupun SISKOP2MI BP2MI.",
+        "Nama perusahaan tidak ditemukan pada data resmi P3MI Kementerian Ketenagakerjaan maupun SISKOP2MI BP2MI.",
       link: "https://siskop2mi.bp2mi.go.id/",
-      mandatory_disclaimer:
-        'Catatan penting: Status "tidak ditemukan" pada basis data resmi bukan bukti bahwa suatu perusahaan otomatis ilegal/kriminal, melainkan menunjukkan ketiadaan jaminan pelindungan hukum ketenagakerjaan resmi dari negara RI.',
     },
     result: {
       schema_version: "1.0",
@@ -111,7 +107,7 @@ const PRESET_DATASETS: Record<string, DatasetItem> = {
         "Lowongan ini memiliki indikator bahaya kritis yang mengarah kuat pada sindikat daring penipuan dan Tindak Pidana Perdagangan Orang (TPPO). Ditemukan desakan berangkat kilat, penahanan paspor, dan penggunaan visa turis tanpa kontrak resmi ketenagakerjaan.",
       extracted: {
         position: "CUSTOMER SERVICE ONLINE",
-        company: "Tidak Dicantumkan (Anonim)",
+        company: "Tidak Ditemukan",
         country: "Phnom Penh, KAMBOJA",
         salary: "USD 1.500 + BONUS",
         fees: "Rp 2.500.000 (di muka)",
@@ -377,10 +373,6 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
     fetchScan();
   }, [rawId]);
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   if (loading) {
     return (
       <>
@@ -408,7 +400,7 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
             <div className="card p-8 bg-white shadow-card space-y-4">
               <AlertCircle className="mx-auto h-12 w-12 text-bahaya stroke-[2]" />
               <h2 className="text-xl font-bold text-ink">Hasil Tidak Ditemukan</h2>
-              <p className="text-sm text-muted leading-relaxed">
+              <p className="text-sm text-muted leading-relaxed whitespace-pre-line">
                 {error ?? "Sesi pemeriksaan tamu telah melewati batas retensi 24 jam atau tautan tidak valid."}
               </p>
               <div className="pt-2">
@@ -441,7 +433,6 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
             similarity_score: dynamicScan.officialCheck.similarityScore,
             detail: dynamicScan.officialCheck.detail,
             link: dynamicScan.officialCheck.link,
-            mandatory_disclaimer: dynamicScan.officialCheck.mandatoryDisclaimer,
           },
           scam_matches: dynamicScan.scamMatches,
           scam_details: dynamicScan.scamDetails as ScamDetailsUI | undefined,
@@ -487,27 +478,18 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
 
           {/* Kartu Ringkasan Hasil Utama */}
           <div className="card p-6 sm:p-8 bg-white shadow-card">
-            <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-              <div className="space-y-3">
-                <div className="flex flex-wrap items-center gap-3">
-                  <RiskBadge status={result.risk_level} className="badge-lg" />
-                  <span className="text-xs font-semibold text-muted bg-slate-100 px-3 py-1 rounded-full">
-                    Tingkat Keyakinan AI: {Math.round(result.confidence * 100)}%
+            {/* Baris Atas: Badge Status Risiko & Tombol Aksi Cepat */}
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-wrap items-center gap-3">
+                <RiskBadge status={result.risk_level} className="badge-lg" />
+                <span className="text-xs font-semibold text-muted bg-slate-100 px-3 py-1 rounded-full">
+                  Tingkat Keyakinan AI: {Math.round(result.confidence * 100)}%
+                </span>
+                {scam_matches > 0 && (
+                  <span className="text-xs font-semibold text-bahaya-ink bg-bahaya-tint px-3 py-1 rounded-full border border-bahaya-line">
+                    Cocok dengan {scam_matches} laporan penipuan terverifikasi
                   </span>
-                  {scam_matches > 0 && (
-                    <span className="text-xs font-semibold text-bahaya-ink bg-bahaya-tint px-3 py-1 rounded-full border border-bahaya-line">
-                      Cocok dengan {scam_matches} laporan penipuan terverifikasi
-                    </span>
-                  )}
-                </div>
-
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-ink">
-                  Hasil Pemeriksaan Lowongan
-                </h1>
-
-                <p className="max-w-3xl text-sm sm:text-base text-slate-700 leading-relaxed">
-                  {result.summary}
-                </p>
+                )}
               </div>
 
               {/* Action Buttons */}
@@ -521,15 +503,6 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   <Download className="h-4 w-4" />
                   <span>Unduh PDF Resmi</span>
                 </a>
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="btn btn-secondary btn-sm cursor-pointer"
-                  title="Cetak atau simpan sebagai PDF"
-                >
-                  <Printer className="h-4 w-4" />
-                  <span>Cetak</span>
-                </button>
                 <Link
                   href={`/lapor?scan_id=${rawId}`}
                   className="btn btn-secondary btn-sm !text-bahaya-ink !border-bahaya-line hover:!bg-bahaya-tint cursor-pointer"
@@ -544,9 +517,15 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
               </div>
             </div>
 
-            {/* Disclaimer Kontekstual */}
-            <div className="mt-6 pt-6 border-t border-line">
-              <DisclaimerBanner />
+            {/* Judul & Ringkasan Hasil (diturunkan ke bawah agar teks judul cukup 1 baris) */}
+            <div className="mt-5 space-y-2">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-ink">
+                Hasil Pemeriksaan Lowongan
+              </h1>
+
+              <p className="max-w-4xl text-sm sm:text-base text-slate-700 leading-relaxed">
+                {result.summary}
+              </p>
             </div>
           </div>
 
@@ -574,7 +553,11 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                     <Building2 className="h-4 w-4 shrink-0 text-muted" />
                     <span>Perusahaan:</span>
                     <strong className="text-ink ml-auto">
-                      {result.extracted?.company ?? "-"}
+                      {!result.extracted?.company ||
+                      result.extracted.company === "-" ||
+                      result.extracted.company.toLowerCase().includes("tidak dicantumkan")
+                        ? "Tidak Ditemukan"
+                        : result.extracted.company}
                     </strong>
                   </div>
                   <div className="flex items-center gap-2 text-slate-600">
@@ -728,10 +711,6 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   </div>
                 )}
 
-                {!official_check.found && (
-                  <DisclaimerBanner variant="official_unfound" />
-                )}
-
                 <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
                   <a
                     href={official_check.link || "https://siskop2mi.bp2mi.go.id/"}
@@ -820,6 +799,9 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
               </div>
             </div>
           </div>
+
+          {/* Disclaimer Kontekstual */}
+          <DisclaimerBanner />
         </div>
       </main>
 

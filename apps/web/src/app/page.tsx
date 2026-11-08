@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { RiskBadge } from "@/components/ui/Badge";
 import { HeroScanner } from "@/components/landing/HeroScanner";
 import { FaqAccordion } from "@/components/landing/FaqAccordion";
@@ -68,7 +67,7 @@ export default function HomePage() {
               </div>
               <div className="md:border-l md:border-line md:pl-12">
                 <p className="max-w-2xl text-xl font-semibold leading-relaxed text-ink sm:text-2xl sm:leading-relaxed">
-                  iklan loker luar negeri fiktif diturunkan pemerintah sepanjang Januari–Agustus
+                  iklan loker luar negeri fiktif diturunkan pemerintah sepanjang Januari - Agustus
                   2026, tapi iklan serupa terus muncul lagi lewat akun baru.
                 </p>
                 <p className="mt-4 text-[13px] text-muted">
@@ -117,7 +116,7 @@ export default function HomePage() {
                   </h3>
                 </div>
                 <p className="mt-3 text-muted">
-                  Screenshot poster lowongan atau chat perekrut, atau tempel teksnya secara manual.
+                  Screenshot lowongan, chat perekrut, atau tempel teksnya secara manual.
                 </p>
               </li>
 
@@ -212,7 +211,7 @@ export default function HomePage() {
                 </span>
                 <h3 className="mt-6 text-xl">Deteksi red flag</h3>
                 <p className="mt-3 text-muted">
-                  Gaji tidak wajar, visa turis, permintaan biaya di muka, hingga penahanan paspor.
+                  Gaji tidak wajar, visa turis, permintaan biaya di awal, hingga penahanan paspor.
                 </p>
               </article>
               <article className="card card-hover p-6">
@@ -360,11 +359,11 @@ export default function HomePage() {
                     Ragu dengan sebuah lowongan?
                   </h2>
                   <p className="mt-4 text-lg leading-relaxed text-white/85">
-                    Cek dulu dalam hitungan detik, gratis dan tanpa harus mendaftar akun.
+                    Cek sekarang dalam hitungan detik, gratis dan tanpa login.
                   </p>
                 </div>
                 <Link href="/cekloker" className="btn btn-white shrink-0 self-start md:self-auto">
-                  Cek Loker Sekarang
+                  Cek Sekarang
                   <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </Link>
               </div>
@@ -372,12 +371,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ================= PERINGATAN / DISCLAIMER ================= */}
-        <section className="border-t border-line py-12" aria-label="Catatan penting">
-          <div className="container-page">
-            <DisclaimerBanner className="mx-auto max-w-3xl" />
-          </div>
-        </section>
       </main>
 
       <Footer />

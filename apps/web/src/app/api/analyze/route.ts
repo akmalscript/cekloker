@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
               "Tamu dapat melakukan maksimal 3 kali pemeriksaan per hari. Silakan masuk atau daftarkan akun gratis untuk melanjutkan.",
             quota,
           },
-          { status: 429 }
+          { status: 429 },
         );
       }
     }
@@ -57,27 +57,32 @@ export async function POST(request: NextRequest) {
     if (files.length === 0 && !teks.trim()) {
       return NextResponse.json(
         { error: "Kirim minimal satu gambar/dokumen atau teks lowongan." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (files.length > MAX_FILES) {
       return NextResponse.json(
         { error: `Maksimal ${MAX_FILES} berkas yang dapat diunggah.` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (teks.length > MAX_TEXT_LENGTH) {
       return NextResponse.json(
         { error: `Teks melebihi batas maksimal ${MAX_TEXT_LENGTH} karakter.` },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // 3. Preprocessing & PII Blur Pipeline (FR-PRI-01 & AGENTS.md §5)
     let totalBytes = 0;
-    const processedFiles: { buffer: Buffer; name: string; type: string; phash: string }[] = [];
+    const processedFiles: {
+      buffer: Buffer;
+      name: string;
+      type: string;
+      phash: string;
+    }[] = [];
     const phashes: string[] = [];
     let previewDataUrl: string | undefined = undefined;
 
@@ -87,22 +92,26 @@ export async function POST(request: NextRequest) {
           {
             error: `Format berkas ${file.name} tidak didukung. Format yang diizinkan adalah JPG, PNG, WEBP, atau PDF.`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
       if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
         return NextResponse.json(
-          { error: `Berkas ${file.name} melebihi batas ${MAX_FILE_SIZE_MB} MB.` },
-          { status: 400 }
+          {
+            error: `Berkas ${file.name} melebihi batas ${MAX_FILE_SIZE_MB} MB.`,
+          },
+          { status: 400 },
         );
       }
 
       totalBytes += file.size;
       if (totalBytes > MAX_TOTAL_SIZE_MB * 1024 * 1024) {
         return NextResponse.json(
-          { error: `Total seluruh berkas melebihi batas ${MAX_TOTAL_SIZE_MB} MB.` },
-          { status: 400 }
+          {
+            error: `Total seluruh berkas melebihi batas ${MAX_TOTAL_SIZE_MB} MB.`,
+          },
+          { status: 400 },
         );
       }
 
@@ -111,10 +120,8 @@ export async function POST(request: NextRequest) {
       const rawBuf = Buffer.from(arrayBuf);
 
       if (file.type.startsWith("image/")) {
-        const { processedBuffer, originalPhash, mimeType } = await processImageForAI(
-          rawBuf,
-          file.type
-        );
+        const { processedBuffer, originalPhash, mimeType } =
+          await processImageForAI(rawBuf, file.type);
         processedFiles.push({
           buffer: processedBuffer,
           name: sanitizedName,
@@ -147,7 +154,9 @@ export async function POST(request: NextRequest) {
       }
 
       for (const pFile of processedFiles) {
-        const blob = new Blob([new Uint8Array(pFile.buffer)], { type: pFile.type });
+        const blob = new Blob([new Uint8Array(pFile.buffer)], {
+          type: pFile.type,
+        });
         fastApiFormData.append("files", blob, pFile.name);
       }
 
@@ -165,7 +174,10 @@ export async function POST(request: NextRequest) {
 
       analysisResult = (await aiResponse.json()) as AnalysisResult;
     } catch (aiErr: unknown) {
-      console.warn("Panggilan FastAPI gagal / offline, menggunakan intelligent fallback:", aiErr);
+      console.warn(
+        "Panggilan FastAPI gagal / offline, menggunakan intelligent fallback:",
+        aiErr,
+      );
 
       // Fallback cerdas agar frontend tetap bisa diuji secara end-to-end saat FastAPI belum dijalankan
       const isSuspect =
@@ -175,11 +187,14 @@ export async function POST(request: NextRequest) {
         teks.toLowerCase().includes("turis") ||
         files.length > 0;
 
-      let inferredCompany = "Tidak Dicantumkan Resmi";
+      let inferredCompany = "";
       const lowerTeks = teks.toLowerCase();
       if (lowerTeks.includes("selnajaya") || lowerTeks.includes("selna jaya")) {
         inferredCompany = "PT OS Selnajaya Indonesia";
-      } else if (lowerTeks.includes("taiwan mandiri") || lowerTeks.includes("tiwan mandiri")) {
+      } else if (
+        lowerTeks.includes("taiwan mandiri") ||
+        lowerTeks.includes("tiwan mandiri")
+      ) {
         inferredCompany = "PT Taiwan Mandiri Jaya";
       } else if (lowerTeks.includes("samudra")) {
         inferredCompany = "PT Samudra Penempatan Indonesia";
@@ -216,7 +231,12 @@ export async function POST(request: NextRequest) {
                   "Perekrut meminta paspor asli ditahan selama masa kerja, melanggar hak kebebasan bergerak.",
                 legal_basis: "UU No. 21 Tahun 2007 (TPPO)",
                 regions: previewDataUrl
-                  ? [{ image_index: 0, bbox: { x: 0.1, y: 0.4, w: 0.65, h: 0.08 } }]
+                  ? [
+                      {
+                        image_index: 0,
+                        bbox: { x: 0.1, y: 0.4, w: 0.65, h: 0.08 },
+                      },
+                    ]
                   : [],
               },
               {
@@ -228,7 +248,12 @@ export async function POST(request: NextRequest) {
                   "Bekerja di luar negeri menggunakan visa wisata merupakan tindak pelanggaran hukum keimigrasian.",
                 legal_basis: "UU No. 18 Tahun 2017 tentang PMI",
                 regions: previewDataUrl
-                  ? [{ image_index: 0, bbox: { x: 0.1, y: 0.52, w: 0.65, h: 0.08 } }]
+                  ? [
+                      {
+                        image_index: 0,
+                        bbox: { x: 0.1, y: 0.52, w: 0.65, h: 0.08 },
+                      },
+                    ]
                   : [],
               },
             ]
@@ -238,7 +263,8 @@ export async function POST(request: NextRequest) {
                 label: "Biaya di muka tidak wajar",
                 severity: "waspada",
                 quote: "Biaya administrasi dan pendaftaran awal.",
-                reason: "Perekrut meminta sejumlah uang sebelum adanya kontrak kerja resmi.",
+                reason:
+                  "Perekrut meminta sejumlah uang sebelum adanya kontrak kerja resmi.",
                 legal_basis: "Peraturan Perlindungan Tenaga Kerja",
                 regions: [],
               },
@@ -246,7 +272,9 @@ export async function POST(request: NextRequest) {
         fingerprint: {
           image_phash: phashes,
           raw_text: teks || "Teks hasil ekstraksi otomatis.",
-          normalized_text: (teks || "teks hasil ekstraksi otomatis").toLowerCase(),
+          normalized_text: (
+            teks || "teks hasil ekstraksi otomatis"
+          ).toLowerCase(),
         },
         meta: {
           model: "gemini-3.8-flash (via CekLoker Orchestrator)",
@@ -295,16 +323,23 @@ export async function POST(request: NextRequest) {
       if (analysisResult.risk_level === "aman") {
         analysisResult.risk_level = "bahaya";
       }
-      if (posterMatchResult.findingLabel && !analysisResult.summary.includes("Cocok dengan")) {
+      if (
+        posterMatchResult.findingLabel &&
+        !analysisResult.summary.includes("Cocok dengan")
+      ) {
         analysisResult.summary = `${posterMatchResult.findingLabel}. ${analysisResult.summary}`;
       }
     }
 
     // 7. Potong Kuota Tamu Hanya Saat Pemeriksaan Berhasil (HTTP 200) untuk tamu
-    const updatedQuota = (!userId && guestId) ? consumeGuestQuota(guestId) : { allowed: true, remaining: 999, total: 999 };
+    const updatedQuota =
+      !userId && guestId
+        ? consumeGuestQuota(guestId)
+        : { allowed: true, remaining: 999, total: 999 };
 
     // 8. Simpan Hasil Pemeriksaan (Permanen untuk User, 24 Jam untuk Tamu)
-    const scanId = "ck_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const scanId =
+      "ck_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     const now = Date.now();
     const expiresAt = userId ? null : now + 24 * 60 * 60 * 1000;
 
@@ -343,9 +378,11 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : "Terjadi kesalahan internal pada server.";
+    const msg =
+      error instanceof Error
+        ? error.message
+        : "Terjadi kesalahan internal pada server.";
     console.error("API /api/analyze error:", error);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
-

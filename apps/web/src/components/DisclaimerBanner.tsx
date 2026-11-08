@@ -28,7 +28,7 @@ export function DisclaimerBanner({ variant = "general", className }: DisclaimerP
         </p>
         {/* Format Komprehensif untuk Desktop */}
         <p className="hidden sm:block">
-          <strong>Batasan Hasil Pemeriksaan:</strong> Hasil analisis ini dibuat secara otomatis oleh model kecerdasan buatan (<em>AI Analysis Service</em>) berdasarkan pola indikasi risiko. Analisis ini merupakan alat bantu penilaian awal (<em>preliminary risk assessment</em>) dan bukan merupakan putusan hukum resmi atau jaminan mutlak. Selalu lakukan verifikasi mandiri melalui kanal resmi pemerintah sebelum mengambil keputusan kerja.
+          <strong>Disclaimer:</strong> Hasil analisis ini merupakan alat bantu pemeriksaan, bukan keputusan hukum atau jaminan mutlak. Selalu lakukan verifikasi mandiri melalui kanal resmi pemerintah sebelum mengambil keputusan kerja.
         </p>
       </div>
     </div>
