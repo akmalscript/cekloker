@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, AlertOctagon } from "lucide-react";
+import { ArrowLeft, OctagonAlert } from "lucide-react";
 
 export default function ExpiredTokenPage() {
   return (
@@ -50,7 +50,7 @@ export default function ExpiredTokenPage() {
 
         {/* Kartu status */}
         <div className="card w-full max-w-[448px] p-6 text-center">
-          <AlertOctagon
+          <OctagonAlert
             className="mx-auto h-14 w-14 text-waspada [stroke-width:1.5]"
             aria-hidden="true"
           />

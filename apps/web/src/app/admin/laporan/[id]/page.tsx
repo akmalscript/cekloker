@@ -7,9 +7,7 @@ import {
   ArrowLeft,
   CirclePlus,
   Clock,
-  CircleCheck,
-  CircleX,
-  AlertTriangle,
+  ShieldCheck,
   OctagonAlert,
   ShieldAlert,
   ArrowRight,
@@ -19,9 +17,6 @@ import {
   User,
   Phone,
   DollarSign,
-  Check,
-  Shield,
-  Eye,
 } from "lucide-react";
 
 interface ReportDetail {
@@ -231,13 +226,13 @@ export default function AdminTinjauLaporanPage({
       {/* Header Info */}
       <div className="mt-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-[26px] font-bold text-ink sm:text-3xl">
-            Tinjau Laporan <span className="text-navy">{reportCode}</span>
+          <h1 className="text-[28px] sm:text-4xl font-bold text-ink">
+            Tinjau Laporan <span className="whitespace-nowrap font-mono">{reportCode}</span>
           </h1>
           {isTppo && (
-            <span className="inline-flex items-center gap-1 rounded bg-red-100 px-2.5 py-1 text-xs font-bold text-bahaya">
+            <span className="inline-flex items-center gap-1 rounded bg-bahaya-tint border border-bahaya-line px-2 py-0.5 text-xs font-bold text-bahaya-ink">
               <ShieldAlert className="h-3.5 w-3.5" aria-hidden="true" />
-              Indikasi Darurat TPPO
+              Darurat TPPO
             </span>
           )}
         </div>
@@ -245,18 +240,23 @@ export default function AdminTinjauLaporanPage({
         <div>
           {report.status === "approved" ? (
             <span className="badge badge-aman">
-              <CircleCheck className="h-4 w-4" aria-hidden="true" />
-              Disetujui / Publik
+              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              Disetujui
             </span>
           ) : report.status === "rejected" ? (
             <span className="badge badge-bahaya">
-              <CircleX className="h-4 w-4" aria-hidden="true" />
+              <OctagonAlert className="h-4 w-4" aria-hidden="true" />
               Ditolak
+            </span>
+          ) : report.status === "reviewing" ? (
+            <span className="badge border-line bg-white text-ink">
+              <Clock className="h-4 w-4" aria-hidden="true" />
+              Ditinjau
             </span>
           ) : (
             <span className="badge border-navy-soft bg-navy-tint text-navy">
               <CirclePlus className="h-4 w-4" aria-hidden="true" />
-              Menunggu Keputusan
+              Baru
             </span>
           )}
         </div>
@@ -268,171 +268,100 @@ export default function AdminTinjauLaporanPage({
         <div className="space-y-6">
           {/* Card 1: Data Laporan Pelapor */}
           <section className="card p-6" aria-labelledby="h-laporan">
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between border-b border-line pb-4">
-              <h2 id="h-laporan" className="text-xl font-bold text-ink sm:text-2xl">
-                Laporan dari Pengguna
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+              <h2 id="h-laporan" className="text-xl sm:text-2xl font-bold text-ink">
+                Laporan dari pengguna
               </h2>
-              <span className="text-xs font-semibold text-muted bg-navy-tint px-2 py-0.5 rounded">
-                Hanya-baca
-              </span>
+              <p className="text-[13px] text-muted">Hanya-baca</p>
             </div>
 
             {/* Kronologi */}
-            <div className="mt-5">
-              <label className="text-xs font-bold uppercase tracking-wider text-muted">
-                Kronologi Kejadian / Indikasi Penipuan:
-              </label>
-              <div className="mt-2 min-h-28 rounded-card border border-line bg-canvas p-4 text-sm text-ink leading-relaxed">
-                {report.chronology}
-              </div>
+            <div className="mt-6 min-h-32 rounded-card border border-line bg-canvas p-4 text-sm text-ink leading-relaxed whitespace-pre-wrap">
+              {report.chronology}
             </div>
 
             {/* Meta Grid */}
-            <dl className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-              <div className="rounded-card border border-line p-3 bg-canvas/50">
-                <dt className="text-xs text-muted">Posisi &amp; Perusahaan</dt>
-                <dd className="font-bold text-ink mt-0.5">
-                  {report.jobTitle || "Tidak disebutkan"}
-                </dd>
-                <dd className="text-xs text-muted">{report.companyName || "Perusahaan Anonim"}</dd>
+            <dl className="mt-6 grid grid-cols-2 gap-4">
+              <div>
+                <dt className="text-[13px] text-muted">Tanggal lapor</dt>
+                <dd className="font-semibold text-ink">{formatDate(report.createdAt)}</dd>
               </div>
 
-              <div className="rounded-card border border-line p-3 bg-canvas/50">
-                <dt className="text-xs text-muted">Tanggal Dilaporkan</dt>
-                <dd className="font-bold text-ink mt-0.5">{formatDate(report.createdAt)}</dd>
-                <dd className="text-xs text-muted">Jenis: {report.type === "chat" ? "Chat Telegram/WA" : "Poster Lowongan"}</dd>
+              <div>
+                <dt className="text-[13px] text-muted">Jenis</dt>
+                <dd className="font-semibold text-ink">{report.type === "chat" ? "Chat" : "Lowongan"}</dd>
               </div>
 
-              <div className="rounded-card border border-line p-3 bg-canvas/50">
-                <dt className="text-xs text-muted flex items-center gap-1">
-                  <Phone className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
-                  Kontak Pelaku
-                </dt>
-                <dd className="font-bold text-ink mt-0.5">
-                  {report.perpetratorContact || "Tidak dicantumkan"}
-                </dd>
-              </div>
-
-              <div className="rounded-card border border-line p-3 bg-canvas/50">
-                <dt className="text-xs text-muted flex items-center gap-1">
-                  <DollarSign className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
-                  Estimasi Kerugian
-                </dt>
-                <dd className="font-bold text-ink mt-0.5">
-                  {formatCurrency(report.financialLoss)}
-                </dd>
-              </div>
-            </dl>
-
-            {/* Info Pelapor */}
-            <div className="mt-4 flex items-center gap-2 text-xs text-muted border-t border-line pt-3">
-              <User className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
-              <span>
-                Pelapor: {report.user ? `${report.user.name || "Pengguna Terdaftar"} (${report.user.email})` : "Pengguna Tamu (Anonim)"}
-              </span>
-            </div>
-          </section>
-
-          {/* Card 2: Pemeriksaan Terkait (AI Scan Link) */}
-          {scanData ? (
-            <section className="card p-6" aria-labelledby="h-periksa">
-              <div className="flex items-center justify-between border-b border-line pb-4">
-                <h2 id="h-periksa" className="text-xl font-bold text-ink sm:text-2xl">
-                  Pemeriksaan Terkait
-                </h2>
-                <span className="text-xs font-mono text-muted">ID: {scanData.id}</span>
-              </div>
-
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-[100px_minmax(0,1fr)] gap-4 rounded-card border border-line bg-canvas p-4">
-                {/* Visual Viewfinder / Poster Preview */}
-                <div className="viewfinder h-24 w-full sm:w-24 shrink-0 rounded-card bg-navy-tint flex flex-col items-center justify-center p-2 text-center">
-                  <FileText className="h-8 w-8 text-navy" aria-hidden="true" />
-                  <span className="text-[10px] font-bold text-navy mt-1">AI SCANNED</span>
-                </div>
-
-                <div className="min-w-0 flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-base font-bold text-ink leading-snug">
-                      {scanData.title}
-                    </h3>
-                    <p className="text-xs text-muted">{scanData.companyName || "Perusahaan Terdeteksi"}</p>
-                    <div className="mt-2 flex items-center gap-2">
-                      {scanData.riskLevel === "bahaya" ? (
-                        <span className="badge badge-bahaya">
-                          <OctagonAlert className="h-3.5 w-3.5" aria-hidden="true" />
-                          Bahaya ({scanData.redFlagCount} Red Flags)
-                        </span>
-                      ) : scanData.riskLevel === "waspada" ? (
-                        <span className="badge badge-waspada">
-                          <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
-                          Waspada ({scanData.redFlagCount} Red Flags)
-                        </span>
-                      ) : (
-                        <span className="badge badge-aman">
-                          <CircleCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                          Aman
-                        </span>
-                      )}
-                      <span className="text-xs text-muted">Keyakinan AI: {scanData.confidence}%</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-3">
-                    <Link
-                      href={`/hasil/${scanData.id}`}
-                      target="_blank"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-navy hover:underline"
-                    >
-                      <span>Lihat Hasil Analisis Lengkap</span>
-                      <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              {/* Red Flag AI List */}
-              {aiFlags.length > 0 && (
-                <div className="mt-5 space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-muted">
-                    Temuan Indikator Red Flag AI:
-                  </label>
-                  <ul className="space-y-2 mt-2">
-                    {aiFlags.map((flag: any, idx: number) => (
-                      <li
-                        key={idx}
-                        className="rounded-ctl border border-red-200 bg-red-50/50 p-3 text-xs leading-relaxed"
-                      >
-                        <p className="font-bold text-bahaya-ink flex items-center gap-1.5">
-                          <OctagonAlert className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                          {flag.label || flag.code}
-                        </p>
-                        <p className="mt-1 text-muted">{flag.reason}</p>
-                      </li>
-                    ))}
-                  </ul>
+              {report.perpetratorContact && (
+                <div>
+                  <dt className="text-[13px] text-muted">Kontak pelaku</dt>
+                  <dd className="font-semibold text-ink text-xs sm:text-sm">{report.perpetratorContact}</dd>
                 </div>
               )}
-            </section>
-          ) : (
-            <section className="card p-6" aria-labelledby="h-periksa-none">
-              <h2 id="h-periksa-none" className="text-lg font-bold text-ink">
-                Pemeriksaan Terkait
+
+              {report.financialLoss != null && (
+                <div>
+                  <dt className="text-[13px] text-muted">Estimasi kerugian</dt>
+                  <dd className="font-semibold text-bahaya-ink">{formatCurrency(report.financialLoss)}</dd>
+                </div>
+              )}
+            </dl>
+          </section>
+
+          {/* Card 2: Pemeriksaan Terkait */}
+          {scanData && (
+            <section className="card p-6" aria-labelledby="h-periksa">
+              <h2 id="h-periksa" className="text-xl sm:text-2xl font-bold text-ink">
+                Pemeriksaan terkait
               </h2>
-              <p className="mt-2 text-sm text-muted">
-                Laporan ini dikirim langsung oleh pengguna tanpa menautkan hasil pindaian AI mandiri sebelumnya.
-              </p>
+
+              <div className="mt-4 grid grid-cols-[80px_minmax(0,1fr)] gap-x-4 gap-y-4 rounded-card border border-line bg-canvas p-4">
+                {/* Visual Viewfinder */}
+                <div className="viewfinder h-20 w-20 shrink-0 rounded-card bg-navy-tint flex flex-col items-center justify-center p-2 text-center" aria-hidden="true">
+                  <FileText className="h-6 w-6 text-navy" />
+                  <span className="text-[9px] font-bold text-navy mt-1">AI SCAN</span>
+                </div>
+
+                <div className="min-w-0">
+                  <h3 className="text-lg font-bold leading-snug text-ink">{scanData.title}</h3>
+                  <p className="mt-1 text-[15px] leading-normal text-muted">{scanData.companyName || "Perusahaan Terdeteksi"}</p>
+                  <p className="mt-1 text-[13px] leading-normal text-muted">ID Pemeriksaan: {scanData.id}</p>
+                </div>
+
+                <div className="col-span-2 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-line pt-3">
+                  <div className="flex items-center gap-4">
+                    {scanData.riskLevel === "bahaya" ? (
+                      <span className="badge badge-bahaya"><OctagonAlert aria-hidden="true" />Bahaya</span>
+                    ) : scanData.riskLevel === "waspada" ? (
+                      <span className="badge badge-waspada"><OctagonAlert aria-hidden="true" />Waspada</span>
+                    ) : (
+                      <span className="badge badge-aman"><ShieldCheck aria-hidden="true" />Aman</span>
+                    )}
+                    <span className="hidden text-[13px] text-muted sm:inline">Keyakinan AI: {scanData.confidence}%</span>
+                  </div>
+
+                  <Link
+                    href={`/hasil/${scanData.id}`}
+                    target="_blank"
+                    className="inline-flex items-center gap-2 rounded-ctl py-2 text-[15px] font-semibold text-navy hover:underline"
+                  >
+                    <span>Lihat Hasil</span>
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </div>
+              </div>
             </section>
           )}
 
-          {/* Card 3: Bukti Berkas Terlampir */}
+          {/* Card 3: Bukti Berkas */}
           <section className="card p-6" aria-labelledby="h-bukti">
-            <h2 id="h-bukti" className="text-xl font-bold text-ink sm:text-2xl">
-              Bukti Terlampir
+            <h2 id="h-bukti" className="text-xl sm:text-2xl font-bold text-ink">
+              Bukti
             </h2>
             <div className="mt-4 rounded-card border border-line bg-canvas p-4 text-sm">
               {report.evidenceUrl ? (
                 <div>
-                  <p className="text-xs text-muted mb-2">Tautan Dokumen / Tangkapan Layar:</p>
+                  <p className="text-xs text-muted mb-2">Berkas Bukti Pelapor:</p>
                   <a
                     href={report.evidenceUrl}
                     target="_blank"
@@ -440,12 +369,12 @@ export default function AdminTinjauLaporanPage({
                     className="inline-flex items-center gap-1.5 text-sm font-bold text-navy underline hover:text-navy-hover"
                   >
                     <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                    Buka Berkas Bukti Pelapor
+                    Buka Berkas Bukti
                   </a>
                 </div>
               ) : (
-                <p className="text-xs text-muted italic">
-                  Tidak ada URL gambar eksternal yang dilampirkan pelapor. Teks kronologi di atas adalah bukti utama.
+                <p className="text-[13px] text-muted italic">
+                  Tidak ada berkas eksternal yang dilampirkan. Bukti mengacu pada kronologi laporan.
                 </p>
               )}
             </div>
@@ -454,21 +383,21 @@ export default function AdminTinjauLaporanPage({
 
         {/* Kolom Kanan: Formulir Keputusan Admin (Sticky) */}
         <section className="card p-6 lg:sticky lg:top-24" aria-labelledby="h-putusan">
-          <h2 id="h-putusan" className="text-xl font-bold text-ink sm:text-2xl">
-            Keputusan Moderator
+          <h2 id="h-putusan" className="text-xl sm:text-2xl font-bold text-ink">
+            Keputusan
           </h2>
 
           {/* Sukses Alert */}
           {suksesMessage && (
-            <div className="alert alert-success mt-5" role="status">
-              <CircleCheck className="mt-0.5 h-5 w-5 shrink-0 text-aman-ink" aria-hidden="true" />
+            <div className="alert alert-success mt-6" role="status">
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-aman-ink" aria-hidden="true" />
               <p className="text-sm font-semibold">{suksesMessage}</p>
             </div>
           )}
 
           {/* Error Alert */}
           {formError && (
-            <div className="alert alert-error mt-5" role="alert">
+            <div className="alert alert-error mt-6" role="alert">
               <OctagonAlert className="mt-0.5 h-5 w-5 shrink-0 text-bahaya-ink" aria-hidden="true" />
               <p className="text-sm font-semibold">{formError}</p>
             </div>
@@ -477,12 +406,12 @@ export default function AdminTinjauLaporanPage({
           <form onSubmit={handleSubmit} className="mt-6" noValidate>
             {/* Pilihan Radio Keputusan */}
             <fieldset>
-              <legend className="field-label !text-sm">Tindakan Moderasi:</legend>
-              <div className="mt-3 space-y-3">
+              <legend className="sr-only">Pilih keputusan</legend>
+              <div className="space-y-4">
                 <label
                   className={`choice ${
                     keputusan === "terima"
-                      ? "!border-navy !bg-navy-tint font-bold text-navy"
+                      ? "border-navy bg-navy-tint text-navy font-semibold"
                       : ""
                   }`}
                 >
@@ -494,18 +423,13 @@ export default function AdminTinjauLaporanPage({
                     onChange={() => setKeputusan("terima")}
                     className="radio"
                   />
-                  <div>
-                    <span className="block font-bold">Setujui &amp; Publikasikan</span>
-                    <span className="block text-xs font-normal text-muted">
-                      Masukkan ke Basis Data Loker Publik &amp; perbarui database deteksi pHash scam.
-                    </span>
-                  </div>
+                  <span>Terima &amp; Masukkan ke Database</span>
                 </label>
 
                 <label
                   className={`choice ${
                     keputusan === "tolak"
-                      ? "!border-bahaya !bg-red-50 font-bold text-bahaya"
+                      ? "border-bahaya bg-bahaya-tint text-bahaya-ink font-semibold"
                       : ""
                   }`}
                 >
@@ -517,12 +441,7 @@ export default function AdminTinjauLaporanPage({
                     onChange={() => setKeputusan("tolak")}
                     className="radio"
                   />
-                  <div>
-                    <span className="block font-bold">Tolak Laporan</span>
-                    <span className="block text-xs font-normal text-muted">
-                      Laporan ditandai tidak valid / kurang bukti, tidak dipublikasikan ke database.
-                    </span>
-                  </div>
+                  <span>Tolak Laporan</span>
                 </label>
               </div>
             </fieldset>
@@ -546,30 +465,27 @@ export default function AdminTinjauLaporanPage({
               </div>
             )}
 
-            {/* Catatan Admin / Alasan Penolakan */}
-            <div className="mt-5">
-              <label htmlFor="catatan" className="field-label !text-sm">
-                Catatan Internal / Alasan Penolakan
+            {/* Catatan Admin */}
+            <div className="mt-6">
+              <label htmlFor="catatan" className="field-label">
+                Alasan / catatan admin (opsional)
               </label>
               <textarea
                 id="catatan"
+                name="catatan"
                 value={catatan}
                 onChange={(e) => setCatatan(e.target.value)}
                 rows={4}
-                className="input mt-2 h-28 resize-y py-2.5 text-sm leading-relaxed"
-                placeholder={
-                  keputusan === "tolak"
-                    ? "Wajib tulis alasan penolakan (misal: bukti tidak cukup, nomor kontak salah, nama PT tidak relevan)..."
-                    : "Catatan internal verifikator (opsional)..."
-                }
+                className="input mt-2 h-40 resize-y py-3 leading-6 text-sm"
+                placeholder="Tulis alasan atau catatan admin"
               />
-              <p className="mt-1.5 text-xs text-muted">
-                Catatan ini disimpan untuk arsip tim moderasi.
+              <p className="mt-2 text-[13px] leading-normal text-muted">
+                Alasan ini hanya untuk internal, tidak ditampilkan ke pengguna.
               </p>
             </div>
 
             {/* Checkbox Anonimitas */}
-            <label className="mt-5 flex items-start gap-3 text-xs leading-normal cursor-pointer">
+            <label className="mt-6 flex items-start gap-4 text-[15px] leading-normal cursor-pointer">
               <input
                 type="checkbox"
                 checked={isAnonim}
@@ -577,7 +493,7 @@ export default function AdminTinjauLaporanPage({
                 className="check mt-0.5"
               />
               <span className="text-muted">
-                Identitas pelapor tetap terlindungi dan <strong className="text-ink">tidak ditampilkan</strong> ke pengunjung basis data loker publik.
+                Identitas pelapor tidak ditampilkan di database.
               </span>
             </label>
 

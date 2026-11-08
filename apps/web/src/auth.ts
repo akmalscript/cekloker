@@ -39,26 +39,50 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const email = String(credentials.email).toLowerCase().trim();
         const password = String(credentials.password);
 
-        const user = await prisma.user.findUnique({
-          where: { email },
-        });
-
-        if (!user || !user.password) {
-          return null;
+        // Fallback akun demo bawaan (bisa login tanpa ketergantungan PostgreSQL / Docker)
+        if (email === "admin@cekloker.id" && password === "admin123") {
+          return {
+            id: "admin-demo-id",
+            name: "Administrator Demo",
+            email: "admin@cekloker.id",
+            role: "ADMIN",
+          };
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-          return null;
+        if (email === "user@cekloker.id" && password === "user123") {
+          return {
+            id: "user-demo-id",
+            name: "Pengguna Demo",
+            email: "user@cekloker.id",
+            role: "USER",
+          };
         }
 
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          image: user.image,
-          role: user.role,
-        };
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email },
+          });
+
+          if (!user || !user.password) {
+            return null;
+          }
+
+          const isMatch = await bcrypt.compare(password, user.password);
+          if (!isMatch) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            image: user.image,
+            role: user.role,
+          };
+        } catch (dbError) {
+          console.warn("Database tidak tersedia atau error saat mencari user:", dbError);
+          return null;
+        }
       },
     }),
   ],

@@ -122,6 +122,27 @@ function LoginForm() {
             Simpan riwayat pemeriksaan dan bantu laporkan loker palsu.
           </p>
 
+          {/* Akun Demo Pengujian */}
+          <div className="mt-6 rounded-card border border-navy-soft bg-navy-tint/60 p-3.5 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-navy">Akun Demo (Tanpa DB):</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("admin@cekloker.id");
+                  setPassword("admin123");
+                  setError(null);
+                }}
+                className="font-bold text-navy underline hover:text-navy/80"
+              >
+                Gunakan Admin
+              </button>
+            </div>
+            <p className="mt-1 text-muted">
+              Email: <strong className="text-ink">admin@cekloker.id</strong> • Sandi: <strong className="text-ink">admin123</strong>
+            </p>
+          </div>
+
           {error && (
             <div className="alert alert-error mt-6" role="alert">
               <AlertCircle className="h-5 w-5 shrink-0 text-bahaya" aria-hidden="true" />
