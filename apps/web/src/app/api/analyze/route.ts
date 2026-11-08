@@ -175,8 +175,8 @@ export async function POST(request: NextRequest) {
       const aiResponse = await fetch(`${FASTAPI_URL}/analyze`, {
         method: "POST",
         body: fastApiFormData,
-        // Timeout 30 detik untuk pemrosesan AI
-        signal: AbortSignal.timeout(30000),
+        // Timeout 60 detik untuk pemrosesan AI
+        signal: AbortSignal.timeout(60000),
       });
 
       if (aiResponse.status === 422) {
