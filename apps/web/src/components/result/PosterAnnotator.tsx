@@ -388,16 +388,18 @@ export function PosterAnnotator({
             const effectivePos = getEffectivePosition(item.id);
 
             const bbox = item.bbox;
-            const top = `${bbox.y * 100}%`;
-            const left = `${bbox.x * 100}%`;
-            const width = `${bbox.w * 100}%`;
-            const height = `${bbox.h * 100}%`;
+            // Add a comfortable breathing room (clearance) around the detected text
+            // so the 2px border frames the text cleanly without slicing into ascenders/descenders
+            const top = `max(0px, calc(${bbox.y * 100}% - 4px))`;
+            const left = `max(0px, calc(${bbox.x * 100}% - 5px))`;
+            const width = `calc(${bbox.w * 100}% + 10px)`;
+            const height = `calc(${bbox.h * 100}% + 8px)`;
 
             return (
               <div
                 key={item.id}
                 className={cn(
-                  "evidence-box cursor-pointer transition-all duration-200",
+                  "evidence-box cursor-pointer transition-all duration-200 !rounded-none",
                   isWaspada && "is-waspada",
                   isActive && "is-active ring-4 ring-offset-1 ring-bahaya scale-[1.01] z-30 shadow-xl"
                 )}
@@ -406,6 +408,7 @@ export function PosterAnnotator({
                   left,
                   width,
                   height,
+                  borderRadius: 0,
                   right: "auto",
                   bottom: "auto",
                   pointerEvents: "auto",
@@ -415,7 +418,7 @@ export function PosterAnnotator({
               >
                 <span
                   className={cn(
-                    "evidence-label shadow-lg transition-all duration-200 inline-flex items-center gap-1 cursor-pointer select-none",
+                    "evidence-label shadow-lg transition-all duration-200 inline-flex items-center gap-1 cursor-pointer select-none !rounded-none",
                     isWaspada ? "!bg-[#B45309]" : "!bg-bahaya",
                     isActive
                       ? "ring-2 ring-white scale-105 z-30 font-bold"
@@ -423,6 +426,7 @@ export function PosterAnnotator({
                   )}
                   style={{
                     ...getLabelPositionStyles(effectivePos),
+                    borderRadius: 0,
                     pointerEvents: "auto",
                   }}
                   onClick={(e) => {
@@ -450,7 +454,7 @@ export function PosterAnnotator({
                   {/* Manual Position Cycle Button */}
                   <button
                     type="button"
-                    className="ml-1 -mr-0.5 p-0.5 rounded hover:bg-black/30 text-white/80 hover:text-white transition-colors cursor-pointer"
+                    className="ml-1 -mr-0.5 p-0.5 !rounded-none hover:bg-black/30 text-white/80 hover:text-white transition-colors cursor-pointer"
                     title={`Posisi label: ${getPositionLabel(effectivePos)}. Klik untuk ubah posisi (Kanan/Bawah/Kiri/Atas)`}
                     onClick={(e) => {
                       e.stopPropagation();
