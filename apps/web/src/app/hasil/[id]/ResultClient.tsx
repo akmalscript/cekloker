@@ -16,7 +16,13 @@ import {
   ShieldAlert,
   Loader2,
   AlertCircle,
+  ShieldCheck,
+  TriangleAlert,
+  Ban,
+  Archive,
+  CheckCircle2,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { RiskBadge } from "@/components/ui/Badge";
@@ -442,58 +448,163 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
 
   const { result, image, official_check, scam_matches, scam_details } = currentDataset;
 
+  const riskInfo = {
+    bahaya: {
+      label: "Bahaya",
+      bg: "bg-[#b91c1c]",
+      icon: ShieldAlert,
+    },
+    waspada: {
+      label: "Waspada",
+      bg: "bg-[#b45309]",
+      icon: TriangleAlert,
+    },
+    aman: {
+      label: "Aman",
+      bg: "bg-[#15803d]",
+      icon: ShieldCheck,
+    },
+  }[result.risk_level] ?? {
+    label: "Bahaya",
+    bg: "bg-[#b91c1c]",
+    icon: ShieldAlert,
+  };
+
+  const RiskBannerIcon = riskInfo.icon;
+
+  const recommendationSteps =
+    result.risk_level === "bahaya"
+      ? [
+          {
+            title: "Hentikan komunikasi",
+            desc: "Jangan mentransfer uang atau menyerahkan dokumen asli (paspor/ijazah) kepada perekrut ini.",
+            border: "border-red-500",
+            textColor: "text-red-500",
+            icon: Ban,
+          },
+          {
+            title: "Laporkan",
+            desc: "Gunakan kanal pengaduan resmi Satgas TPPO Polri atau BP2MI jika diminta berangkat dengan visa turis.",
+            border: "border-blue-600",
+            textColor: "text-blue-600",
+            icon: Flag,
+          },
+          {
+            title: "Simpan bukti",
+            desc: "Amankan tangkapan layar percakapan dan bukti pembayaran untuk proses hukum.",
+            border: "border-emerald-600",
+            textColor: "text-emerald-600",
+            icon: Archive,
+          },
+        ]
+      : result.risk_level === "waspada"
+      ? [
+          {
+            title: "Verifikasi langsung",
+            desc: "Hubungi kontak resmi perusahaan untuk memastikan nama perekrut benar-benar terdaftar.",
+            border: "border-amber-500",
+            textColor: "text-amber-600",
+            icon: Building2,
+          },
+          {
+            title: "Tolak pungutan liar",
+            desc: "Rekrutmen resmi tidak membebankan biaya tiket/pelatihan di muka tanpa rincian perjanjian kerja resmi.",
+            border: "border-red-500",
+            textColor: "text-red-500",
+            icon: Ban,
+          },
+          {
+            title: "Simpan bukti",
+            desc: "Amankan tangkapan layar percakapan dan berkas penawaran untuk verifikasi lebih lanjut.",
+            border: "border-emerald-600",
+            textColor: "text-emerald-600",
+            icon: Archive,
+          },
+        ]
+      : [
+          {
+            title: "Tetap cermat",
+            desc: "Pastikan Anda menandatangani Perjanjian Kerja (PK) yang disahkan oleh instansi resmi.",
+            border: "border-blue-600",
+            textColor: "text-blue-600",
+            icon: ShieldCheck,
+          },
+          {
+            title: "Kroscek visa & izin",
+            desc: "Pastikan jenis visa yang diterbitkan adalah visa kerja resmi (bukan visa wisata/kunjungan).",
+            border: "border-emerald-600",
+            textColor: "text-emerald-600",
+            icon: CheckCircle2,
+          },
+          {
+            title: "Simpan kontak darurat",
+            desc: "Catat nomor call center ketenagakerjaan atau perwakilan resmi sebelum memulai pekerjaan.",
+            border: "border-amber-500",
+            textColor: "text-amber-600",
+            icon: Archive,
+          },
+        ];
+
   return (
     <>
       <Navbar />
 
-      <main className="flex-1 bg-canvas py-8 sm:py-12">
+      <main className="flex-1 bg-canvas pt-4 sm:pt-6 pb-8 sm:pb-12">
         {/* Cap air saat dicetak via browser print (FR-HSL-02) */}
         <div className="watermark-print hidden print:block" aria-hidden="true">
           DOKUMEN EVALUASI RESMI CEKLOKER — HANYA UNTUK PELAPORAN
         </div>
         <div className="container-page space-y-6">
-          {/* Preset Selector Bar (Pengujian Prototipe) */}
-          <div className="card p-3 bg-white flex flex-wrap items-center justify-between gap-3 no-print">
-            <div className="flex items-center gap-2 text-xs font-semibold text-muted">
-              <span className="eyebrow !text-xs">Uji Sampel Evaluasi:</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(PRESET_DATASETS).map(([key, item]) => (
-                <button
-                  key={key}
-                  type="button"
-                  className={`btn btn-xs ${
-                    selectedKey === key ? "btn-primary" : "btn-secondary"
-                  } cursor-pointer`}
-                  onClick={() => {
-                    setSelectedKey(key);
-                    setActiveFlagCode(null);
-                  }}
-                >
-                  {item.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Kartu Ringkasan Hasil Utama */}
-          <div className="card p-6 sm:p-8 bg-white shadow-card">
-            {/* Baris Atas: Badge Status Risiko & Tombol Aksi Cepat */}
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-wrap items-center gap-3">
-                <RiskBadge status={result.risk_level} className="badge-lg" />
-                <span className="text-xs font-semibold text-muted bg-slate-100 px-3 py-1 rounded-full">
-                  Tingkat Keyakinan AI: {Math.round(result.confidence * 100)}%
-                </span>
-                {scam_matches > 0 && (
-                  <span className="text-xs font-semibold text-bahaya-ink bg-bahaya-tint px-3 py-1 rounded-full border border-bahaya-line">
-                    Cocok dengan {scam_matches} laporan penipuan terverifikasi
-                  </span>
-                )}
+          <div className="card !p-0 bg-white shadow-card overflow-hidden flex flex-col md:flex-row items-stretch">
+            {/* Panel Status Kiri (Sesuai Desain Mockup) */}
+            <div
+              className={`w-full md:w-60 lg:w-64 p-6 sm:p-7 flex flex-col justify-between shrink-0 text-white ${riskInfo.bg}`}
+            >
+              <div>
+                <RiskBannerIcon className="h-10 w-10 text-white stroke-[2.2]" />
+              </div>
+
+              <div className="mt-8 md:mt-0">
+                <h2
+                  className="text-3xl font-extrabold !text-white tracking-tight leading-tight"
+                  style={{ color: "#ffffff" }}
+                >
+                  {riskInfo.label}
+                </h2>
+                <p
+                  className="mt-1 text-xs sm:text-sm font-medium !text-white/90"
+                  style={{ color: "rgba(255, 255, 255, 0.9)" }}
+                >
+                  Tingkat keyakinan AI: {Math.round(result.confidence * 100)}%
+                </p>
+              </div>
+            </div>
+
+            {/* Konten Kanan */}
+            <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between gap-5">
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h1 className="text-[22px] sm:text-[26px] font-extrabold text-ink tracking-tight">
+                    Hasil Pemeriksaan Lowongan
+                  </h1>
+                  {scam_matches > 0 && (
+                    <span className="text-xs font-semibold text-bahaya-ink bg-bahaya-tint px-2.5 py-0.5 rounded-full border border-bahaya-line shrink-0">
+                      Cocok dengan {scam_matches} laporan penipuan
+                    </span>
+                  )}
+                </div>
+
+                <p
+                  className="text-[13px] sm:text-[15px] text-slate-700 leading-relaxed text-justify"
+                  style={{ textAlign: "justify" }}
+                >
+                  {result.summary}
+                </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-2 shrink-0 no-print">
+              <div className="flex flex-wrap items-center gap-3 no-print pt-2">
                 <a
                   href={`/api/scan/${selectedKey !== "custom" ? selectedKey : rawId}/pdf`}
                   download
@@ -501,7 +612,7 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   title="Unduh berkas PDF formal dengan cap air resmi CekLoker"
                 >
                   <Download className="h-4 w-4" />
-                  <span>Unduh PDF Resmi</span>
+                  <span>Unduh PDF</span>
                 </a>
                 <Link
                   href={`/lapor?scan_id=${rawId}`}
@@ -516,23 +627,12 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                 </Link>
               </div>
             </div>
-
-            {/* Judul & Ringkasan Hasil (diturunkan ke bawah agar teks judul cukup 1 baris) */}
-            <div className="mt-5 space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-ink">
-                Hasil Pemeriksaan Lowongan
-              </h1>
-
-              <p className="max-w-4xl text-sm sm:text-base text-slate-700 leading-relaxed">
-                {result.summary}
-              </p>
-            </div>
           </div>
 
           {/* Grid Layout 2 Kolom: Kiri Poster Anotasi, Kanan Informasi & Temuan */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Kolom Kiri: Visual Poster & Anotasi Bounding Box (5/12) */}
-            <div className="lg:col-span-5 sticky top-20 space-y-6">
+            {/* Kolom Kiri: Visual Poster & Anotasi Bounding Box (6/12) */}
+            <div className="lg:col-span-6 sticky top-20">
               <PosterAnnotator
                 imageSrc={image}
                 imageAlt={result.extracted?.position ?? "Poster lowongan"}
@@ -540,64 +640,78 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                 activeCode={activeFlagCode}
                 onSelectFlag={(code) => setActiveFlagCode(code)}
               />
-
-              {/* Informasi Lowongan Diekstrak */}
-              <div className="card p-5 bg-white space-y-4">
-                <h3 className="font-bold text-base text-ink flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-navy" />
-                  <span>Informasi Lowongan Diekstrak</span>
-                </h3>
-
-                <div className="grid grid-cols-1 gap-2.5 text-xs">
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Building2 className="h-4 w-4 shrink-0 text-muted" />
-                    <span>Perusahaan:</span>
-                    <strong className="text-ink ml-auto">
-                      {!result.extracted?.company ||
-                      result.extracted.company === "-" ||
-                      result.extracted.company.toLowerCase().includes("tidak dicantumkan")
-                        ? "Tidak Ditemukan"
-                        : result.extracted.company}
-                    </strong>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <MapPin className="h-4 w-4 shrink-0 text-muted" />
-                    <span>Lokasi:</span>
-                    <strong className="text-ink ml-auto">
-                      {result.extracted?.country ?? "-"}
-                    </strong>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Banknote className="h-4 w-4 shrink-0 text-muted" />
-                    <span>Gaji:</span>
-                    <strong className="text-ink ml-auto">
-                      {result.extracted?.salary ?? "-"}
-                    </strong>
-                  </div>
-                  {result.extracted?.fees && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <AlertOctagon className="h-4 w-4 shrink-0 text-bahaya-ink" />
-                      <span>Biaya Diminta:</span>
-                      <strong className="text-bahaya-ink ml-auto">
-                        {result.extracted.fees}
-                      </strong>
-                    </div>
-                  )}
-                  {result.extracted?.contact && result.extracted.contact.length > 0 && (
-                    <div className="flex items-start gap-2 text-slate-600 pt-1">
-                      <Phone className="h-4 w-4 shrink-0 text-muted mt-0.5" />
-                      <span>Kontak:</span>
-                      <span className="text-ink ml-auto text-right font-medium">
-                        {result.extracted.contact.join(", ")}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
 
-            {/* Kolom Kanan: Rincian Red Flags & Verifikasi Resmi (7/12) */}
-            <div className="lg:col-span-7 space-y-6">
+            {/* Kolom Kanan: Rincian Red Flags & Verifikasi Resmi (6/12) */}
+            <div className="lg:col-span-6 space-y-6">
+              {/* Informasi Lowongan */}
+              <div className="card !p-0 bg-white shadow-card rounded-2xl overflow-hidden divide-y divide-slate-100 border border-line">
+                {/* Header Card */}
+                <div className="px-4 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between gap-3">
+                  <h3 className="font-bold text-sm sm:text-base text-ink flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-ink shrink-0" />
+                    <span>Informasi Lowongan</span>
+                  </h3>
+                </div>
+
+                {/* Baris 1: Perusahaan */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    Perusahaan
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {!result.extracted?.company ||
+                    result.extracted.company === "-" ||
+                    result.extracted.company.toLowerCase().includes("tidak dicantumkan")
+                      ? "Tidak Ditemukan"
+                      : result.extracted.company}
+                  </span>
+                </div>
+
+                {/* Baris 2: Lokasi */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    Lokasi
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {result.extracted?.country ?? "-"}
+                  </span>
+                </div>
+
+                {/* Baris 3: Gaji */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    Gaji
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {result.extracted?.salary ?? "-"}
+                  </span>
+                </div>
+
+                {/* Baris Opsional: Biaya Diminta */}
+                {result.extracted?.fees && (
+                  <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-[13px]">
+                    <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                      Biaya Diminta
+                    </span>
+                    <span className="font-semibold text-bahaya-ink">
+                      {result.extracted.fees}
+                    </span>
+                  </div>
+                )}
+
+                {/* Baris Opsional: Kontak */}
+                {result.extracted?.contact && result.extracted.contact.length > 0 && (
+                  <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-[13px]">
+                    <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                      Kontak
+                    </span>
+                    <span className="font-semibold text-ink">
+                      {result.extracted.contact.join(", ")}
+                    </span>
+                  </div>
+                )}
+              </div>
               {/* Notifikasi Pencocokan Poster Scam Terverifikasi (M4 - FR-PST-01 s/d 03) */}
               {scam_matches > 0 && (
                 <div className="card p-5 bg-white border border-bahaya-line space-y-3">
@@ -652,77 +766,92 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
               )}
 
               {/* Verifikasi Sumber Resmi Pemerintah (BP2MI / Kemnaker - FR-RSM-01 s/d 04) */}
-              <div className="card p-5 bg-white space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-base text-ink flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-navy" />
-                    <span>Pengecekan Sumber Resmi (BP2MI / Kemnaker)</span>
+              <div className="card !p-0 bg-white shadow-card rounded-2xl overflow-hidden divide-y divide-slate-100 border border-line">
+                {/* Header Card */}
+                <div className="px-4 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between gap-3">
+                  <h3 className="font-bold text-sm sm:text-base text-ink flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-ink shrink-0" />
+                    <span>Pengecekan sumber resmi</span>
                   </h3>
                   <span
-                    className={`badge ${
-                      official_check.found ? "badge-aman" : "badge-waspada"
-                    }`}
+                    className={cn(
+                      "font-semibold text-[11px] sm:text-xs px-2.5 py-0.5 rounded-md border",
+                      official_check.found
+                        ? "bg-emerald-100/80 text-emerald-900 border-emerald-200/60"
+                        : "bg-red-100/80 text-red-900 border-red-200/70"
+                    )}
                   >
-                    {official_check.found ? "Ditemukan Resmi" : "Tidak Ditemukan"}
+                    {official_check.found ? "Ditemukan resmi" : "Tidak ditemukan"}
                   </span>
                 </div>
 
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  {official_check.detail}
-                </p>
+                {/* Baris 1: Nama Perusahaan */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    Nama Perusahaan
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {result.extracted?.company &&
+                    result.extracted.company !== "-" &&
+                    !result.extracted.company.toLowerCase().includes("tidak dicantumkan")
+                      ? result.extracted.company
+                      : official_check.p3mi_name || "Tidak dicantumkan"}
+                  </span>
+                </div>
 
-                {official_check.found && official_check.p3mi_name && (
-                  <div className="rounded bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200 space-y-1.5">
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <div>
-                        <strong>Nama P3MI Terdaftar:</strong> {official_check.p3mi_name}
-                      </div>
-                      {official_check.license_status && (
-                        <span className="inline-flex items-center gap-1 font-semibold text-aman-ink bg-aman-tint px-2 py-0.5 rounded text-[11px] border border-aman-line">
-                          <span className="h-1.5 w-1.5 rounded-full bg-aman"></span>
-                          Status Izin: {official_check.license_status}
-                        </span>
-                      )}
-                    </div>
+                {/* Baris 2: P3MI Kemnaker */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    P3MI Kemnaker
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {official_check.found
+                      ? official_check.license_status
+                        ? `Terdaftar (${official_check.license_status})`
+                        : "Terdaftar Resmi"
+                      : "Tidak ditemukan"}
+                  </span>
+                </div>
 
-                    {official_check.sip2mi_code && (
-                      <div>
-                        <strong>Nomor Izin SIP2MI / KEP:</strong> {official_check.sip2mi_code}
-                      </div>
-                    )}
+                {/* Baris 3: SISKOP2MI BP2MI */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    SISKOP2MI BP2MI
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {official_check.found
+                      ? official_check.sip2mi_code
+                        ? `Terdaftar (${official_check.sip2mi_code})`
+                        : "Terdaftar Resmi"
+                      : "Tidak ditemukan"}
+                  </span>
+                </div>
 
-                    {official_check.countries && official_check.countries.length > 0 && (
-                      <div>
-                        <strong>Negara Penempatan Resmi:</strong> {official_check.countries.join(", ")}
-                      </div>
-                    )}
-
-                    {official_check.job_types && official_check.job_types.length > 0 && (
-                      <div>
-                        <strong>Sektor Pekerjaan Resmi:</strong> {official_check.job_types.join(", ")}
-                      </div>
-                    )}
-
-                    {!official_check.is_exact && official_check.similarity_score !== undefined && (
-                      <div className="text-[11px] text-muted italic pt-0.5">
-                        * Pencarian toleran salah ketik: terdeteksi kecocokan fonetik/ejaan dengan kemiripan {Math.round(official_check.similarity_score * 100)}%.
-                      </div>
-                    )}
+                {/* Baris Opsional Jika Resmi & Ada Data Tambahan */}
+                {official_check.found && official_check.countries && official_check.countries.length > 0 && (
+                  <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-[13px]">
+                    <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                      Negara Penempatan
+                    </span>
+                    <span className="font-semibold text-ink">
+                      {official_check.countries.join(", ")}
+                    </span>
                   </div>
                 )}
 
-                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
+
+                {/* Footer Link & Call Center */}
+                <div className="px-4 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-2.5 text-[11px] sm:text-xs">
                   <a
                     href={official_check.link || "https://siskop2mi.bp2mi.go.id/"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 font-semibold text-navy hover:underline"
+                    className="font-semibold text-navy hover:underline underline"
                   >
-                    <span>Periksa mandiri di SISKOP2MI BP2MI</span>
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    Periksa mandiri di SISKOP2MI
                   </a>
-                  <span className="text-muted">
-                    Call Center BP2MI: <strong className="text-ink">1500-117</strong> (Bebas Pulsa 24 Jam)
+                  <span className="text-slate-600">
+                    Call Center BP2MI: <strong className="font-bold text-ink">1500–117</strong> (24 jam)
                   </span>
                 </div>
               </div>
@@ -735,67 +864,45 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                 onOpenFeedback={(flag) => setFeedbackFlag(flag)}
               />
 
-              {/* Rekomendasi Tindakan Keamanan */}
-              <div className="card p-5 bg-white space-y-4">
-                <h3 className="font-bold text-base text-ink flex items-center gap-2">
-                  <ShieldAlert className="h-5 w-5 text-navy" />
-                  <span>Rekomendasi Tindakan Keamanan</span>
-                </h3>
+            </div>
+          </div>
 
-                <ul className="space-y-2 text-sm text-slate-700">
-                  {result.risk_level === "bahaya" ? (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-bahaya shrink-0 mt-2" />
-                        <span>
-                          <strong>Hentikan komunikasi:</strong> Jangan mentransfer uang atau menyerahkan dokumen asli (paspor/ijazah) kepada perekrut ini.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-bahaya shrink-0 mt-2" />
-                        <span>
-                          <strong>Laporkan:</strong> Gunakan kanal pengaduan resmi Satgas TPPO Polri atau BP2MI jika diminta berangkat dengan visa turis.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-bahaya shrink-0 mt-2" />
-                        <span>
-                          <strong>Simpan bukti:</strong> Amankan tangkapan layar percakapan dan bukti pembayaran untuk proses hukum.
-                        </span>
-                      </li>
-                    </>
-                  ) : result.risk_level === "waspada" ? (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-waspada shrink-0 mt-2" />
-                        <span>
-                          <strong>Verifikasi langsung:</strong> Hubungi kontak resmi perusahaan untuk memastikan nama perekrut benar-benar terdaftar.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-waspada shrink-0 mt-2" />
-                        <span>
-                          <strong>Tolak pungutan liar:</strong> Rekrutmen resmi tidak membebankan biaya tiket/pelatihan di muka tanpa rincian perjanjian kerja resmi.
-                        </span>
-                      </li>
-                    </>
-                  ) : (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-aman shrink-0 mt-2" />
-                        <span>
-                          <strong>Tetap cermat:</strong> Pastikan Anda menandatangani Perjanjian Kerja (PK) yang disahkan oleh instansi ketenagakerjaan resmi.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-aman shrink-0 mt-2" />
-                        <span>
-                          <strong>Kroscek visa:</strong> Pastikan jenis visa yang diterbitkan adalah visa kerja resmi (bukan visa wisata/kunjungan).
-                        </span>
-                      </li>
-                    </>
-                  )}
-                </ul>
+          {/* Rekomendasi Tindakan */}
+          <div className="card p-6 sm:p-8 bg-white shadow-card rounded-2xl border border-line space-y-6">
+            <h3 className="font-bold text-base sm:text-lg text-ink text-center">
+              Rekomendasi Tindakan
+            </h3>
+
+            <div className="relative">
+              {/* Garis Putus-Putus Penghubung (Desktop) */}
+              <div
+                className="hidden md:block absolute top-7 left-16 right-16 border-t-2 border-dashed border-slate-200 z-0"
+                aria-hidden="true"
+              />
+
+              {/* 3 Langkah Horizontal Melebar Penuh */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-10 relative z-10">
+                {recommendationSteps.map((step, idx) => {
+                  const StepIcon = step.icon;
+                  return (
+                    <div key={idx} className="flex flex-col items-center text-center">
+                      <div
+                        className={cn(
+                          "h-14 w-14 rounded-full bg-white border-2 flex items-center justify-center shadow-xs transition-transform hover:scale-105",
+                          step.border
+                        )}
+                      >
+                        <StepIcon className={cn("h-6 w-6 stroke-[2]", step.textColor)} />
+                      </div>
+                      <h4 className="mt-3.5 font-bold text-sm sm:text-base text-ink">
+                        {step.title}
+                      </h4>
+                      <p className="mt-1 text-xs sm:text-sm text-slate-600 leading-relaxed max-w-sm">
+                        {step.desc}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

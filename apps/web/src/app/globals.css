@@ -217,7 +217,7 @@ html :is(h1, h2, h3) {
 }
 .badge svg { width: .875rem; height: .875rem; stroke-width: 2.5; }
 .badge-aman    { border-color: var(--ck-aman-line);    background-color: var(--ck-aman-tint);    color: var(--ck-aman-ink); }
-.badge-waspada { border-color: var(--ck-waspada-line); background-color: var(--ck-waspada-tint); color: var(--ck-waspada-ink); }
+.badge-waspada { border-color: var(--ck-bahaya-line); background-color: var(--ck-bahaya-tint); color: var(--ck-bahaya-ink); }
 .badge-bahaya  { border-color: var(--ck-bahaya-line);  background-color: var(--ck-bahaya-tint);  color: var(--ck-bahaya-ink); }
 
 /* ---------- Motif Penanda Bukti (Evidence) ---------- */
