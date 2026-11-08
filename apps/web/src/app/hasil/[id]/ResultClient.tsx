@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   TriangleAlert,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { RiskBadge } from "@/components/ui/Badge";
@@ -675,77 +676,99 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
               )}
 
               {/* Verifikasi Sumber Resmi Pemerintah (BP2MI / Kemnaker - FR-RSM-01 s/d 04) */}
-              <div className="card p-5 bg-white space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-base text-ink flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-navy" />
-                    <span>Pengecekan Sumber Resmi (BP2MI / Kemnaker)</span>
+              <div className="card !p-0 bg-white shadow-card rounded-2xl overflow-hidden divide-y divide-slate-100 border border-line">
+                {/* Header Card */}
+                <div className="px-4 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between gap-3">
+                  <h3 className="font-bold text-sm sm:text-base text-ink flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-ink shrink-0" />
+                    <span>Pengecekan sumber resmi</span>
                   </h3>
                   <span
-                    className={`badge ${
-                      official_check.found ? "badge-aman" : "badge-waspada"
-                    }`}
+                    className={cn(
+                      "font-semibold text-xs px-2.5 py-0.5 rounded-md border",
+                      official_check.found
+                        ? "bg-emerald-100/80 text-emerald-900 border-emerald-200/60"
+                        : "bg-amber-100/80 text-amber-900 border-amber-200/60"
+                    )}
                   >
-                    {official_check.found ? "Ditemukan Resmi" : "Tidak Ditemukan"}
+                    {official_check.found ? "Ditemukan resmi" : "Tidak ditemukan"}
                   </span>
                 </div>
 
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  {official_check.detail}
-                </p>
+                {/* Baris 1: Nama dicari */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    Nama dicari
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {result.extracted?.company &&
+                    result.extracted.company !== "-" &&
+                    !result.extracted.company.toLowerCase().includes("tidak dicantumkan")
+                      ? result.extracted.company
+                      : official_check.p3mi_name || "Tidak dicantumkan"}
+                  </span>
+                </div>
 
-                {official_check.found && official_check.p3mi_name && (
-                  <div className="rounded bg-slate-50 p-3 text-xs text-slate-800 border border-slate-200 space-y-1.5">
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <div>
-                        <strong>Nama P3MI Terdaftar:</strong> {official_check.p3mi_name}
-                      </div>
-                      {official_check.license_status && (
-                        <span className="inline-flex items-center gap-1 font-semibold text-aman-ink bg-aman-tint px-2 py-0.5 rounded text-[11px] border border-aman-line">
-                          <span className="h-1.5 w-1.5 rounded-full bg-aman"></span>
-                          Status Izin: {official_check.license_status}
-                        </span>
-                      )}
-                    </div>
+                {/* Baris 2: P3MI Kemnaker */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    P3MI Kemnaker
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {official_check.found
+                      ? official_check.license_status
+                        ? `Terdaftar (${official_check.license_status})`
+                        : "Terdaftar Resmi"
+                      : "Tidak ditemukan"}
+                  </span>
+                </div>
 
-                    {official_check.sip2mi_code && (
-                      <div>
-                        <strong>Nomor Izin SIP2MI / KEP:</strong> {official_check.sip2mi_code}
-                      </div>
-                    )}
+                {/* Baris 3: SISKOP2MI BP2MI */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    SISKOP2MI BP2MI
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {official_check.found
+                      ? official_check.sip2mi_code
+                        ? `Terdaftar (${official_check.sip2mi_code})`
+                        : "Terdaftar Resmi"
+                      : "Tidak ditemukan"}
+                  </span>
+                </div>
 
-                    {official_check.countries && official_check.countries.length > 0 && (
-                      <div>
-                        <strong>Negara Penempatan Resmi:</strong> {official_check.countries.join(", ")}
-                      </div>
-                    )}
-
-                    {official_check.job_types && official_check.job_types.length > 0 && (
-                      <div>
-                        <strong>Sektor Pekerjaan Resmi:</strong> {official_check.job_types.join(", ")}
-                      </div>
-                    )}
-
-                    {!official_check.is_exact && official_check.similarity_score !== undefined && (
-                      <div className="text-[11px] text-muted italic pt-0.5">
-                        * Pencarian toleran salah ketik: terdeteksi kecocokan fonetik/ejaan dengan kemiripan {Math.round(official_check.similarity_score * 100)}%.
-                      </div>
-                    )}
+                {/* Baris Opsional Jika Resmi & Ada Data Tambahan */}
+                {official_check.found && official_check.countries && official_check.countries.length > 0 && (
+                  <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                    <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                      Negara Penempatan
+                    </span>
+                    <span className="font-semibold text-ink">
+                      {official_check.countries.join(", ")}
+                    </span>
                   </div>
                 )}
 
-                <div className="pt-2 flex flex-wrap items-center justify-between gap-3 text-xs">
+                {/* Notifikasi Toleran Salah Ketik */}
+                {!official_check.is_exact && official_check.similarity_score !== undefined && (
+                  <div className="px-4 sm:px-5 py-2 bg-amber-50/60 text-[11px] text-amber-900 italic">
+                    * Pencarian toleran salah ketik: terdeteksi kecocokan fonetik/ejaan dengan kemiripan{" "}
+                    {Math.round(official_check.similarity_score * 100)}%.
+                  </div>
+                )}
+
+                {/* Footer Link & Call Center */}
+                <div className="px-4 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-2.5 text-xs">
                   <a
                     href={official_check.link || "https://siskop2mi.bp2mi.go.id/"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 font-semibold text-navy hover:underline"
+                    className="font-semibold text-navy hover:underline underline"
                   >
-                    <span>Periksa mandiri di SISKOP2MI BP2MI</span>
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    Periksa mandiri di SISKOP2MI
                   </a>
-                  <span className="text-muted">
-                    Call Center BP2MI: <strong className="text-ink">1500-117</strong> (Bebas Pulsa 24 Jam)
+                  <span className="text-slate-600">
+                    Call Center BP2MI: <strong className="font-bold text-ink">1500–117</strong> (24 jam)
                   </span>
                 </div>
               </div>
