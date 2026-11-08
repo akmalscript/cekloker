@@ -131,6 +131,7 @@ def _perkecil(data: bytes, mime: str) -> tuple[bytes, str]:
 
 # ---------------------------------------------------------------- endpoint
 @app.get("/health")
+@app.head("/health")
 def health():
     return {"ok": True}
 
