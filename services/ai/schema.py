@@ -37,8 +37,19 @@ class Strict(BaseModel):
 # Output MENTAH dari Gemini (internal — tidak dikirim ke API publik)
 # ═══════════════════════════════════════════════════════════════════════════════
 
+def _wajibkan_lokasi(schema: dict) -> None:
+    """Tandai box_2d dan image_index wajib pada skema yang dikirim ke model, supaya model
+    tidak melewatkannya. Validasi di Python tetap longgar (default None / 0)."""
+    wajib = schema.setdefault("required", [])
+    for nama in ("box_2d", "image_index"):
+        if nama not in wajib:
+            wajib.append(nama)
+
+
 class RawFlag(BaseModel):
     """Satu red flag sebagaimana dikembalikan Gemini. Hanya code, kutipan, alasan, kotak."""
+    model_config = ConfigDict(json_schema_extra=_wajibkan_lokasi)
+
     code: str
     quote: str | None = None
     reason: str

@@ -155,21 +155,25 @@ def _bbox(box: list[int] | None) -> BBox | None:
 # Model kadang menempelkan koordinat ke dalam teks, mis. "KLIK LINK DI BIO photo_index 0 box_2d [848,154,883,476]".
 _BOX_BOCOR = re.compile(
     r"\s*(?:(?:photo_index|image_index)\s*[:=]?\s*(\d+)\s*)?"
-    r"(?:box_2d|box2d|bound(?:ing|ary)[\s_]*box)\s*[:=]?\s*\[\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\]",
+    r"(?:box_2d|box2d|bound(?:ing|ary)[\s_]*box)\s*[:=]?\s*\[?\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)[\s,]+(\d+)\s*\]?",
     re.I,
 )
 
 
+_IDX_BOCOR = re.compile(r"\s*(?:photo_index|image_index)\s*[:=]?\s*\d+\s*,?", re.I)
+
+
 def _pisah_box(teks: str | None) -> tuple[str | None, int | None, list[int] | None]:
-    """Buang koordinat yang bocor dari sebuah teks. Return (teks_bersih, image_index, box_2d)."""
+    """Buang koordinat dan indeks yang bocor dari sebuah teks. Return (teks_bersih, image_index, box_2d)."""
     if not teks:
         return teks, None, None
     m = _BOX_BOCOR.search(teks)
-    if not m:
+    idx = int(m.group(1)) if m and m.group(1) is not None else None
+    box = [int(m.group(i)) for i in (2, 3, 4, 5)] if m else None
+    bersih = _IDX_BOCOR.sub("", _BOX_BOCOR.sub("", teks)).strip()
+    if m is None and bersih == teks.strip():
         return teks, None, None
-    idx = int(m.group(1)) if m.group(1) is not None else None
-    box = [int(m.group(i)) for i in (2, 3, 4, 5)]
-    return _BOX_BOCOR.sub("", teks).strip(), idx, box
+    return bersih, idx, box
 
 
 def _quote_valid(quote: str | None, sumber_ternormalisasi: str) -> bool:
@@ -251,6 +255,9 @@ def bangun_hasil(
             bb = _bbox(box)
             if bb is not None:
                 regions.append(Region(image_index=idx, bbox=bb))
+        if not regions:
+            log.warning("red flag %s tanpa kotak: box_2d=%r image_index=%r (bocor=%r)",
+                        f.code, f.box_2d, f.image_index, box_q)
         red_flags.append(
             RedFlag(
                 code=e.code,
