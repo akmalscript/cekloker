@@ -383,7 +383,7 @@ export default function CekLokerPage() {
                 </div>
 
                 <p id="upload-hint" className="mt-4 text-center text-[13px] leading-snug text-muted">
-                  JPG, JPEG, PNG, WEBP, PDF. Maks. 5 file, 10 MB per file, total 25 MB.
+                  JPG, JPEG, PNG, WEBP, PDF. Maks. 3 file, 10 MB per file, total 25 MB.
                 </p>
 
                 {/* Daftar Berkas Terpilih */}
