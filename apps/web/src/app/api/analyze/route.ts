@@ -8,7 +8,7 @@ import { verifyOfficialP3MI } from "@/lib/matching/p3mi-verifier";
 import type { AnalysisResult } from "@/types";
 
 const FASTAPI_URL = process.env.AI_SERVICE_URL || "http://127.0.0.1:8000";
-const MAX_FILES = 5;
+const MAX_FILES = 3;
 const MAX_FILE_SIZE_MB = 10;
 const MAX_TOTAL_SIZE_MB = 25;
 const MAX_TEXT_LENGTH = 10000;
