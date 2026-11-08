@@ -47,7 +47,6 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
     const teksAsli = (formData.get("teks") as string | null) ?? "";
-    const jenis = (formData.get("jenis") as string | null) ?? "lowongan";
 
     // 2. Verifikasi Kunci Akses Demo Juri (Option 3: demo_key=juri2026)
     // Melindungi layanan AI dari traffic publik tak dikenal dan bot agar kuota LLM tidak habis
@@ -227,7 +226,7 @@ export async function POST(request: NextRequest) {
       const aiResponse = await fetch(`${FASTAPI_URL}/analyze`, {
         method: "POST",
         body: fastApiFormData,
-        // Timeout 60 detik untuk pemrosesan AI
+        // Timeout 90 detik untuk pemrosesan AI (termasuk cold start)
         signal: AbortSignal.timeout(90000),
       });
 
@@ -254,117 +253,26 @@ export async function POST(request: NextRequest) {
 
       analysisResult = (await aiResponse.json()) as AnalysisResult;
     } catch (aiErr: unknown) {
-      console.warn(
-        "Panggilan FastAPI gagal / offline, menggunakan intelligent fallback:",
+      console.error(
+        "Panggilan ke layanan AI gagal atau melewati batas waktu:",
         aiErr,
       );
 
-      // Fallback cerdas agar frontend tetap bisa diuji secara end-to-end saat FastAPI belum dijalankan
-      const isSuspect =
-        teks.toLowerCase().includes("telegram") ||
-        teks.toLowerCase().includes("paspor") ||
-        teks.toLowerCase().includes("kamboja") ||
-        teks.toLowerCase().includes("turis") ||
-        files.length > 0;
-
-      let inferredCompany = "";
-      const lowerTeks = teks.toLowerCase();
-      if (lowerTeks.includes("selnajaya") || lowerTeks.includes("selna jaya")) {
-        inferredCompany = "PT OS Selnajaya Indonesia";
-      } else if (
-        lowerTeks.includes("taiwan mandiri") ||
-        lowerTeks.includes("tiwan mandiri")
-      ) {
-        inferredCompany = "PT Taiwan Mandiri Jaya";
-      } else if (lowerTeks.includes("samudra")) {
-        inferredCompany = "PT Samudra Penempatan Indonesia";
-      } else if (lowerTeks.includes("binawan")) {
-        inferredCompany = "PT Binawan Inti Utama";
-      }
-
-      analysisResult = {
-        schema_version: "1.0",
-        input_type: jenis === "chat" ? "chat" : "lowongan",
-        risk_level: isSuspect ? "bahaya" : "waspada",
-        confidence: 0.92,
-        needs_manual_check: false,
-        summary: isSuspect
-          ? "Lowongan ini terindikasi memiliki pola risiko tinggi penipuan dan penahanan dokumen perjalanan tanpa perlindungan ketenagakerjaan resmi."
-          : "Lowongan ini memerlukan verifikasi lebih lanjut terhadap keabsahan kontrak dan izin penempatan.",
-        extracted: {
-          position: "Staf Rekrutmen / Operasional",
-          company: inferredCompany,
-          country: "Luar Negeri",
-          salary: "Menjanjikan Upah Tinggi",
-          fees: "Terdapat indikasi biaya",
-          contact: ["Kanal pesan instan"],
-          requirements: ["Tanpa pengalaman"],
+      // Jangan pernah membuat hasil analisis palsu. Jika layanan AI tidak dapat
+      // dihubungi, kembalikan error agar pengguna tahu analisis belum terjadi.
+      // Kuota tamu tidak dipotong karena langkah 7 tidak tercapai.
+      const isTimeout =
+        aiErr instanceof Error &&
+        (aiErr.name === "TimeoutError" || aiErr.name === "AbortError");
+      return NextResponse.json(
+        {
+          error: isTimeout
+            ? "Layanan AI memerlukan waktu terlalu lama untuk merespons. Server mungkin baru bangun dari mode tidur, jadi silakan coba lagi dalam beberapa saat."
+            : "Layanan analisis AI sedang tidak dapat dihubungi, jadi lowongan ini belum dianalisis. Silakan coba lagi nanti.",
+          error_code: isTimeout ? "ai_timeout" : "ai_unavailable",
         },
-        red_flags: isSuspect
-          ? [
-              {
-                code: "paspor_ditahan",
-                label: "Penahanan paspor",
-                severity: "bahaya",
-                quote: "Paspor asli dititipkan kepada pihak perantara.",
-                reason:
-                  "Perekrut meminta paspor asli ditahan selama masa kerja, melanggar hak kebebasan bergerak.",
-                legal_basis: "UU No. 21 Tahun 2007 (TPPO)",
-                regions: previewDataUrl
-                  ? [
-                      {
-                        image_index: 0,
-                        bbox: { x: 0.1, y: 0.4, w: 0.65, h: 0.08 },
-                      },
-                    ]
-                  : [],
-              },
-              {
-                code: "visa_turis",
-                label: "Berangkat dengan visa turis",
-                severity: "bahaya",
-                quote: "Berangkat memakai visa kunjungan terlebih dahulu.",
-                reason:
-                  "Bekerja di luar negeri menggunakan visa wisata merupakan tindak pelanggaran hukum keimigrasian.",
-                legal_basis: "UU No. 18 Tahun 2017 tentang PMI",
-                regions: previewDataUrl
-                  ? [
-                      {
-                        image_index: 0,
-                        bbox: { x: 0.1, y: 0.52, w: 0.65, h: 0.08 },
-                      },
-                    ]
-                  : [],
-              },
-            ]
-          : [
-              {
-                code: "biaya_di_muka",
-                label: "Biaya di muka tidak wajar",
-                severity: "waspada",
-                quote: "Biaya administrasi dan pendaftaran awal.",
-                reason:
-                  "Perekrut meminta sejumlah uang sebelum adanya kontrak kerja resmi.",
-                legal_basis: "Peraturan Perlindungan Tenaga Kerja",
-                regions: [],
-              },
-            ],
-        fingerprint: {
-          image_phash: phashes,
-          raw_text: teks || "Teks hasil ekstraksi otomatis.",
-          normalized_text: (
-            teks || "teks hasil ekstraksi otomatis"
-          ).toLowerCase(),
-        },
-        meta: {
-          model: "gemini-3.8-flash (via CekLoker Orchestrator)",
-          prompt_version: "v1.0",
-          catalog_version: "1.0.0",
-          normalization_version: "1",
-          risk_score: isSuspect ? 8 : 4,
-          latency_ms: 1200,
-        },
-      };
+        { status: 503 },
+      );
     }
 
     // 5. Pencocokan Poster Scam Terverifikasi (M4 - FR-PST-01 s/d 03)
