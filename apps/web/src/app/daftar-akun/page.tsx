@@ -225,7 +225,7 @@ export default function RegisterPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input !pr-32 short:h-10"
+                  className="input !pr-14 short:h-10"
                   aria-describedby="password-hint"
                   autoComplete="new-password"
                   required
@@ -233,19 +233,15 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-1 top-1/2 inline-flex h-10 -translate-y-1/2 items-center gap-2 rounded-lg px-3 text-[13px] font-semibold text-navy hover:bg-navy-tint short:h-9"
+                  className="absolute right-1 top-1/2 grid h-10 w-10 short:h-9 short:w-9 -translate-y-1/2 place-items-center rounded-lg text-muted hover:bg-navy-tint hover:text-navy"
+                  aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                  aria-pressed={showPassword}
                   aria-controls="password password2"
                 >
                   {showPassword ? (
-                    <>
-                      <EyeOff className="h-4 w-4" aria-hidden="true" />
-                      <span>Sembunyikan</span>
-                    </>
+                    <EyeOff className="h-5 w-5" aria-hidden="true" />
                   ) : (
-                    <>
-                      <Eye className="h-4 w-4" aria-hidden="true" />
-                      <span>Tampilkan</span>
-                    </>
+                    <Eye className="h-5 w-5" aria-hidden="true" />
                   )}
                 </button>
               </div>

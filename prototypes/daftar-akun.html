@@ -326,11 +326,10 @@
           <div>
             <label for="password" class="field-label">Password</label>
             <div class="relative mt-2 short:mt-1">
-              <input id="password" name="password" type="password" class="input !pr-32 short:h-10" autocomplete="new-password" aria-invalid="false" data-hint="password-hint">
-              <button id="pw-toggle" type="button" class="absolute right-1 top-1/2 inline-flex h-10 -translate-y-1/2 items-center gap-2 rounded-lg px-3 text-[13px] font-semibold text-navy hover:bg-navy-tint short:h-9" aria-controls="password password2">
-                <span data-icon-show><i data-lucide="eye" class="h-4 w-4" aria-hidden="true"></i></span>
-                <span data-icon-hide class="hidden"><i data-lucide="eye-off" class="h-4 w-4" aria-hidden="true"></i></span>
-                <span data-label>Tampilkan</span>
+              <input id="password" name="password" type="password" class="input !pr-14 short:h-10" autocomplete="new-password" aria-invalid="false" data-hint="password-hint">
+              <button id="pw-toggle" type="button" class="absolute right-1 top-1/2 grid h-10 w-10 short:h-9 short:w-9 -translate-y-1/2 place-items-center rounded-lg text-muted hover:bg-navy-tint hover:text-navy" aria-label="Tampilkan password" aria-pressed="false" aria-controls="password password2">
+                <span data-icon-show><i data-lucide="eye" class="h-5 w-5" aria-hidden="true"></i></span>
+                <span data-icon-hide class="hidden"><i data-lucide="eye-off" class="h-5 w-5" aria-hidden="true"></i></span>
               </button>
             </div>
             <p id="password-hint" class="mt-2 text-[13px] leading-snug text-muted">Minimal 8 karakter</p>
@@ -479,7 +478,8 @@
     pwToggle.addEventListener('click', () => {
       const show = pw.type === 'password';
       pw.type = pw2.type = show ? 'text' : 'password';
-      pwToggle.querySelector('[data-label]').textContent = show ? 'Sembunyikan' : 'Tampilkan';
+      pwToggle.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
+      pwToggle.setAttribute('aria-pressed', show ? 'true' : 'false');
       pwToggle.querySelector('[data-icon-show]').classList.toggle('hidden', show);
       pwToggle.querySelector('[data-icon-hide]').classList.toggle('hidden', !show);
     });
