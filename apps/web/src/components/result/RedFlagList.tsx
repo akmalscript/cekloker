@@ -8,7 +8,6 @@ import {
   Eye,
   MessageSquare,
   OctagonAlert,
-  ShieldAlert,
   TriangleAlert,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -69,9 +68,8 @@ export function RedFlagList({
   return (
     <div className="space-y-3.5">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm sm:text-base font-bold text-ink flex items-center gap-2">
-          <ShieldAlert className="h-4 w-4 text-bahaya-ink" />
-          <span>Rincian Indikasi Bahaya ({redFlags.length})</span>
+        <h3 className="text-[13px] sm:text-[15px] font-bold text-ink">
+          Rincian Indikasi Bahaya ({redFlags.length})
         </h3>
         <span className="text-xs text-muted">
           Ketuk kartu untuk melihat detail bukti
@@ -91,9 +89,7 @@ export function RedFlagList({
             ? CheckCircle2
             : OctagonAlert;
 
-          const circleStyle = isWaspada
-            ? "bg-amber-100/90 text-amber-800"
-            : isAman
+          const circleStyle = isAman
             ? "bg-emerald-100 text-emerald-800"
             : "bg-red-100 text-red-800";
 
@@ -123,7 +119,7 @@ export function RedFlagList({
                   >
                     <IconComponent className="h-4 w-4 sm:h-4.5 sm:w-4.5 stroke-[2.2]" />
                   </div>
-                  <h4 className="font-bold text-xs sm:text-sm text-ink truncate leading-tight">
+                  <h4 className="font-bold text-[13px] sm:text-[15px] text-ink truncate leading-tight">
                     {flag.label}
                   </h4>
                 </div>

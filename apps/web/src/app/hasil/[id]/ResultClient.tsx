@@ -585,7 +585,7 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
             <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between gap-5">
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h1 className="text-2xl sm:text-[26px] font-extrabold text-ink tracking-tight">
+                  <h1 className="text-[22px] sm:text-[26px] font-extrabold text-ink tracking-tight">
                     Hasil Pemeriksaan Lowongan
                   </h1>
                   {scam_matches > 0 && (
@@ -596,7 +596,7 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                 </div>
 
                 <p
-                  className="text-sm sm:text-base text-slate-700 leading-relaxed text-justify"
+                  className="text-[13px] sm:text-[15px] text-slate-700 leading-relaxed text-justify"
                   style={{ textAlign: "justify" }}
                 >
                   {result.summary}
@@ -644,58 +644,73 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
 
             {/* Kolom Kanan: Rincian Red Flags & Verifikasi Resmi (6/12) */}
             <div className="lg:col-span-6 space-y-6">
-              {/* Informasi Lowongan Diekstrak */}
-              <div className="card p-5 bg-white space-y-4">
-                <h3 className="font-bold text-base text-ink flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-navy" />
-                  <span>Informasi Lowongan Diekstrak</span>
-                </h3>
-
-                <div className="grid grid-cols-1 gap-2.5 text-xs">
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Building2 className="h-4 w-4 shrink-0 text-muted" />
-                    <span>Perusahaan:</span>
-                    <strong className="text-ink ml-auto">
-                      {!result.extracted?.company ||
-                      result.extracted.company === "-" ||
-                      result.extracted.company.toLowerCase().includes("tidak dicantumkan")
-                        ? "Tidak Ditemukan"
-                        : result.extracted.company}
-                    </strong>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <MapPin className="h-4 w-4 shrink-0 text-muted" />
-                    <span>Lokasi:</span>
-                    <strong className="text-ink ml-auto">
-                      {result.extracted?.country ?? "-"}
-                    </strong>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-600">
-                    <Banknote className="h-4 w-4 shrink-0 text-muted" />
-                    <span>Gaji:</span>
-                    <strong className="text-ink ml-auto">
-                      {result.extracted?.salary ?? "-"}
-                    </strong>
-                  </div>
-                  {result.extracted?.fees && (
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <AlertOctagon className="h-4 w-4 shrink-0 text-bahaya-ink" />
-                      <span>Biaya Diminta:</span>
-                      <strong className="text-bahaya-ink ml-auto">
-                        {result.extracted.fees}
-                      </strong>
-                    </div>
-                  )}
-                  {result.extracted?.contact && result.extracted.contact.length > 0 && (
-                    <div className="flex items-start gap-2 text-slate-600 pt-1">
-                      <Phone className="h-4 w-4 shrink-0 text-muted mt-0.5" />
-                      <span>Kontak:</span>
-                      <span className="text-ink ml-auto text-right font-medium">
-                        {result.extracted.contact.join(", ")}
-                      </span>
-                    </div>
-                  )}
+              {/* Informasi Lowongan */}
+              <div className="card !p-0 bg-white shadow-card rounded-2xl overflow-hidden divide-y divide-slate-100 border border-line">
+                {/* Header Card */}
+                <div className="px-4 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between gap-3">
+                  <h3 className="font-bold text-sm sm:text-base text-ink flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-ink shrink-0" />
+                    <span>Informasi Lowongan</span>
+                  </h3>
                 </div>
+
+                {/* Baris 1: Perusahaan */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    Perusahaan
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {!result.extracted?.company ||
+                    result.extracted.company === "-" ||
+                    result.extracted.company.toLowerCase().includes("tidak dicantumkan")
+                      ? "Tidak Ditemukan"
+                      : result.extracted.company}
+                  </span>
+                </div>
+
+                {/* Baris 2: Lokasi */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    Lokasi
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {result.extracted?.country ?? "-"}
+                  </span>
+                </div>
+
+                {/* Baris 3: Gaji */}
+                <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                    Gaji
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {result.extracted?.salary ?? "-"}
+                  </span>
+                </div>
+
+                {/* Baris Opsional: Biaya Diminta */}
+                {result.extracted?.fees && (
+                  <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-[13px]">
+                    <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                      Biaya Diminta
+                    </span>
+                    <span className="font-semibold text-bahaya-ink">
+                      {result.extracted.fees}
+                    </span>
+                  </div>
+                )}
+
+                {/* Baris Opsional: Kontak */}
+                {result.extracted?.contact && result.extracted.contact.length > 0 && (
+                  <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-[13px]">
+                    <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
+                      Kontak
+                    </span>
+                    <span className="font-semibold text-ink">
+                      {result.extracted.contact.join(", ")}
+                    </span>
+                  </div>
+                )}
               </div>
               {/* Notifikasi Pencocokan Poster Scam Terverifikasi (M4 - FR-PST-01 s/d 03) */}
               {scam_matches > 0 && (
@@ -760,20 +775,20 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   </h3>
                   <span
                     className={cn(
-                      "font-semibold text-xs px-2.5 py-0.5 rounded-md border",
+                      "font-semibold text-[11px] sm:text-xs px-2.5 py-0.5 rounded-md border",
                       official_check.found
                         ? "bg-emerald-100/80 text-emerald-900 border-emerald-200/60"
-                        : "bg-amber-100/80 text-amber-900 border-amber-200/60"
+                        : "bg-red-100/80 text-red-900 border-red-200/70"
                     )}
                   >
                     {official_check.found ? "Ditemukan resmi" : "Tidak ditemukan"}
                   </span>
                 </div>
 
-                {/* Baris 1: Nama dicari */}
+                {/* Baris 1: Nama Perusahaan */}
                 <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
                   <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
-                    Nama dicari
+                    Nama Perusahaan
                   </span>
                   <span className="font-semibold text-ink">
                     {result.extracted?.company &&
@@ -814,7 +829,7 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
 
                 {/* Baris Opsional Jika Resmi & Ada Data Tambahan */}
                 {official_check.found && official_check.countries && official_check.countries.length > 0 && (
-                  <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-sm">
+                  <div className="px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between sm:justify-start gap-0.5 sm:gap-4 text-xs sm:text-[13px]">
                     <span className="w-36 sm:w-44 shrink-0 text-slate-500 font-medium">
                       Negara Penempatan
                     </span>
@@ -824,16 +839,9 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   </div>
                 )}
 
-                {/* Notifikasi Toleran Salah Ketik */}
-                {!official_check.is_exact && official_check.similarity_score !== undefined && (
-                  <div className="px-4 sm:px-5 py-2 bg-amber-50/60 text-[11px] text-amber-900 italic">
-                    * Pencarian toleran salah ketik: terdeteksi kecocokan fonetik/ejaan dengan kemiripan{" "}
-                    {Math.round(official_check.similarity_score * 100)}%.
-                  </div>
-                )}
 
                 {/* Footer Link & Call Center */}
-                <div className="px-4 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-2.5 text-xs">
+                <div className="px-4 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-2.5 text-[11px] sm:text-xs">
                   <a
                     href={official_check.link || "https://siskop2mi.bp2mi.go.id/"}
                     target="_blank"
@@ -859,10 +867,10 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
             </div>
           </div>
 
-          {/* Rekomendasi Tindakan Keamanan (Melebar Penuh / Full Width) */}
+          {/* Rekomendasi Tindakan */}
           <div className="card p-6 sm:p-8 bg-white shadow-card rounded-2xl border border-line space-y-6">
             <h3 className="font-bold text-base sm:text-lg text-ink text-center">
-              Rekomendasi Tindakan Keamanan
+              Rekomendasi Tindakan
             </h3>
 
             <div className="relative">

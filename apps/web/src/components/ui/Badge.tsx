@@ -23,7 +23,7 @@ export function RiskBadge({ status, className, label }: BadgeProps) {
 
   if (normalized === "waspada") {
     return (
-      <span className={cn("badge badge-waspada", className)}>
+      <span className={cn("badge badge-bahaya", className)}>
         <TriangleAlert aria-hidden="true" />
         <span>{label ?? "Waspada"}</span>
       </span>
