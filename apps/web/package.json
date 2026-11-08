@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "tsx src/tests/matching.test.ts && tsx src/tests/pii.test.ts",
+    "test": "tsx src/tests/matching.test.ts && tsx src/tests/pii.test.ts && tsx src/tests/pii-image.test.ts",
     "lint": "eslint",
     "typegen": "python ../../services/ai/export_openapi.py && openapi-typescript ../../services/ai/openapi.json -o src/types/api.ts"
   },

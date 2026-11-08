@@ -25,7 +25,7 @@ function validatePassword(val: string): string {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/riwayat";
+  const callbackUrl = searchParams.get("callbackUrl") || "/masuk/arahkan";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
