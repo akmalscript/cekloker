@@ -71,7 +71,7 @@ export default function KebijakanPrivasiPage() {
                 1. Data yang kami kumpulkan
               </h2>
               <p className="text-muted leading-relaxed">
-                Kami menyimpan data yang Anda berikan saat menggunakan CekLoker, seperti informasi akun (nama, email), detail berkas poster lowongan atau tangkapan layar percakapan rekruter yang diunggah, serta hasil pemeriksaan dalam riwayat Anda. Sistem kami secara otomatis mengaburkan (*PII blurring*) data sensitif pribadi (seperti NIK, foto KTP, nomor rekening, atau alamat lengkap) sebelum diproses ke mesin analisis AI. Berikan hanya informasi yang diperlukan dan hindari mengirim data sensitif yang tidak terkait dengan pemeriksaan.
+                Kami menyimpan data yang Anda berikan saat menggunakan CekLoker, seperti informasi akun (nama, email), detail berkas poster lowongan atau tangkapan layar percakapan rekruter yang diunggah, serta hasil pemeriksaan dalam riwayat Anda. Sistem kami secara otomatis menyensor data sensitif pribadi (seperti NIK, foto KTP, nomor rekening, atau alamat lengkap) sebelum diproses ke mesin analisis AI. Berikan hanya informasi yang diperlukan dan hindari mengirim data sensitif yang tidak terkait dengan pemeriksaan.
               </p>
             </section>
 
@@ -80,7 +80,7 @@ export default function KebijakanPrivasiPage() {
                 2. Cara kami memakai data
               </h2>
               <p className="text-muted leading-relaxed">
-                Data Anda digunakan untuk memproses pemeriksaan lowongan, mendeteksi pola tanda bahaya (*red flags*), menampilkan hasil, dan menyediakan riwayat agar dapat Anda lihat kembali. Kami tidak menjual data pribadi Anda atau menggunakannya untuk tujuan yang tidak berkaitan dengan layanan CekLoker.
+                Data Anda digunakan untuk memproses pemeriksaan lowongan, mendeteksi pola tanda bahaya (red flags), menampilkan hasil, dan menyediakan riwayat agar dapat Anda lihat kembali. Kami tidak menjual data pribadi Anda atau menggunakannya untuk tujuan yang tidak berkaitan dengan layanan CekLoker.
               </p>
             </section>
 
