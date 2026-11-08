@@ -119,22 +119,15 @@ function LaporForm() {
 
       <main id="konten" className="flex-1 grid-paper">
         <div className="container-page max-w-[1264px] pb-12 pt-6 md:pb-16 md:pt-10">
-          <Link
-            href={scanId ? `/hasil/${scanId}` : "/database-loker"}
-            className="inline-flex min-h-[40px] items-center gap-2 rounded text-[15px] font-semibold text-navy underline-offset-4 hover:underline"
-          >
-            <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            <span>Kembali</span>
-          </Link>
 
           <h1 className="mt-2 text-[32px] md:text-[40px] font-extrabold text-ink">
-            Laporkan Loker Ini
+            Laporkan Loker
           </h1>
 
           <div className="alert alert-info mt-4 items-center">
             <Info className="h-5 w-5 shrink-0 text-navy" aria-hidden="true" />
             <p className="text-sm">
-              Laporan Anda akan ditinjau secara independen oleh tim verifikator CekLoker demi melindungi pencari kerja lainnya. Identitas Anda dirahasiakan.
+              Laporan Anda akan ditinjau oleh tim verifikator CekLoker demi melindungi pencari kerja lainnya. Identitas Anda dirahasiakan.
             </p>
           </div>
 
@@ -257,7 +250,7 @@ function LaporForm() {
                         type="text"
                         value={jobTitle}
                         onChange={(e) => setJobTitle(e.target.value)}
-                        placeholder="Contoh: Customer Service Kamboja"
+                        placeholder="Customer Service"
                         className="input mt-2"
                       />
                     </div>
@@ -270,7 +263,7 @@ function LaporForm() {
                         type="text"
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
-                        placeholder="Contoh: PT Fiktif Jaya"
+                        placeholder="PT Fiktif Jaya"
                         className="input mt-2"
                       />
                     </div>
@@ -287,7 +280,7 @@ function LaporForm() {
                         type="text"
                         value={contact}
                         onChange={(e) => setContact(e.target.value)}
-                        placeholder="WhatsApp / Username Telegram"
+                        placeholder="WhatsApp/Username Telegram"
                         className="input mt-2"
                       />
                     </div>
@@ -300,7 +293,7 @@ function LaporForm() {
                         type="text"
                         value={lossAmount}
                         onChange={(e) => setLossAmount(e.target.value)}
-                        placeholder="Rp 0 atau nominal yang ditransfer"
+                        placeholder="Rp 500.000"
                         className="input mt-2"
                       />
                     </div>

@@ -40,8 +40,6 @@ export default function DatabaseLokerPage() {
   const [cari, setCari] = useState("");
   const [negara, setNegara] = useState("");
   const [jenis, setJenis] = useState("");
-  const [dari, setDari] = useState("");
-  const [sampai, setSampai] = useState("");
   const [urut, setUrut] = useState("terbaru");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -56,11 +54,9 @@ export default function DatabaseLokerPage() {
       if (cari) params.set("cari", cari);
       if (negara && negara !== "Semua Negara") params.set("negara", negara);
       if (jenis) params.set("jenis", jenis);
-      if (dari) params.set("dari", dari);
-      if (sampai) params.set("sampai", sampai);
       if (urut) params.set("urut", urut);
       params.set("page", String(page));
-      params.set("limit", "10");
+      params.set("limit", "5");
 
       const res = await fetch(`/api/database-loker?${params.toString()}`);
       const json = await res.json();
@@ -78,7 +74,7 @@ export default function DatabaseLokerPage() {
 
   useEffect(() => {
     fetchDatabase();
-  }, [page, negara, jenis, dari, sampai, urut]);
+  }, [page, negara, jenis, urut]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,8 +86,6 @@ export default function DatabaseLokerPage() {
     setCari("");
     setNegara("");
     setJenis("");
-    setDari("");
-    setSampai("");
     setUrut("terbaru");
     setPage(1);
   };
@@ -151,7 +145,7 @@ export default function DatabaseLokerPage() {
               Database Loker Terindikasi Penipuan
             </h1>
             <p className="mt-2 text-[15px] leading-normal text-muted sm:text-base">
-              Daftar temuan lowongan kerja mencurigakan yang telah diverifikasi oleh tim kurasi CekLoker dan laporan terkonfirmasi masyarakat.
+              Daftar temuan lowongan kerja mencurigakan yang telah diverifikasi oleh Admin dan laporan terkonfirmasi masyarakat.
             </p>
           </div>
           <button
@@ -174,7 +168,7 @@ export default function DatabaseLokerPage() {
         >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {/* Input Pencarian */}
-            <div className="sm:col-span-2 lg:col-span-1">
+            <div className="sm:col-span-2 lg:col-span-2">
               <label htmlFor="cari" className="field-label text-[13px] text-muted">
                 Cari database
               </label>
@@ -189,8 +183,8 @@ export default function DatabaseLokerPage() {
                   type="search"
                   value={cari}
                   onChange={(e) => setCari(e.target.value)}
-                  className="input pl-11"
-                  placeholder="Posisi, entitas, ID"
+                  className="input !pl-11"
+                  placeholder="Posisi, perusahaan, atau ID"
                   autoComplete="off"
                 />
               </div>
@@ -210,7 +204,7 @@ export default function DatabaseLokerPage() {
                     setNegara(e.target.value);
                     setPage(1);
                   }}
-                  className="input appearance-none pr-10"
+                  className="input appearance-none !pr-10"
                 >
                   {COUNTRIES.map((c) => (
                     <option key={c} value={c === "Semua Negara" ? "" : c}>
@@ -239,7 +233,7 @@ export default function DatabaseLokerPage() {
                     setJenis(e.target.value);
                     setPage(1);
                   }}
-                  className="input appearance-none pr-10"
+                  className="input appearance-none !pr-10"
                 >
                   <option value="">Semua jenis</option>
                   {RED_FLAGS.map((f) => (
@@ -253,24 +247,6 @@ export default function DatabaseLokerPage() {
                   aria-hidden="true"
                 />
               </div>
-            </div>
-
-            {/* Rentang Tanggal */}
-            <div>
-              <label htmlFor="dari" className="field-label text-[13px] text-muted">
-                Diverifikasi dari
-              </label>
-              <input
-                id="dari"
-                name="dari"
-                type="date"
-                value={dari}
-                onChange={(e) => {
-                  setDari(e.target.value);
-                  setPage(1);
-                }}
-                className="input mt-2 px-3 text-[15px]"
-              />
             </div>
 
             {/* Urutan */}
@@ -287,7 +263,7 @@ export default function DatabaseLokerPage() {
                     setUrut(e.target.value);
                     setPage(1);
                   }}
-                  className="input appearance-none pr-10"
+                  className="input appearance-none !pr-10"
                 >
                   <option value="terbaru">Terbaru</option>
                   <option value="terlama">Terlama</option>
@@ -305,7 +281,7 @@ export default function DatabaseLokerPage() {
             <p className="text-[13px] text-muted">
               Menampilkan {entries.length} dari {totalItems} entri terverifikasi
             </p>
-            {(cari || negara || jenis || dari || sampai || urut !== "terbaru") && (
+            {(cari || negara || jenis || urut !== "terbaru") && (
               <button
                 type="button"
                 onClick={handleReset}
@@ -321,7 +297,7 @@ export default function DatabaseLokerPage() {
         {loading ? (
           <div className="my-16 flex flex-col items-center justify-center gap-3">
             <div className="spinner border-navy" />
-            <p className="text-sm font-semibold text-muted">Memuat database terverifikasi...</p>
+            <p className="text-sm font-semibold text-muted">Sedang memuat...</p>
           </div>
         ) : entries.length > 0 ? (
           <ul className="mt-6 space-y-4">

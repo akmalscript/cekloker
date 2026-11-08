@@ -71,8 +71,12 @@ function LoginForm() {
 
   return (
     <div className="relative flex min-h-screen flex-col grid-paper">
+      <a href="#form-masuk" className="skip-link">
+        Lewati ke formulir masuk
+      </a>
+
       {/* Kembali ke beranda (pojok kiri atas) */}
-      <header className="px-4 pt-4 sm:absolute sm:left-0 sm:top-0 sm:px-6 sm:pt-6">
+      <header className="px-4 pt-4 sm:absolute sm:left-0 sm:top-0 sm:px-6 sm:pt-6 short:pt-4">
         <Link href="/" className="btn btn-ghost btn-sm !px-3">
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Beranda
@@ -81,15 +85,15 @@ function LoginForm() {
 
       <main
         id="konten"
-        className="flex flex-1 flex-col items-center justify-center px-4 pb-10 pt-4 sm:px-6 sm:py-12"
+        className="flex flex-1 flex-col items-center justify-center px-4 pb-10 pt-4 sm:px-6 sm:py-12 short:py-3"
       >
         {/* Logo */}
         <Link
           href="/"
-          className="mb-6 flex items-center gap-2 rounded-ctl text-xl font-extrabold tracking-tight text-ink"
+          className="mb-6 flex items-center gap-2 rounded-ctl text-xl font-extrabold tracking-tight text-ink short:mb-3"
           aria-label="CekLoker, ke beranda"
         >
-          <svg className="h-9 w-9 shrink-0" viewBox="0 0 32 32" aria-hidden="true">
+          <svg className="h-9 w-9 shrink-0 short:h-8 short:w-8" viewBox="0 0 32 32" aria-hidden="true">
             <rect width="32" height="32" rx="8" fill="#1E3A8A" />
             <path
               d="M9 13V9h4M19 9h4v4M23 19v4h-4M13 23H9v-4"
@@ -112,9 +116,9 @@ function LoginForm() {
         </Link>
 
         {/* Kartu form */}
-        <div className="card w-full max-w-[420px] p-6 sm:p-10">
-          <h1 className="text-center text-[28px] sm:text-[32px]">Masuk ke CekLoker</h1>
-          <p className="mx-auto mt-2 max-w-[300px] text-center text-[15px] leading-normal text-muted">
+        <div className="card w-full max-w-[420px] p-6 sm:p-10 short:px-8 short:py-5">
+          <h1 className="text-center text-[28px] sm:text-[32px] short:text-2xl">Masuk ke CekLoker</h1>
+          <p className="mx-auto mt-2 max-w-[300px] text-center text-[15px] leading-normal text-muted short:mt-1">
             Simpan riwayat pemeriksaan dan bantu laporkan loker palsu.
           </p>
 
@@ -146,7 +150,12 @@ function LoginForm() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-5" noValidate>
+          <form
+            id="form-masuk"
+            onSubmit={handleSubmit}
+            className="mt-8 space-y-5 short:mt-4 short:space-y-3"
+            noValidate
+          >
             <div>
               <label htmlFor="email" className="field-label">
                 Email
@@ -157,7 +166,7 @@ function LoginForm() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input mt-2"
+                className="input mt-2 short:mt-1 short:h-10"
                 autoComplete="email"
                 inputMode="email"
                 placeholder="nama@email.com"
@@ -169,14 +178,14 @@ function LoginForm() {
               <label htmlFor="password" className="field-label">
                 Password
               </label>
-              <div className="relative mt-2">
+              <div className="relative mt-2 short:mt-1">
                 <input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input !pr-14"
+                  className="input !pr-14 short:h-10"
                   autoComplete="current-password"
                   placeholder="Minimal 8 karakter"
                   required
@@ -184,8 +193,10 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-1 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-lg text-muted hover:bg-navy-tint hover:text-navy"
+                  className="absolute right-1 top-1/2 grid h-10 w-10 short:h-9 short:w-9 -translate-y-1/2 place-items-center rounded-lg text-muted hover:bg-navy-tint hover:text-navy"
                   aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                  aria-pressed={showPassword}
+                  aria-controls="password"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" aria-hidden="true" />
@@ -194,7 +205,7 @@ function LoginForm() {
                   )}
                 </button>
               </div>
-              <div className="mt-2 flex justify-end">
+              <div className="mt-2 flex justify-end short:mt-1">
                 <Link
                   href="/lupa-password"
                   className="rounded text-sm font-semibold text-navy underline-offset-4 hover:underline"
@@ -207,14 +218,14 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading || googleLoading}
-              className="btn btn-primary w-full"
+              className="btn btn-primary w-full short:min-h-[40px]"
             >
               {loading && <span className="spinner" aria-hidden="true" />}
               <span>{loading ? "Memproses..." : "Masuk"}</span>
             </button>
           </form>
 
-          <div className="my-6 flex items-center gap-4 text-sm font-medium text-muted">
+          <div className="my-6 flex items-center gap-4 text-sm font-medium text-muted short:my-2.5">
             <span className="h-px flex-1 bg-line" aria-hidden="true" />
             atau
             <span className="h-px flex-1 bg-line" aria-hidden="true" />
@@ -224,7 +235,7 @@ function LoginForm() {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={loading || googleLoading}
-            className="btn btn-secondary w-full !text-ink"
+            className="btn btn-secondary w-full !text-ink short:min-h-[40px]"
           >
             {googleLoading ? (
               <span className="spinner border-navy" aria-hidden="true" />
@@ -247,7 +258,7 @@ function LoginForm() {
         </div>
 
         {/* Jalur tamu */}
-        <div className="mt-6 grid w-full max-w-[420px] grid-cols-1 items-center gap-x-4 sm:grid-cols-[minmax(0,1fr)_auto] rounded-card border border-navy-soft bg-navy-tint px-5 py-4">
+        <div className="mt-6 grid w-full max-w-[420px] grid-cols-1 items-center gap-x-4 sm:grid-cols-[minmax(0,1fr)_auto] rounded-card border border-navy-soft bg-navy-tint px-5 py-4 short:mt-3 short:py-2">
           <p className="order-1 font-bold leading-snug text-ink sm:order-none">
             Belum mau daftar?
           </p>
@@ -263,8 +274,8 @@ function LoginForm() {
           </p>
         </div>
 
-        <div className="mt-6 w-full max-w-[420px] text-center">
-          <p className="text-[15px] text-muted">
+        <div className="mt-6 w-full max-w-[420px] text-center short:mt-3 short:max-w-[520px]">
+          <p className="text-[15px] text-muted short:text-sm">
             Belum punya akun?{" "}
             <Link
               href="/daftar-akun"
@@ -273,7 +284,7 @@ function LoginForm() {
               Daftar
             </Link>
           </p>
-          <p className="mt-2 text-[13px] leading-relaxed text-muted">
+          <p className="mt-2 text-[13px] leading-relaxed text-muted short:mt-0.5">
             Dengan masuk, kamu menyetujui pemrosesan data sesuai{" "}
             <Link
               href="/kebijakan-privasi"
