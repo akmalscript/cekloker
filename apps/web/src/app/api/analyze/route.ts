@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { checkGuestQuota, consumeGuestQuota } from "@/lib/rate-limit";
-import { processImageForAI } from "@/lib/image/pii-blur";
+import { processImageForAI, type BlurRegion } from "@/lib/image/pii-blur";
+import { detectPiiRegions, PiiDetectionError } from "@/lib/image/pii-ocr";
+import { maskPiiText } from "@/lib/pii/detect";
 import { saveScan } from "@/lib/store";
 import { matchScamPosters } from "@/lib/matching/poster-matcher";
 import { verifyOfficialP3MI } from "@/lib/matching/p3mi-verifier";
@@ -44,7 +46,7 @@ export async function POST(request: NextRequest) {
     // 1. Baca FormData terlebih dahulu agar parameter demo_key dan input dapat dievaluasi
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
-    const teks = (formData.get("teks") as string | null) ?? "";
+    const teksAsli = (formData.get("teks") as string | null) ?? "";
     const jenis = (formData.get("jenis") as string | null) ?? "lowongan";
 
     // 2. Verifikasi Kunci Akses Demo Juri (Option 3: demo_key=juri2026)
@@ -100,7 +102,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (files.length === 0 && !teks.trim()) {
+    if (files.length === 0 && !teksAsli.trim()) {
       return NextResponse.json(
         { error: "Kirim minimal satu gambar atau teks lowongan." },
         { status: 400 },
@@ -114,12 +116,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (teks.length > MAX_TEXT_LENGTH) {
+    if (teksAsli.length > MAX_TEXT_LENGTH) {
       return NextResponse.json(
         { error: `Teks melebihi batas maksimal ${MAX_TEXT_LENGTH} karakter.` },
         { status: 400 },
       );
     }
+
+    // Samarkan NIK / nomor rekening pada teks sebelum dipakai di langkah mana pun
+    // berikutnya (dikirim ke AI, dicocokkan, dan disimpan). Gambar ditangani di bawah.
+    const teks = maskPiiText(teksAsli).text;
 
     // 3. Preprocessing & PII Blur Pipeline (FR-PRI-01 & AGENTS.md §5)
     let totalBytes = 0;
@@ -165,8 +171,30 @@ export async function POST(request: NextRequest) {
       const arrayBuf = await file.arrayBuffer();
       const rawBuf = Buffer.from(arrayBuf);
 
+      // Cari NIK / nomor rekening pada gambar. Urutannya tidak boleh dibalik:
+      // gambar hanya boleh dikirim ke AI setelah area sensitifnya di-blur.
+      let piiRegions: BlurRegion[] = [];
+      try {
+        piiRegions = await detectPiiRegions(rawBuf);
+      } catch (piiErr) {
+        if (!(piiErr instanceof PiiDetectionError)) throw piiErr;
+        console.error("Deteksi data sensitif pada gambar gagal:", piiErr);
+        // Tanpa hasil OCR, letak data sensitif tidak diketahui. Secara bawaan gambar
+        // tidak dikirim ke AI. PII_OCR_FAIL_OPEN=1 mengizinkan lanjut tanpa blur.
+        if (process.env.PII_OCR_FAIL_OPEN !== "1") {
+          return NextResponse.json(
+            {
+              error:
+                "Pemeriksaan data sensitif pada gambar gagal, jadi gambar tidak dikirim ke AI. Silakan coba lagi.",
+              error_code: "pii_check_failed",
+            },
+            { status: 503 },
+          );
+        }
+      }
+
       const { processedBuffer, originalPhash, mimeType } =
-        await processImageForAI(rawBuf, file.type);
+        await processImageForAI(rawBuf, file.type, piiRegions);
       processedFiles.push({
         buffer: processedBuffer,
         name: sanitizedName,

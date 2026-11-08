@@ -71,7 +71,7 @@ export default function KebijakanPrivasiPage() {
                 1. Data yang kami kumpulkan
               </h2>
               <p className="text-muted leading-relaxed">
-                Kami menyimpan data yang Anda berikan saat menggunakan CekLoker, seperti informasi akun (nama, email), detail berkas poster lowongan atau tangkapan layar percakapan rekruter yang diunggah, serta hasil pemeriksaan dalam riwayat Anda. Sistem kami secara otomatis menyensor data sensitif pribadi (seperti NIK, foto KTP, nomor rekening, atau alamat lengkap) sebelum diproses ke mesin analisis AI. Berikan hanya informasi yang diperlukan dan hindari mengirim data sensitif yang tidak terkait dengan pemeriksaan.
+                Kami menyimpan data yang Anda berikan saat menggunakan CekLoker, seperti informasi akun (nama, email), detail berkas poster lowongan atau tangkapan layar percakapan rekruter yang diunggah, serta hasil pemeriksaan dalam riwayat Anda. Sistem kami secara otomatis menyamarkan NIK dan nomor rekening yang terbaca pada gambar atau teks sebelum diproses ke mesin analisis AI. Penyamaran ini berbasis pembacaan teks sehingga tidak menjamin semua data tertangkap, dan tidak mencakup foto dokumen identitas (KTP, KK, paspor, ijazah) maupun alamat lengkap. Berikan hanya informasi yang diperlukan dan hindari mengirim data sensitif yang tidak terkait dengan pemeriksaan.
               </p>
             </section>
 
