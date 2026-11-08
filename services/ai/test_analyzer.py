@@ -129,6 +129,40 @@ def test_prompt_melarang_koordinat_di_teks_dan_fees_kosong_bila_gratis():
     assert "field TERPISAH" in p and "tidak memungut biaya" in p
 
 
+def test_jawaban_model_rusak_diulang_lalu_berhasil(monkeypatch):
+    from providers import ModelError
+    panggilan = []
+
+    def panggil(provider, model, bagian, sp, skema):
+        panggilan.append(1)
+        if len(panggilan) == 1:
+            raise ModelError(None, "Jawaban model bukan JSON yang sesuai skema (finish_reason=length)")
+        return _raw()
+
+    monkeypatch.setattr(analyzer, "panggil", panggil)
+    raw, model = analyzer._panggil_model([], "sp")
+    assert len(panggilan) == 2 and raw.summary == "Ringkasan."
+
+
+def test_jawaban_model_rusak_menyerah_setelah_dua_ulangan(monkeypatch):
+    from providers import ModelError
+    panggilan = []
+
+    def panggil(*a, **k):
+        panggilan.append(1)
+        raise ModelError(None, "Jawaban model bukan JSON yang sesuai skema")
+
+    monkeypatch.setattr(analyzer, "panggil", panggil)
+    with pytest.raises(ModelError):
+        analyzer._panggil_model([], "sp")
+    assert len(panggilan) == 3          # 1 percobaan + 2 ulangan
+
+
+def test_prompt_membatasi_panjang_transkripsi():
+    from prompts import build_system_prompt
+    assert "1.500 karakter" in build_system_prompt()
+
+
 def test_kode_sama_dua_kali_dihitung_sekali():
     f = RawFlag(code="biaya_di_muka", quote="x", reason="r")
     assert _hasil(_raw([f, f])).meta.risk_score == 3
@@ -248,3 +282,20 @@ def test_endpoint_rate_limit(klien, monkeypatch):
     monkeypatch.setattr(analyzer, "PAKAI_CACHE", False)
     kode = [klien.post("/analyze", data={"teks": "x"}).status_code for _ in range(3)]
     assert kode == [200, 200, 429]
+
+
+def test_kode_sama_digabung_satu():
+    raw = _raw(red_flags=[
+        {"code": "pendaftaran_tidak_resmi", "quote": "KLIK LINK DI BIO", "reason": "a",
+         "box_2d": [10, 10, 20, 20], "image_index": 0},
+        {"code": "pendaftaran_tidak_resmi", "quote": "KLIK LINK DI BIO", "reason": "b",
+         "box_2d": [100, 100, 200, 200], "image_index": 0},
+    ], extracted_text="KLIK LINK DI BIO")
+    hasil = analyzer.bangun_hasil(raw, model="m", jumlah_gambar=1, teks=None, latency_ms=1)
+    assert [f.code for f in hasil.red_flags] == ["pendaftaran_tidak_resmi"]
+    assert len(hasil.red_flags[0].regions) == 2
+
+
+def test_boundary_box_bocor_dipisah():
+    teks, idx, box = analyzer._pisah_box("PENDAFTARAN14.ONLINE-RI.COM Boundary Box: [687, 469, 703, 775]")
+    assert teks == "PENDAFTARAN14.ONLINE-RI.COM" and box == [687, 469, 703, 775]

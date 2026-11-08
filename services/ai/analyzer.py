@@ -92,6 +92,7 @@ def _panggil_model(bagian, system_prompt: str, percobaan: int = 6) -> tuple[RawA
     Error sementara (429/5xx) → jeda lalu ulang."""
     daftar = _daftar_model()
     terakhir: Exception | None = None
+    json_rusak = 0
     for i in range(percobaan):
         tersedia = [m for m in daftar if m not in _HABIS]
         if not tersedia:
@@ -107,6 +108,12 @@ def _panggil_model(bagian, system_prompt: str, percobaan: int = 6) -> tuple[RawA
                 _HABIS.add(model)
                 continue
             kode = getattr(e, "code", None)
+            # Model sesekali melantur sehingga jawabannya bukan JSON utuh. Sifatnya acak,
+            # jadi ulangi (paling banyak 2 kali) tanpa menunggu.
+            if kode is None and "bukan JSON" in str(e) and json_rusak < 2:
+                json_rusak += 1
+                log.warning("jawaban model rusak, mengulang (%d/2)", json_rusak)
+                continue
             if kode not in (408, 429, 500, 502, 503, 504) or i == percobaan - 1:
                 raise
             time.sleep(min(5 * 2**i, 30))  # 5, 10, 20, 30 detik
@@ -148,7 +155,7 @@ def _bbox(box: list[int] | None) -> BBox | None:
 # Model kadang menempelkan koordinat ke dalam teks, mis. "KLIK LINK DI BIO photo_index 0 box_2d [848,154,883,476]".
 _BOX_BOCOR = re.compile(
     r"\s*(?:(?:photo_index|image_index)\s*[:=]?\s*(\d+)\s*)?"
-    r"box_2d\s*[:=]?\s*\[\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\]",
+    r"(?:box_2d|box2d|bound(?:ing|ary)[\s_]*box)\s*[:=]?\s*\[\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\]",
     re.I,
 )
 
@@ -173,6 +180,23 @@ def _quote_valid(quote: str | None, sumber_ternormalisasi: str) -> bool:
         return True
     log.warning("quote bukan potongan input, dikosongkan: %.80r", quote)
     return False
+
+
+def _gabung_kode_sama(flags: list[RedFlag]) -> list[RedFlag]:
+    """Satu kode tampil sekali. Bila model mengulang kode yang sama, gabungkan:
+    pakai kutipan pertama yang valid dan kumpulkan semua region."""
+    hasil: dict[str, RedFlag] = {}
+    for f in flags:
+        ada = hasil.get(f.code)
+        if ada is None:
+            hasil[f.code] = f
+            continue
+        regions = ada.regions + [r for r in f.regions if r not in ada.regions]
+        update = {"regions": regions}
+        if ada.quote is None and f.quote is not None:
+            update.update(quote=f.quote, reason=f.reason)
+        hasil[f.code] = ada.model_copy(update=update)
+    return list(hasil.values())
 
 
 def bangun_hasil(
@@ -238,6 +262,8 @@ def bangun_hasil(
                 regions=regions,
             )
         )
+
+    red_flags = _gabung_kode_sama(red_flags)
 
     confidence = min(1.0, max(0.0, raw.confidence))
     risiko = hitung_risiko([f.code for f in red_flags], confidence)

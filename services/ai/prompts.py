@@ -21,7 +21,7 @@ def build_system_prompt() -> str:
 Input: satu atau beberapa screenshot/poster lowongan atau chat perekrut, dan/atau teks.
 
 Tugasmu (isi field JSON persis dengan nama berikut):
-1. extracted_text: salin seluruh teks yang terbaca dari semua gambar apa adanya, berurutan dari atas ke bawah (dan teks yang dikirim pengguna bila ada). Jangan menambah, menilai, atau merangkum.
+1. extracted_text: salin teks yang terbaca dari semua gambar apa adanya, berurutan dari atas ke bawah (dan teks yang dikirim pengguna bila ada). Maksimal sekitar 1.500 karakter: bila lebih panjang, berhenti di situ. Jangan mengulang kalimat yang sama, jangan menambah, menilai, atau merangkum.
 2. extracted: info lowongan (position, company, country, salary, requirements, contact, fees). Isi null bila tidak tertulis, daftar kosong untuk requirements/contact bila tidak ada. Jangan menebak.
 3. input_type: "lowongan" (poster/iklan), "chat" (percakapan dengan perekrut), atau "gabungan" (keduanya).
 4. red_flags: temukan red flag HANYA dari daftar kode di bawah. Setiap red flag wajib punya:
