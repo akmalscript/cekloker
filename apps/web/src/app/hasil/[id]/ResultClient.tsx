@@ -28,6 +28,7 @@ import { Footer } from "@/components/Footer";
 import { RiskBadge } from "@/components/ui/Badge";
 import { DisclaimerBanner } from "@/components/DisclaimerBanner";
 import { PosterAnnotator } from "@/components/result/PosterAnnotator";
+import { TextEvidencePanel } from "@/components/result/TextEvidencePanel";
 import { RedFlagList } from "@/components/result/RedFlagList";
 import { FeedbackModal } from "@/components/result/FeedbackModal";
 import type { AnalysisResult, RedFlag } from "@/types";
@@ -427,7 +428,11 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
     selectedKey === "custom" && dynamicScan
       ? {
           name: "Hasil Pemeriksaan Anda",
-          image: dynamicScan.imageUrl || "/img/scam_kamboja.png",
+          // Hasil lama dari input teks menyimpan poster contoh sebagai placeholder.
+          image:
+            dynamicScan.imageUrl && dynamicScan.imageUrl !== "/img/scam_kamboja.png"
+              ? dynamicScan.imageUrl
+              : null,
           official_check: {
             found: dynamicScan.officialCheck.found,
             p3mi_name: dynamicScan.officialCheck.p3miName,
@@ -633,13 +638,22 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Kolom Kiri: Visual Poster & Anotasi Bounding Box (6/12) */}
             <div className="lg:col-span-6 sticky top-20">
-              <PosterAnnotator
-                imageSrc={image}
-                imageAlt={result.extracted?.position ?? "Poster lowongan"}
-                redFlags={result.red_flags ?? []}
-                activeCode={activeFlagCode}
-                onSelectFlag={(code) => setActiveFlagCode(code)}
-              />
+              {image ? (
+                <PosterAnnotator
+                  imageSrc={image}
+                  imageAlt={result.extracted?.position ?? "Poster lowongan"}
+                  redFlags={result.red_flags ?? []}
+                  activeCode={activeFlagCode}
+                  onSelectFlag={(code) => setActiveFlagCode(code)}
+                />
+              ) : (
+                <TextEvidencePanel
+                  text={result.fingerprint?.raw_text ?? ""}
+                  redFlags={result.red_flags ?? []}
+                  activeCode={activeFlagCode}
+                  onSelectFlag={(code) => setActiveFlagCode(code)}
+                />
+              )}
             </div>
 
             {/* Kolom Kanan: Rincian Red Flags & Verifikasi Resmi (6/12) */}

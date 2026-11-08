@@ -342,7 +342,8 @@ export async function POST(request: NextRequest) {
       userId: userId ?? undefined,
       createdAt: now,
       expiresAt,
-      imageUrl: previewDataUrl ?? "/img/scam_kamboja.png",
+      // Input teks saja tidak punya gambar. Jangan isi dengan poster contoh.
+      imageUrl: previewDataUrl,
       result: analysisResult,
       officialCheck: officialCheckData,
       scamMatches: posterMatchResult.matchedCount,

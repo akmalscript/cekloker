@@ -592,7 +592,6 @@ export default function CekLokerPage() {
                       setDemoInputKey(e.target.value);
                       setDemoError(null);
                     }}
-                    placeholder="Contoh: juri2026"
                     className="input w-full"
                     autoFocus
                   />
