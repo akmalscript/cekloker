@@ -16,6 +16,8 @@ import {
   ShieldAlert,
   Loader2,
   AlertCircle,
+  ShieldCheck,
+  TriangleAlert,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -442,58 +444,90 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
 
   const { result, image, official_check, scam_matches, scam_details } = currentDataset;
 
+  const riskInfo = {
+    bahaya: {
+      label: "Bahaya",
+      bg: "bg-[#b91c1c]",
+      icon: ShieldAlert,
+    },
+    waspada: {
+      label: "Waspada",
+      bg: "bg-[#b45309]",
+      icon: TriangleAlert,
+    },
+    aman: {
+      label: "Aman",
+      bg: "bg-[#15803d]",
+      icon: ShieldCheck,
+    },
+  }[result.risk_level] ?? {
+    label: "Bahaya",
+    bg: "bg-[#b91c1c]",
+    icon: ShieldAlert,
+  };
+
+  const RiskBannerIcon = riskInfo.icon;
+
   return (
     <>
       <Navbar />
 
-      <main className="flex-1 bg-canvas py-8 sm:py-12">
+      <main className="flex-1 bg-canvas pt-4 sm:pt-6 pb-8 sm:pb-12">
         {/* Cap air saat dicetak via browser print (FR-HSL-02) */}
         <div className="watermark-print hidden print:block" aria-hidden="true">
           DOKUMEN EVALUASI RESMI CEKLOKER — HANYA UNTUK PELAPORAN
         </div>
         <div className="container-page space-y-6">
-          {/* Preset Selector Bar (Pengujian Prototipe) */}
-          <div className="card p-3 bg-white flex flex-wrap items-center justify-between gap-3 no-print">
-            <div className="flex items-center gap-2 text-xs font-semibold text-muted">
-              <span className="eyebrow !text-xs">Uji Sampel Evaluasi:</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(PRESET_DATASETS).map(([key, item]) => (
-                <button
-                  key={key}
-                  type="button"
-                  className={`btn btn-xs ${
-                    selectedKey === key ? "btn-primary" : "btn-secondary"
-                  } cursor-pointer`}
-                  onClick={() => {
-                    setSelectedKey(key);
-                    setActiveFlagCode(null);
-                  }}
-                >
-                  {item.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Kartu Ringkasan Hasil Utama */}
-          <div className="card p-6 sm:p-8 bg-white shadow-card">
-            {/* Baris Atas: Badge Status Risiko & Tombol Aksi Cepat */}
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-wrap items-center gap-3">
-                <RiskBadge status={result.risk_level} className="badge-lg" />
-                <span className="text-xs font-semibold text-muted bg-slate-100 px-3 py-1 rounded-full">
-                  Tingkat Keyakinan AI: {Math.round(result.confidence * 100)}%
-                </span>
-                {scam_matches > 0 && (
-                  <span className="text-xs font-semibold text-bahaya-ink bg-bahaya-tint px-3 py-1 rounded-full border border-bahaya-line">
-                    Cocok dengan {scam_matches} laporan penipuan terverifikasi
-                  </span>
-                )}
+          <div className="card !p-0 bg-white shadow-card overflow-hidden flex flex-col md:flex-row items-stretch">
+            {/* Panel Status Kiri (Sesuai Desain Mockup) */}
+            <div
+              className={`w-full md:w-60 lg:w-64 p-6 sm:p-7 flex flex-col justify-between shrink-0 text-white ${riskInfo.bg}`}
+            >
+              <div>
+                <RiskBannerIcon className="h-10 w-10 text-white stroke-[2.2]" />
+              </div>
+
+              <div className="mt-8 md:mt-0">
+                <h2
+                  className="text-3xl font-extrabold !text-white tracking-tight leading-tight"
+                  style={{ color: "#ffffff" }}
+                >
+                  {riskInfo.label}
+                </h2>
+                <p
+                  className="mt-1 text-xs sm:text-sm font-medium !text-white/90"
+                  style={{ color: "rgba(255, 255, 255, 0.9)" }}
+                >
+                  Tingkat keyakinan AI: {Math.round(result.confidence * 100)}%
+                </p>
+              </div>
+            </div>
+
+            {/* Konten Kanan */}
+            <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between gap-5">
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h1 className="text-2xl sm:text-[26px] font-extrabold text-ink tracking-tight">
+                    Hasil Pemeriksaan Lowongan
+                  </h1>
+                  {scam_matches > 0 && (
+                    <span className="text-xs font-semibold text-bahaya-ink bg-bahaya-tint px-2.5 py-0.5 rounded-full border border-bahaya-line shrink-0">
+                      Cocok dengan {scam_matches} laporan penipuan
+                    </span>
+                  )}
+                </div>
+
+                <p
+                  className="text-sm sm:text-base text-slate-700 leading-relaxed text-justify"
+                  style={{ textAlign: "justify" }}
+                >
+                  {result.summary}
+                </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-2 shrink-0 no-print">
+              <div className="flex flex-wrap items-center gap-3 no-print pt-2">
                 <a
                   href={`/api/scan/${selectedKey !== "custom" ? selectedKey : rawId}/pdf`}
                   download
@@ -501,7 +535,7 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   title="Unduh berkas PDF formal dengan cap air resmi CekLoker"
                 >
                   <Download className="h-4 w-4" />
-                  <span>Unduh PDF Resmi</span>
+                  <span>Unduh PDF</span>
                 </a>
                 <Link
                   href={`/lapor?scan_id=${rawId}`}
@@ -515,17 +549,6 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
                   <span>Cek Lainnya</span>
                 </Link>
               </div>
-            </div>
-
-            {/* Judul & Ringkasan Hasil (diturunkan ke bawah agar teks judul cukup 1 baris) */}
-            <div className="mt-5 space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-ink">
-                Hasil Pemeriksaan Lowongan
-              </h1>
-
-              <p className="max-w-4xl text-sm sm:text-base text-slate-700 leading-relaxed">
-                {result.summary}
-              </p>
             </div>
           </div>
 

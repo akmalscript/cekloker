@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { AlertTriangle, BookOpen, MessageSquareQuote, CheckCircle2, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RiskBadge } from "@/components/ui/Badge";
@@ -18,6 +19,16 @@ export function RedFlagList({
   onSelectFlag,
   onOpenFeedback,
 }: RedFlagListProps) {
+  // Gulir halus kartu ke viewport saat anotasi di poster dipilih
+  useEffect(() => {
+    if (activeCode) {
+      const el = document.getElementById(`flag-card-${activeCode}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+  }, [activeCode]);
+
   if (redFlags.length === 0) {
     return (
       <div className="card p-8 text-center bg-white">
@@ -51,10 +62,10 @@ export function RedFlagList({
               key={flag.code}
               id={`flag-card-${flag.code}`}
               className={cn(
-                "card p-4 transition-all duration-200 cursor-pointer border",
+                "card p-4 transition-all duration-300 cursor-pointer border relative",
                 isActive
-                  ? "border-bahaya bg-bahaya-tint/30 shadow-md ring-2 ring-bahaya/40"
-                  : "border-line bg-white hover:border-slate-400"
+                  ? "border-navy ring-4 ring-navy/25 ring-offset-1 bg-navy-tint/30 shadow-lg scale-[1.01] -translate-y-0.5 z-10"
+                  : "border-line bg-white hover:border-slate-400 hover:shadow-sm"
               )}
               onClick={() => onSelectFlag(isActive ? null : flag.code)}
             >
@@ -64,7 +75,14 @@ export function RedFlagList({
                   <h4 className="font-bold text-base text-ink">{flag.label}</h4>
                 </div>
                 {(flag.regions?.length ?? 0) > 0 && (
-                  <span className="text-[11px] font-semibold text-navy bg-navy-tint px-2 py-0.5 rounded-full shrink-0">
+                  <span
+                    className={cn(
+                      "text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0 transition-colors",
+                      isActive
+                        ? "bg-navy text-white shadow-sm"
+                        : "text-navy bg-navy-tint"
+                    )}
+                  >
                     {flag.regions?.length} Bukti Visual
                   </span>
                 )}

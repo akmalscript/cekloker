@@ -94,9 +94,9 @@ export function PosterAnnotator({
                 <div
                   key={`${flag.code}-${rIdx}`}
                   className={cn(
-                    "evidence-box",
+                    "evidence-box cursor-pointer transition-all duration-200",
                     isWaspada && "is-waspada",
-                    isActive && "is-active ring-4 ring-offset-1 ring-red-500 scale-[1.01]"
+                    isActive && "is-active ring-4 ring-offset-1 ring-bahaya scale-[1.02] z-20 shadow-lg"
                   )}
                   style={{
                     top,
@@ -108,7 +108,12 @@ export function PosterAnnotator({
                   onClick={() => onSelectFlag(isActive ? null : flag.code)}
                   title={`${flag.label}: ${flag.reason}`}
                 >
-                  <span className="evidence-label shadow-md">
+                  <span
+                    className={cn(
+                      "evidence-label shadow-md transition-transform duration-200",
+                      isActive && "scale-105"
+                    )}
+                  >
                     {flag.label}
                   </span>
                 </div>

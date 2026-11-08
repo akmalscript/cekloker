@@ -144,7 +144,7 @@ export default function AdminDatabaseLokerPage() {
           onClick={handleExportPDF}
           disabled={exporting || entries.length === 0}
           className="btn btn-secondary btn-sm -ml-3 mt-2 w-fit !px-3 sm:ml-0 sm:mt-0"
-          title="Unduh data dalam format PDF resmi"
+          title="Unduh data dalam format PDF"
         >
           {exporting ? (
             <div className="spinner !h-3.5 !w-3.5 !border-navy !border-t-transparent" />
