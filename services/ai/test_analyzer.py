@@ -299,3 +299,18 @@ def test_kode_sama_digabung_satu():
 def test_boundary_box_bocor_dipisah():
     teks, idx, box = analyzer._pisah_box("PENDAFTARAN14.ONLINE-RI.COM Boundary Box: [687, 469, 703, 775]")
     assert teks == "PENDAFTARAN14.ONLINE-RI.COM" and box == [687, 469, 703, 775]
+
+
+def test_box_tanpa_kurung_dan_photo_index_dipisah():
+    teks, idx, box = analyzer._pisah_box("ncmanpoweragent@gmail.com photo_index: 0 box_2d: 292 236 312 817")
+    assert teks == "ncmanpoweragent@gmail.com" and idx == 0 and box == [292, 236, 312, 817]
+    teks, idx, box = analyzer._pisah_box("Email: tenriawarutei@gmail.com photo_index: 0,")
+    assert teks == "Email: tenriawarutei@gmail.com" and box is None
+
+
+def test_prompt_mewajibkan_box_untuk_gambar():
+    from prompts import build_system_prompt
+    sp = build_system_prompt()
+    assert "box_2d WAJIB diisi" in sp
+    assert "lokasinya tidak jelas" not in sp
+    assert "satu tempat yang berurutan" in sp

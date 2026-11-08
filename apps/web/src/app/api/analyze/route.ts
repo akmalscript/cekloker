@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
         method: "POST",
         body: fastApiFormData,
         // Timeout 60 detik untuk pemrosesan AI
-        signal: AbortSignal.timeout(60000),
+        signal: AbortSignal.timeout(90000),
       });
 
       if (aiResponse.status === 422) {
