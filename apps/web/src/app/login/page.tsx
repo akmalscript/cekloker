@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { ArrowLeft, ArrowRight, Eye, EyeOff, CircleAlert } from "lucide-react";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -37,6 +38,19 @@ function LoginForm() {
   }>({});
   const [attempted, setAttempted] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+
+  const oauthError = searchParams.get("error");
+  useEffect(() => {
+    if (oauthError) {
+      if (oauthError === "OAuthAccountNotLinked") {
+        setServerError("Email sudah terdaftar dengan kata sandi. Silakan masuk menggunakan form kata sandi.");
+      } else if (oauthError === "OAuthSignin" || oauthError === "OAuthCallback") {
+        setServerError("Gagal masuk dengan Google. Pastikan akun Google Anda aktif dan konfigurasi OAuth valid.");
+      } else {
+        setServerError(`Terjadi kendala autentikasi Google (${oauthError}).`);
+      }
+    }
+  }, [oauthError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,9 +107,16 @@ function LoginForm() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    setGoogleLoading(true);
-    signIn("google", { callbackUrl });
+  const handleGoogleSignIn = async () => {
+    try {
+      setGoogleLoading(true);
+      setServerError(null);
+      await signIn("google", { callbackUrl });
+    } catch (err) {
+      console.error("Google sign in error:", err);
+      setServerError("Gagal menghubungkan ke akun Google. Silakan coba lagi.");
+      setGoogleLoading(false);
+    }
   };
 
   return (
@@ -282,20 +303,9 @@ function LoginForm() {
             className="btn btn-secondary w-full !text-ink short:min-h-[40px]"
           >
             {googleLoading ? (
-              <span className="spinner border-navy" aria-hidden="true" />
+              <span className="spinner spinner-navy" aria-hidden="true" />
             ) : (
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.25"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
-                <path d="M20 12a8 8 0 1 1-2.34-5.66" />
-                <path d="M20 12h-7" />
-              </svg>
+              <GoogleIcon />
             )}
             <span>Masuk dengan Google</span>
           </button>

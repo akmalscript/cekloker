@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { ArrowLeft, ArrowRight, Eye, EyeOff, CircleAlert } from "lucide-react";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -130,9 +131,16 @@ export default function RegisterPage() {
     }
   };
 
-  const handleGoogleSignUp = () => {
-    setGoogleLoading(true);
-    signIn("google", { callbackUrl: "/riwayat" });
+  const handleGoogleSignUp = async () => {
+    try {
+      setGoogleLoading(true);
+      setServerError(null);
+      await signIn("google", { callbackUrl: "/riwayat" });
+    } catch (err) {
+      console.error("Google sign up error:", err);
+      setServerError("Gagal menghubungkan ke akun Google. Silakan coba lagi.");
+      setGoogleLoading(false);
+    }
   };
 
   return (
@@ -205,20 +213,9 @@ export default function RegisterPage() {
             className="btn btn-secondary w-full !text-ink short:min-h-[40px]"
           >
             {googleLoading ? (
-              <span className="spinner border-navy" aria-hidden="true" />
+              <span className="spinner spinner-navy" aria-hidden="true" />
             ) : (
-              <svg
-                className="h-5 w-5 text-navy"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.25"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
-                <path d="M20 12a8 8 0 1 1-2.34-5.66" />
-                <path d="M20 12h-7" />
-              </svg>
+              <GoogleIcon />
             )}
             <span>Daftar dengan Google</span>
           </button>
