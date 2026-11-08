@@ -79,6 +79,56 @@ def test_level_huruf_kecil_dan_skor_dari_katalog():
     assert _hasil(_raw(waspada)).risk_level == "waspada"   # skor 3
 
 
+def test_quote_yang_bukan_potongan_input_dikosongkan_flag_tetap_ada():
+    benar = RawFlag(code="biaya_di_muka", quote="bayar rp500.000", reason="r")
+    ngawur = RawFlag(code="paspor_ditahan", quote="Wait, quote exact: sesuatu lain", reason="r")
+    h = _hasil(_raw([benar, ngawur]))
+    assert [f.quote for f in h.red_flags] == ["bayar rp500.000", None]
+    assert [f.code for f in h.red_flags] == ["biaya_di_muka", "paspor_ditahan"]
+
+
+def test_prompt_melarang_catatan_di_dalam_field():
+    from prompts import build_system_prompt
+    assert "nilai final yang bersih" in build_system_prompt()
+
+
+def test_koordinat_bocor_di_quote_dipindah_ke_region_dan_dibersihkan():
+    f = RawFlag(
+        code="pendaftaran_tidak_resmi",
+        quote="KLIK LINK DI BIO photo_index 0 box_2d [848,154,883,476]",
+        reason="Pendaftaran lewat link di bio.",
+    )
+    h = _hasil(_raw([f], extracted_text="DAFTAR SEKARANG! KLIK LINK DI BIO"))
+    fl = h.red_flags[0]
+    assert fl.quote == "KLIK LINK DI BIO"
+    r = fl.regions[0]
+    assert r.image_index == 0
+    assert (r.bbox.x, r.bbox.y) == (0.154, 0.848)
+    assert (round(r.bbox.w, 3), round(r.bbox.h, 3)) == (0.322, 0.035)
+
+
+def test_koordinat_bocor_tidak_menimpa_box_yang_benar():
+    f = RawFlag(code="biaya_di_muka", quote="Bayar box_2d [1,2,3,4]", reason="r",
+                box_2d=[100, 200, 300, 600])
+    r = _hasil(_raw([f])).red_flags[0].regions[0]
+    assert (r.bbox.x, r.bbox.y) == (0.2, 0.1)
+
+
+def test_koordinat_bocor_di_reason_summary_dan_teks_dibersihkan():
+    f = RawFlag(code="biaya_di_muka", quote="Bayar", reason="Minta biaya box_2d [1,2,3,4]")
+    h = _hasil(_raw([f], summary="Ringkas photo_index 0 box_2d [5,6,7,8]",
+                    extracted_text="Bayar Rp500.000 dulu box_2d [9,9,9,9]"))
+    assert "box_2d" not in h.red_flags[0].reason
+    assert "box_2d" not in h.summary
+    assert "box_2d" not in h.fingerprint.raw_text
+
+
+def test_prompt_melarang_koordinat_di_teks_dan_fees_kosong_bila_gratis():
+    from prompts import build_system_prompt
+    p = build_system_prompt()
+    assert "field TERPISAH" in p and "tidak memungut biaya" in p
+
+
 def test_kode_sama_dua_kali_dihitung_sekali():
     f = RawFlag(code="biaya_di_muka", quote="x", reason="r")
     assert _hasil(_raw([f, f])).meta.risk_score == 3

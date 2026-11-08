@@ -10,6 +10,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import time
 from pathlib import Path
 
@@ -144,6 +145,36 @@ def _bbox(box: list[int] | None) -> BBox | None:
     return BBox(x=xmin / 1000, y=ymin / 1000, w=(xmax - xmin) / 1000, h=(ymax - ymin) / 1000)
 
 
+# Model kadang menempelkan koordinat ke dalam teks, mis. "KLIK LINK DI BIO photo_index 0 box_2d [848,154,883,476]".
+_BOX_BOCOR = re.compile(
+    r"\s*(?:(?:photo_index|image_index)\s*[:=]?\s*(\d+)\s*)?"
+    r"box_2d\s*[:=]?\s*\[\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\]",
+    re.I,
+)
+
+
+def _pisah_box(teks: str | None) -> tuple[str | None, int | None, list[int] | None]:
+    """Buang koordinat yang bocor dari sebuah teks. Return (teks_bersih, image_index, box_2d)."""
+    if not teks:
+        return teks, None, None
+    m = _BOX_BOCOR.search(teks)
+    if not m:
+        return teks, None, None
+    idx = int(m.group(1)) if m.group(1) is not None else None
+    box = [int(m.group(i)) for i in (2, 3, 4, 5)]
+    return _BOX_BOCOR.sub("", teks).strip(), idx, box
+
+
+def _quote_valid(quote: str | None, sumber_ternormalisasi: str) -> bool:
+    if not quote or not quote.strip():
+        return False
+    q = normalize(quote)
+    if q and q in sumber_ternormalisasi:
+        return True
+    log.warning("quote bukan potongan input, dikosongkan: %.80r", quote)
+    return False
+
+
 def bangun_hasil(
     raw: RawAnalysis,
     *,
@@ -167,10 +198,15 @@ def bangun_hasil(
             continue
         mentah_ok.append(f)
 
-    teks_ekstrak = raw.extracted_text.strip() or (teks or "").strip()
+    raw_teks, _, _ = _pisah_box(raw.extracted_text)
+    summary, _, _ = _pisah_box(raw.summary)
+    teks_ekstrak = (raw_teks or "").strip() or (teks or "").strip()
     if not teks_ekstrak and not mentah_ok:
         raise AnalysisFailed("no_text_found", "Tidak ada teks yang terbaca dari input.")
 
+    # Penjaga: quote harus benar-benar potongan dari input. Kalau bukan (model mengarang atau
+    # menempelkan seluruh input), kosongkan quote, tetapi tetap simpan red flag-nya.
+    sumber = normalize(f"{raw_teks} {teks or ''}")
     kodes = {f.code for f in mentah_ok}
     luar = _luar_negeri(raw.extracted.country, kodes)
 
@@ -181,18 +217,23 @@ def bangun_hasil(
         # Pasal UU Pekerja Migran hanya relevan untuk penempatan ke luar negeri
         if legal and legal.startswith("UU No. 18") and not luar:
             legal = None
+        quote, idx_q, box_q = _pisah_box(f.quote)
+        reason, _, _ = _pisah_box(f.reason)
+        # Kotak bocor di kutipan dipakai hanya bila field box_2d yang benar kosong
+        box = f.box_2d if f.box_2d else box_q
+        idx = f.image_index if (f.box_2d or idx_q is None) else idx_q
         regions: list[Region] = []
-        if 0 <= f.image_index < min(jumlah_gambar, MAKS_REGION_GAMBAR):
-            bb = _bbox(f.box_2d)
+        if 0 <= idx < min(jumlah_gambar, MAKS_REGION_GAMBAR):
+            bb = _bbox(box)
             if bb is not None:
-                regions.append(Region(image_index=f.image_index, bbox=bb))
+                regions.append(Region(image_index=idx, bbox=bb))
         red_flags.append(
             RedFlag(
                 code=e.code,
                 label=e.label,
                 severity=e.severity,
-                quote=f.quote,
-                reason=f.reason,
+                quote=quote if _quote_valid(quote, sumber) else None,
+                reason=reason or f.reason,
                 legal_basis=legal,
                 regions=regions,
             )
@@ -206,7 +247,7 @@ def bangun_hasil(
         risk_level=risiko["risk_level"],
         confidence=confidence,
         needs_manual_check=risiko["needs_manual_check"],
-        summary=raw.summary,
+        summary=summary or raw.summary,
         extracted=Extracted(**raw.extracted.model_dump()),
         red_flags=red_flags,
         fingerprint=Fingerprint(

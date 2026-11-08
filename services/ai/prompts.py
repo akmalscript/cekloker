@@ -34,6 +34,11 @@ Tugasmu (isi field JSON persis dengan nama berikut):
 7. rejection: isi null untuk input yang bisa dianalisis. Isi "not_a_job_posting" bila input bukan lowongan atau chat perekrut, "no_text_found" bila tidak ada teks yang terbaca, atau "low_quality_image" bila gambar terlalu buram untuk dibaca. Bila rejection terisi, red_flags harus kosong.
 
 Aturan penting:
+- Isi setiap field SATU kali dengan nilai final yang bersih. Jangan menulis catatan, koreksi, pikiran, atau kata seperti "wait" atau "let's" di dalam nilai field.
+- quote adalah potongan pendek (satu kalimat atau frasa) yang disalin persis dari input, BUKAN seluruh input.
+- box_2d dan image_index adalah field TERPISAH. Jangan menulis "box_2d", "photo_index", atau koordinat angka di dalam quote, reason, maupun summary.
+- extracted.fees: isi hanya bila ada biaya yang diminta dari pelamar. Bila tidak ada biaya, atau tertulis gratis atau "tidak memungut biaya", isi null.
+- Periksa kode di daftar satu per satu terhadap input. Satu input bisa punya banyak red flag; jangan berhenti setelah menemukan satu.
 - Jangan membuat red flag tanpa bukti di input. Lebih baik melewatkan daripada menuduh.
 - Jangan menyimpulkan lowongan "pasti penipuan" atau "pasti aman". Kamu hanya menandai indikasi.
 - Jangan mengarang nama perusahaan, nomor, atau pasal hukum.
