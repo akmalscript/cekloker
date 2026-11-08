@@ -314,3 +314,10 @@ def test_prompt_mewajibkan_box_untuk_gambar():
     assert "box_2d WAJIB diisi" in sp
     assert "lokasinya tidak jelas" not in sp
     assert "satu tempat yang berurutan" in sp
+
+
+def test_skema_model_mewajibkan_lokasi_tapi_python_longgar():
+    from schema import RawFlag, RawAnalysis
+    flag = RawAnalysis.model_json_schema()["$defs"]["RawFlag"]
+    assert "box_2d" in flag["required"] and "image_index" in flag["required"]
+    assert RawFlag(code="x", reason="r").box_2d is None   # validasi Python tetap longgar
