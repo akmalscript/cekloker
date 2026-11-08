@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "entries": [
     {
       "code": "gaji_tidak_wajar",
@@ -31,7 +31,7 @@
     {
       "code": "biaya_di_muka",
       "label": "Biaya di muka",
-      "description": "Diminta membayar biaya pendaftaran, administrasi, pelatihan, tiket, atau utang keberangkatan sebelum bekerja.",
+      "description": "Diminta membayar biaya pendaftaran, administrasi, pelatihan, tiket, atau utang keberangkatan sebelum bekerja. Termasuk biaya yang 'ditalangi dulu' lalu dipotong dari gaji, atau deposit yang dijanjikan kembali.",
       "severity": "waspada",
       "weight": 3,
       "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
@@ -49,7 +49,7 @@
     {
       "code": "desakan_berangkat",
       "label": "Desakan berangkat cepat",
-      "description": "Tekanan waktu: kuota terbatas, harus segera daftar, berangkat dalam hitungan hari.",
+      "description": "Tekanan waktu yang menghalangi korban berpikir, membaca kontrak, atau mengecek legalitas: harus segera berangkat, setor, atau memutuskan dalam hitungan hari. Tenggat konfirmasi wajar dari HR yang tetap memberi kesempatan membaca dokumen BUKAN red flag.",
       "severity": "waspada",
       "weight": 2,
       "legal_basis": "UU No. 18 Tahun 2017 tentang Pelindungan Pekerja Migran Indonesia",
@@ -128,6 +128,15 @@
       "legal_basis_verified": false
     },
     {
+      "code": "pendaftaran_tidak_resmi",
+      "label": "Pendaftaran di luar kanal resmi",
+      "description": "Lowongan memakai nama perusahaan atau instansi tertentu, tetapi pendaftaran diarahkan ke 'link di bio', tautan pendek, formulir online, situs gratisan, atau DM/chat, bukan ke situs dengan domain resmi perusahaan atau portal pemerintah. BUKAN red flag bila tertulis alamat dengan domain resmi perusahaan (misalnya career.namaperusahaan.com) atau portal pemerintah, atau bila gambar adalah halaman lowongan di portal resmi.",
+      "severity": "waspada",
+      "weight": 3,
+      "legal_basis": null,
+      "legal_basis_verified": false
+    },
+    {
       "code": "tiket_tanpa_kontrak",
       "label": "Tiket/keberangkatan tanpa kontrak",
       "description": "Dijanjikan tiket dan keberangkatan tanpa perjanjian kerja tertulis yang jelas.",
@@ -138,4 +147,3 @@
     }
   ]
 }
-
