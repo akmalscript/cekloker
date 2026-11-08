@@ -51,7 +51,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = String(credentials.password);
 
         // Fallback akun demo bawaan (bisa login tanpa ketergantungan PostgreSQL / Docker)
-        if (email === "admin@cekloker.id" && password === "admin123") {
+        if (email === "admin@cekloker.id" && password === "josjis001") {
           return {
             id: "admin-demo-id",
             name: "Administrator Demo",

@@ -16,6 +16,8 @@ import {
   Image as ImageIcon,
   LogIn,
   UserPlus,
+  KeyRound,
+  ShieldCheck,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -41,17 +43,47 @@ export default function CekLokerPage() {
   const [loading, setLoading] = useState(false);
   const [quotaRemaining, setQuotaRemaining] = useState<number>(3);
   const [quotaLoading, setQuotaLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
+  const [showDemoModal, setShowDemoModal] = useState<boolean>(false);
+  const [demoInputKey, setDemoInputKey] = useState<string>("");
+  const [demoError, setDemoError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Ambil kuota tamu dari server
+  // Ambil kuota tamu dari server & deteksi akses demo juri (?demo_key=juri2026)
   useEffect(() => {
+    // 1. Cek parameter URL (?demo_key=juri2026) atau cookie / localStorage
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlDemoKey = params.get("demo_key");
+      if (urlDemoKey === "juri2026") {
+        document.cookie = "ck_demo_access=juri2026; path=/; max-age=2592000; SameSite=Lax";
+        try {
+          localStorage.setItem("ck_demo_access", "juri2026");
+        } catch {}
+        setIsDemoMode(true);
+      } else {
+        const hasCookie = document.cookie.includes("ck_demo_access=juri2026");
+        let hasStorage = false;
+        try {
+          hasStorage = localStorage.getItem("ck_demo_access") === "juri2026";
+        } catch {}
+        if (hasCookie || hasStorage) {
+          setIsDemoMode(true);
+        }
+      }
+    }
+
+    // 2. Ambil kuota tamu dari server
     async function loadQuota() {
       try {
         const res = await fetch("/api/quota");
         if (res.ok) {
           const data = await res.json();
           setQuotaRemaining(data.remaining ?? 3);
+          if (data.isDemo) {
+            setIsDemoMode(true);
+          }
         }
       } catch (err) {
         console.warn("Gagal mengambil kuota:", err);
@@ -127,7 +159,7 @@ export default function CekLokerPage() {
     e.preventDefault();
     setError(null);
 
-    if (quotaRemaining <= 0) {
+    if (!isDemoMode && quotaRemaining <= 0) {
       setError("Jatah cek tanpa login Anda hari ini telah habis. Silakan masuk atau daftarkan akun.");
       return;
     }
@@ -149,14 +181,28 @@ export default function CekLokerPage() {
         formData.append("files", file);
       });
 
+      // Tambahkan demo_key jika dalam mode demo juri
+      const activeDemo =
+        isDemoMode ||
+        (typeof document !== "undefined" &&
+          document.cookie.includes("ck_demo_access=juri2026"));
+      if (activeDemo) {
+        formData.append("demo_key", "juri2026");
+      }
+
       const response = await fetch("/api/analyze", {
         method: "POST",
+        headers: activeDemo ? { "x-demo-key": "juri2026" } : undefined,
         body: formData,
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 403 && data.demo_required) {
+          setShowDemoModal(true);
+          throw new Error(data.message || "Akses evaluasi juri diperlukan. Silakan masukkan kode akses demo.");
+        }
         if (response.status === 429) {
           setQuotaRemaining(0);
           throw new Error(data.message || "Batas kuota harian tamu telah tercapai.");
@@ -199,28 +245,43 @@ export default function CekLokerPage() {
                 Verifikasi keaslian lowongan kerja atau pesan dari rekrutmen dengan bantuan AI.
               </p>
 
-              {/* Status Kuota Tamu (FR-AKN-02) */}
+              {/* Status Kuota Tamu / Mode Demo Juri */}
               <div className="mt-8 flex justify-center short:mt-6">
-                <p
-                  id="quota-pill"
-                  className={cn(
-                    "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-left text-[14px] font-semibold leading-snug",
-                    isQuotaExhausted
-                      ? "border-bahaya-line bg-bahaya-tint text-bahaya-ink"
-                      : "border-navy-soft bg-navy-tint text-navy"
-                  )}
-                >
-                  <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span>
-                    Sisa jatah cek tanpa login:{" "}
-                    <span className="font-bold">{quotaRemaining}</span> dari 3
-                  </span>
-                </p>
+                {isDemoMode ? (
+                  <div
+                    id="demo-pill"
+                    className="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-emerald-50 px-4 py-2 text-left text-[14px] font-semibold text-emerald-900 shadow-xs"
+                  >
+                    <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" aria-hidden="true" />
+                    <span>
+                      Mode Demo Juri Aktif &bull; <span className="font-bold">Akses AI Terbuka</span>
+                    </span>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowDemoModal(true)}
+                    id="quota-pill"
+                    title="Klik untuk memasukkan kode akses demo juri"
+                    className={cn(
+                      "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-left text-[14px] font-semibold leading-snug cursor-pointer transition hover:opacity-90",
+                      isQuotaExhausted
+                        ? "border-bahaya-line bg-bahaya-tint text-bahaya-ink"
+                        : "border-navy-soft bg-navy-tint text-navy"
+                    )}
+                  >
+                    <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>
+                      Sisa jatah cek tanpa login:{" "}
+                      <span className="font-bold">{quotaRemaining}</span> dari 3
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
 
             {/* Peringatan Kuota Habis (Modal Ajakan Masuk) */}
-            {isQuotaExhausted && (
+            {isQuotaExhausted && !isDemoMode && (
               <div className="card mx-auto mt-6 w-full max-w-[736px] p-6 bg-amber-50 border-amber-300">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="space-y-1 text-center sm:text-left">
@@ -470,7 +531,7 @@ export default function CekLokerPage() {
               <button
                 id="submit-btn"
                 type="submit"
-                disabled={loading || isQuotaExhausted}
+                disabled={loading || (isQuotaExhausted && !isDemoMode)}
                 className="btn btn-primary mt-6 w-full shadow-lift short:min-h-[40px] cursor-pointer disabled:opacity-50"
               >
                 {loading ? (
@@ -488,6 +549,85 @@ export default function CekLokerPage() {
             </form>
           </div>
         </section>
+
+        {/* Modal Kunci Akses Demo Juri */}
+        {showDemoModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+            <div className="card w-full max-w-md p-6 bg-white shadow-2xl border border-line">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-navy-tint text-navy">
+                  <KeyRound className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-ink text-base">Akses Evaluasi Demo Juri</h3>
+                  <p className="text-xs text-muted">Layanan AI CekLoker diproteksi</p>
+                </div>
+              </div>
+              <p className="mt-4 text-sm text-ink leading-relaxed">
+                Untuk melindungi kuota API model AI selama sesi penilaian, silakan masukkan kode akses demo juri:
+              </p>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (demoInputKey.trim() === "juri2026") {
+                    document.cookie =
+                      "ck_demo_access=juri2026; path=/; max-age=2592000; SameSite=Lax";
+                    try {
+                      localStorage.setItem("ck_demo_access", "juri2026");
+                    } catch {}
+                    setIsDemoMode(true);
+                    setShowDemoModal(false);
+                    setDemoError(null);
+                    setError(null);
+                  } else {
+                    setDemoError(
+                      "Kunci akses demo salah. Gunakan kunci resmi dari penyelenggara/tim (juri2026)."
+                    );
+                  }
+                }}
+                className="mt-4 space-y-3"
+              >
+                <div>
+                  <label
+                    htmlFor="demo-key-input"
+                    className="block text-xs font-semibold text-ink mb-1"
+                  >
+                    Kode Akses Demo
+                  </label>
+                  <input
+                    id="demo-key-input"
+                    type="text"
+                    value={demoInputKey}
+                    onChange={(e) => {
+                      setDemoInputKey(e.target.value);
+                      setDemoError(null);
+                    }}
+                    placeholder="Contoh: juri2026"
+                    className="input w-full"
+                    autoFocus
+                  />
+                  {demoError && (
+                    <p className="mt-1.5 text-xs text-bahaya font-medium">
+                      {demoError}
+                    </p>
+                  )}
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowDemoModal(false)}
+                    className="btn btn-secondary btn-sm"
+                  >
+                    Batal
+                  </button>
+                  <button type="submit" className="btn btn-primary btn-sm">
+                    Aktifkan Mode Demo
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />
