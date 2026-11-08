@@ -5,6 +5,12 @@ import { processImageForAI } from "@/lib/image/pii-blur";
 import { saveScan } from "@/lib/store";
 import { matchScamPosters } from "@/lib/matching/poster-matcher";
 import { verifyOfficialP3MI } from "@/lib/matching/p3mi-verifier";
+import {
+  DEMO_COOKIE_NAME,
+  DEMO_HEADER_NAME,
+  DEMO_KEY,
+  isValidDemoKey,
+} from "@/lib/demo-access";
 import type { AnalysisResult } from "@/types";
 
 const FASTAPI_URL = process.env.AI_SERVICE_URL || "http://127.0.0.1:8000";
@@ -35,11 +41,46 @@ export async function POST(request: NextRequest) {
     const session = await auth();
     const userId = session?.user?.id;
 
-    // 1. Cek Kuota Tamu (FR-AKN-02) - hanya untuk pengguna tanpa login
+    // 1. Baca FormData terlebih dahulu agar parameter demo_key dan input dapat dievaluasi
+    const formData = await request.formData();
+    const files = formData.getAll("files") as File[];
+    const teks = (formData.get("teks") as string | null) ?? "";
+    const jenis = (formData.get("jenis") as string | null) ?? "lowongan";
+
+    // 2. Verifikasi Kunci Akses Demo Juri (Option 3: demo_key=juri2026)
+    // Melindungi layanan AI dari traffic publik tak dikenal dan bot agar kuota LLM tidak habis
+    const demoCookie = request.cookies.get(DEMO_COOKIE_NAME)?.value;
+    const demoHeader = request.headers.get(DEMO_HEADER_NAME);
+    const demoQuery = request.nextUrl.searchParams.get("demo_key");
+    const demoForm = formData.get("demo_key") as string | null;
+
+    const hasValidDemoKey =
+      isValidDemoKey(demoCookie) ||
+      isValidDemoKey(demoHeader) ||
+      isValidDemoKey(demoQuery) ||
+      isValidDemoKey(demoForm);
+
+    const isAdmin =
+      session?.user?.role === "ADMIN" ||
+      Boolean(session?.user?.email?.startsWith("admin@"));
+
+    if (!hasValidDemoKey && !isAdmin) {
+      return NextResponse.json(
+        {
+          error: "Akses pemeriksaan AI dibatasi untuk sesi demo/evaluasi juri.",
+          message:
+            "Silakan gunakan tautan demo resmi (?demo_key=juri2026) atau masukkan kode akses demo juri untuk mengaktifkan AI Analysis Service.",
+          demo_required: true,
+        },
+        { status: 403 },
+      );
+    }
+
+    // 3. Cek Kuota Tamu (FR-AKN-02) - hanya untuk pengguna tanpa login dan bukan sesi demo juri
     let guestId = request.cookies.get("ck_guest_session")?.value;
     let isNewGuest = false;
 
-    if (!userId) {
+    if (!userId && !hasValidDemoKey) {
       if (!guestId) {
         guestId = "guest_" + Math.random().toString(36).slice(2, 10);
         isNewGuest = true;
@@ -58,12 +99,6 @@ export async function POST(request: NextRequest) {
         );
       }
     }
-
-    // 2. Baca FormData
-    const formData = await request.formData();
-    const files = formData.getAll("files") as File[];
-    const teks = (formData.get("teks") as string | null) ?? "";
-    const jenis = (formData.get("jenis") as string | null) ?? "lowongan";
 
     if (files.length === 0 && !teks.trim()) {
       return NextResponse.json(
@@ -353,9 +388,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 7. Potong Kuota Tamu Hanya Saat Pemeriksaan Berhasil (HTTP 200) untuk tamu
+    // 7. Potong Kuota Tamu Hanya Saat Pemeriksaan Berhasil (HTTP 200) untuk tamu (bukan demo juri)
     const updatedQuota =
-      !userId && guestId
+      !userId && guestId && !hasValidDemoKey
         ? consumeGuestQuota(guestId)
         : { allowed: true, remaining: 999, total: 999 };
 
@@ -386,7 +421,18 @@ export async function POST(request: NextRequest) {
       scamMatches: posterMatchResult.matchedCount,
       scamDetails: posterMatchResult,
       quota: updatedQuota,
+      isDemo: hasValidDemoKey,
     });
+
+    // Pasang cookie sesi demo juri jika belum terpasang
+    if (hasValidDemoKey && !demoCookie) {
+      response.cookies.set(DEMO_COOKIE_NAME, DEMO_KEY, {
+        path: "/",
+        maxAge: 30 * 24 * 60 * 60, // 30 hari
+        sameSite: "lax",
+        httpOnly: false,
+      });
+    }
 
     // Pasang cookie sesi tamu jika baru
     if (isNewGuest && guestId) {
