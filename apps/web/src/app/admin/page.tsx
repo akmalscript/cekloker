@@ -116,7 +116,7 @@ export default function AdminDashboardPage() {
           </Link>
           <Link href="/admin/database-loker" className="btn btn-secondary btn-sm">
             <Database className="h-4 w-4" aria-hidden="true" />
-            <span>Database Publik</span>
+            <span>Database Loker</span>
           </Link>
         </div>
       </div>

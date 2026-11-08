@@ -95,7 +95,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
             aria-current={isDatabaseActive ? "page" : undefined}
           >
             <Database className="h-4 w-4" aria-hidden="true" />
-            <span>Database Publik</span>
+            <span>Database Loker</span>
           </Link>
         </nav>
 
