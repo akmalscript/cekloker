@@ -11,7 +11,6 @@ import {
   OctagonAlert,
   TriangleAlert,
   SearchX,
-  FileCheck2,
 } from "lucide-react";
 import type { DatabaseLokerEntry } from "@/app/api/database-loker/route";
 
@@ -369,27 +368,11 @@ export default function AdminDatabaseLokerPage() {
                     ))}
                   </ul>
 
-                  {/* Footer kartu: jumlah laporan & tombol aksi */}
-                  <div className="col-span-2 flex flex-col gap-2 sm:col-span-1 sm:col-start-2 sm:row-start-3 sm:flex-row sm:items-center sm:justify-between pt-2 border-t border-line/60">
+                  {/* Footer kartu: jumlah laporan */}
+                  <div className="col-span-2 pt-2 border-t border-line/60 sm:col-span-1 sm:col-start-2 sm:row-start-3">
                     <p className="text-[13px] leading-normal text-muted font-medium">
                       Dilaporkan {item.reports} kali oleh pencari kerja
                     </p>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Link
-                        href={`/lapor?ref=${item.id}&pos=${encodeURIComponent(item.pos)}&org=${encodeURIComponent(item.org)}`}
-                        className="btn btn-ghost btn-sm text-bahaya-ink hover:!bg-bahaya-tint"
-                      >
-                        <Flag className="h-4 w-4" />
-                        <span>Laporkan Bukti Baru</span>
-                      </Link>
-                      <Link
-                        href="/cekloker"
-                        className="btn btn-ghost btn-sm text-navy"
-                      >
-                        <FileCheck2 className="h-4 w-4" />
-                        <span>Periksa Loker Serupa</span>
-                      </Link>
-                    </div>
                   </div>
                 </article>
               </li>
@@ -457,3 +440,4 @@ export default function AdminDatabaseLokerPage() {
     </main>
   );
 }
+
