@@ -107,6 +107,12 @@ def _openrouter(model: str, bagian: list, system_prompt: str, skema: type[BaseMo
             "json_schema": {"name": skema.__name__, "schema": skema_json, "strict": False},
         },
     }
+    # Pembatas opsional (diatur lewat .env): batasi keluaran dan tingkat "berpikir" model
+    if os.getenv("OPENROUTER_MAX_TOKENS"):
+        body["max_tokens"] = int(os.environ["OPENROUTER_MAX_TOKENS"])
+    nalar = os.getenv("OPENROUTER_REASONING", "").strip().lower()
+    if nalar:
+        body["reasoning"] = {"enabled": False} if nalar in ("off", "none", "false") else {"effort": nalar}
     try:
         data = _post_openrouter(body)
     except ModelError as e:
