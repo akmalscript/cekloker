@@ -13,6 +13,7 @@ import {
   SearchX,
 } from "lucide-react";
 import type { DatabaseLokerEntry } from "@/app/api/database-loker/route";
+import { downloadDatabasePdf } from "@/lib/pdf/generate-database-pdf";
 
 const RED_FLAGS = [
   "Biaya rekrutmen",
@@ -86,28 +87,24 @@ export default function AdminDatabaseLokerPage() {
     setPage(1);
   };
 
-  const handleExportCSV = () => {
-    if (entries.length === 0) return;
-    const headers = ["ID", "Posisi", "Perusahaan", "Negara", "Laporan", "Tanggal", "Red Flags"];
-    const rows = entries.map((e) => [
-      e.id,
-      `"${e.pos.replace(/"/g, '""')}"`,
-      `"${e.org.replace(/"/g, '""')}"`,
-      `"${e.country || "-"}"`,
-      e.reports,
-      e.date,
-      `"${e.flags.join(", ")}"`,
-    ]);
+  const [exporting, setExporting] = useState(false);
 
-    const csvContent =
-      "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `database-loker-cekloker-${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleExportPDF = async () => {
+    if (entries.length === 0 || exporting) return;
+    setExporting(true);
+    try {
+      await downloadDatabasePdf({
+        entries,
+        cari,
+        negara,
+        jenis,
+        totalFiltered: totalItems,
+      });
+    } catch (err) {
+      console.error("Gagal mengekspor PDF database loker:", err);
+    } finally {
+      setExporting(false);
+    }
   };
 
   const isSevere = (flags: string[]) => {
@@ -144,12 +141,17 @@ export default function AdminDatabaseLokerPage() {
         </div>
         <button
           type="button"
-          onClick={handleExportCSV}
+          onClick={handleExportPDF}
+          disabled={exporting || entries.length === 0}
           className="btn btn-secondary btn-sm -ml-3 mt-2 w-fit !px-3 sm:ml-0 sm:mt-0"
-          title="Unduh data dalam format CSV"
+          title="Unduh data dalam format PDF resmi"
         >
-          <Download className="h-4 w-4" aria-hidden="true" />
-          <span>Ekspor CSV</span>
+          {exporting ? (
+            <div className="spinner !h-3.5 !w-3.5 !border-navy !border-t-transparent" />
+          ) : (
+            <Download className="h-4 w-4" aria-hidden="true" />
+          )}
+          <span>{exporting ? "Membuat PDF..." : "Ekspor PDF"}</span>
         </button>
       </div>
 
