@@ -312,20 +312,14 @@ function LoginForm() {
         </div>
 
         {/* Jalur tamu */}
-        <div className="mt-6 grid w-full max-w-[420px] grid-cols-1 items-center gap-x-4 sm:grid-cols-[minmax(0,1fr)_auto] rounded-card border border-navy-soft bg-navy-tint px-5 py-4 short:mt-3 short:py-2">
-          <p className="order-1 font-bold leading-snug text-ink sm:order-none">
-            Belum mau daftar?
-          </p>
+        <div className="mt-6 w-full max-w-[420px] rounded-card border border-navy-soft bg-navy-tint p-3 short:mt-3 short:p-2">
           <Link
             href="/cekloker"
-            className="btn btn-ghost btn-sm order-3 -ml-3 mt-2 justify-self-start !px-3 hover:!bg-navy-soft sm:order-none sm:row-span-2 sm:-mr-2 sm:ml-0 sm:mt-0"
+            className="btn btn-ghost w-full hover:!bg-navy-soft short:min-h-[40px]"
           >
             Cek tanpa login
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
-          <p className="order-2 text-[13px] leading-snug text-muted sm:order-none">
-            Tamu bisa cek 3 kali per hari
-          </p>
         </div>
 
         <div className="mt-6 w-full max-w-[420px] text-center short:mt-3 short:max-w-[520px]">
