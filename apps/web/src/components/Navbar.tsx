@@ -1,19 +1,103 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Menu, X, LogOut, History, User, Shield } from "lucide-react";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("");
   const { data: session, status } = useSession();
+  const pathname = usePathname();
 
   const isAdmin = Boolean(
     session?.user?.role === "ADMIN" ||
       session?.user?.role === "MODERATOR" ||
       session?.user?.email?.startsWith("admin@")
   );
+
+  useEffect(() => {
+    if (pathname !== "/") {
+      setActiveSection("");
+      return;
+    }
+
+    const sectionIds = ["cara-kerja", "fitur", "faq"];
+
+    const updateActiveSection = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const isBottom = windowHeight + scrollY >= documentHeight - 60;
+
+      if (isBottom) {
+        const faqEl = document.getElementById("faq");
+        if (faqEl && faqEl.getBoundingClientRect().top < windowHeight) {
+          setActiveSection("faq");
+          return;
+        }
+      }
+
+      let current = "";
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        // Section is active when its top is under or near the header (120px) and bottom hasn't scrolled past (70px)
+        if (rect.top <= 120 && rect.bottom > 70) {
+          current = id;
+        }
+      }
+
+      setActiveSection(current);
+    };
+
+    if (window.location.hash) {
+      const hash = window.location.hash.replace("#", "");
+      if (sectionIds.includes(hash)) {
+        setActiveSection(hash);
+      }
+    }
+
+    updateActiveSection();
+
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateActiveSection();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    window.addEventListener("hashchange", updateActiveSection);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("hashchange", updateActiveSection);
+    };
+  }, [pathname]);
+
+  const handleNavClick = (sectionId: string) => {
+    if (pathname === "/") {
+      setActiveSection(sectionId);
+    }
+  };
+
+  const isCaraKerjaActive = pathname === "/" && activeSection === "cara-kerja";
+  const isFiturActive = pathname === "/" && activeSection === "fitur";
+  const isFaqActive = pathname === "/" && activeSection === "faq";
+  const isDatabaseActive = pathname === "/database-loker" || pathname.startsWith("/database-loker/");
+  const isLaporActive = pathname === "/lapor" || pathname.startsWith("/lapor/");
+  const isRiwayatActive = pathname === "/riwayat" || pathname.startsWith("/riwayat/");
+  const isAdminActive = pathname === "/admin" || pathname.startsWith("/admin/");
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
@@ -52,23 +136,62 @@ export function Navbar() {
 
           {/* Desktop Links (di sebelah kanan logo) */}
           <div className="hidden items-center gap-0.5 md:flex md:gap-1">
-            <Link href="/#cara-kerja" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
+            <Link
+              href="/#cara-kerja"
+              onClick={() => handleNavClick("cara-kerja")}
+              className={`nav-link !px-2 text-sm lg:!px-3 lg:text-[15px] ${
+                isCaraKerjaActive ? "bg-navy-tint !text-navy font-bold" : ""
+              }`}
+              aria-current={isCaraKerjaActive ? "page" : undefined}
+            >
               Cara Kerja
             </Link>
-            <Link href="/#fitur" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
+            <Link
+              href="/#fitur"
+              onClick={() => handleNavClick("fitur")}
+              className={`nav-link !px-2 text-sm lg:!px-3 lg:text-[15px] ${
+                isFiturActive ? "bg-navy-tint !text-navy font-bold" : ""
+              }`}
+              aria-current={isFiturActive ? "page" : undefined}
+            >
               Fitur Utama
             </Link>
-            <Link href="/database-loker" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
+            <Link
+              href="/database-loker"
+              className={`nav-link !px-2 text-sm lg:!px-3 lg:text-[15px] ${
+                isDatabaseActive ? "bg-navy-tint !text-navy font-bold" : ""
+              }`}
+              aria-current={isDatabaseActive ? "page" : undefined}
+            >
               Database
             </Link>
-            <Link href="/lapor" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
+            <Link
+              href="/lapor"
+              className={`nav-link !px-2 text-sm lg:!px-3 lg:text-[15px] ${
+                isLaporActive ? "bg-navy-tint !text-navy font-bold" : ""
+              }`}
+              aria-current={isLaporActive ? "page" : undefined}
+            >
               Laporkan
             </Link>
-            <Link href="/#faq" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
+            <Link
+              href="/#faq"
+              onClick={() => handleNavClick("faq")}
+              className={`nav-link !px-2 text-sm lg:!px-3 lg:text-[15px] ${
+                isFaqActive ? "bg-navy-tint !text-navy font-bold" : ""
+              }`}
+              aria-current={isFaqActive ? "page" : undefined}
+            >
               FAQ
             </Link>
             {session?.user && !isAdmin && (
-              <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 !px-2 text-sm font-bold text-navy lg:!px-3 lg:text-[15px]">
+              <Link
+                href="/riwayat"
+                className={`nav-link inline-flex items-center gap-1.5 !px-2 text-sm font-bold lg:!px-3 lg:text-[15px] ${
+                  isRiwayatActive ? "bg-navy-tint !text-navy" : "text-navy"
+                }`}
+                aria-current={isRiwayatActive ? "page" : undefined}
+              >
                 <History className="h-4 w-4" aria-hidden="true" />
                 Riwayat
               </Link>
@@ -86,7 +209,10 @@ export function Navbar() {
               {isAdmin ? (
                 <Link
                   href="/admin"
-                  className="nav-link inline-flex items-center gap-1.5 !px-2 text-sm font-bold text-navy lg:!px-3 lg:text-[15px]"
+                  className={`nav-link inline-flex items-center gap-1.5 !px-2 text-sm font-bold lg:!px-3 lg:text-[15px] ${
+                    isAdminActive ? "bg-navy-tint !text-navy" : "text-navy"
+                  }`}
+                  aria-current={isAdminActive ? "page" : undefined}
                 >
                   <Shield className="h-4 w-4" aria-hidden="true" />
                   <span>Admin</span>
@@ -149,44 +275,71 @@ export function Navbar() {
           <div className="flex flex-col gap-2">
             <Link
               href="/#cara-kerja"
-              className="nav-link w-full py-2"
-              onClick={() => setMobileMenuOpen(false)}
+              className={`nav-link w-full py-2 ${
+                isCaraKerjaActive ? "bg-navy-tint !text-navy font-bold" : ""
+              }`}
+              onClick={() => {
+                handleNavClick("cara-kerja");
+                setMobileMenuOpen(false);
+              }}
+              aria-current={isCaraKerjaActive ? "page" : undefined}
             >
               Cara Kerja
             </Link>
             <Link
               href="/#fitur"
-              className="nav-link w-full py-2"
-              onClick={() => setMobileMenuOpen(false)}
+              className={`nav-link w-full py-2 ${
+                isFiturActive ? "bg-navy-tint !text-navy font-bold" : ""
+              }`}
+              onClick={() => {
+                handleNavClick("fitur");
+                setMobileMenuOpen(false);
+              }}
+              aria-current={isFiturActive ? "page" : undefined}
             >
               Fitur Utama
             </Link>
             <Link
               href="/database-loker"
-              className="nav-link w-full py-2"
+              className={`nav-link w-full py-2 ${
+                isDatabaseActive ? "bg-navy-tint !text-navy font-bold" : ""
+              }`}
               onClick={() => setMobileMenuOpen(false)}
+              aria-current={isDatabaseActive ? "page" : undefined}
             >
               Database
             </Link>
             <Link
               href="/lapor"
-              className="nav-link w-full py-2"
+              className={`nav-link w-full py-2 ${
+                isLaporActive ? "bg-navy-tint !text-navy font-bold" : ""
+              }`}
               onClick={() => setMobileMenuOpen(false)}
+              aria-current={isLaporActive ? "page" : undefined}
             >
               Laporkan
             </Link>
             <Link
               href="/#faq"
-              className="nav-link w-full py-2"
-              onClick={() => setMobileMenuOpen(false)}
+              className={`nav-link w-full py-2 ${
+                isFaqActive ? "bg-navy-tint !text-navy font-bold" : ""
+              }`}
+              onClick={() => {
+                handleNavClick("faq");
+                setMobileMenuOpen(false);
+              }}
+              aria-current={isFaqActive ? "page" : undefined}
             >
               FAQ
             </Link>
             {session?.user && !isAdmin && (
               <Link
                 href="/riwayat"
-                className="nav-link w-full py-2 font-bold text-navy"
+                className={`nav-link w-full py-2 font-bold ${
+                  isRiwayatActive ? "bg-navy-tint !text-navy" : "text-navy"
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
+                aria-current={isRiwayatActive ? "page" : undefined}
               >
                 Riwayat Pemeriksaan
               </Link>
@@ -194,8 +347,11 @@ export function Navbar() {
             {isAdmin && (
               <Link
                 href="/admin"
-                className="nav-link inline-flex items-center gap-2 w-full py-2 font-bold text-navy"
+                className={`nav-link inline-flex items-center gap-2 w-full py-2 font-bold ${
+                  isAdminActive ? "bg-navy-tint !text-navy" : "text-navy"
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
+                aria-current={isAdminActive ? "page" : undefined}
               >
                 <Shield className="h-4 w-4" aria-hidden="true" />
                 Panel Administrasi
