@@ -81,7 +81,7 @@ export function RedFlagList({
           const isActive = activeCode === flag.code;
           const isOpen = !!expandedCodes[flag.code];
           const isWaspada = flag.severity === "waspada";
-          const isAman = flag.severity === "aman";
+          const isAman = (flag.severity as string) === "aman";
 
           const IconComponent = isWaspada
             ? TriangleAlert

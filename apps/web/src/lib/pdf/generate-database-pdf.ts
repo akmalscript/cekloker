@@ -19,7 +19,9 @@ function cleanText(text: string): string {
     .replace(/[^\x00-\x7F]/g, " ");
 }
 
-export async function generateDatabasePdf(options: DatabasePdfOptions): Promise<Uint8Array> {
+export async function generateDatabasePdf(
+  options: DatabasePdfOptions,
+): Promise<Uint8Array> {
   const { entries, cari, negara, jenis, totalFiltered } = options;
 
   const pdfDoc = await PDFDocument.create();
@@ -59,7 +61,12 @@ export async function generateDatabasePdf(options: DatabasePdfOptions): Promise<
   };
 
   // Wrap text helper
-  const wrapText = (text: string, maxWidth: number, font: typeof fontRegular, fontSize: number): string[] => {
+  const wrapText = (
+    text: string,
+    maxWidth: number,
+    font: typeof fontRegular,
+    fontSize: number,
+  ): string[] => {
     const cleaned = cleanText(text);
     const words = cleaned.split(" ");
     const lines: string[] = [];
@@ -119,13 +126,16 @@ export async function generateDatabasePdf(options: DatabasePdfOptions): Promise<
     color: navyColor,
   });
 
-  page.drawText("Arsip Temuan Lowongan Kerja Mencurigakan & Laporan Terkonfirmasi Masyarakat", {
-    x: margin + 14,
-    y: currentY - 34,
-    size: 9,
-    font: fontRegular,
-    color: mutedColor,
-  });
+  page.drawText(
+    "Arsip Temuan Lowongan Kerja Mencurigakan & Laporan Terkonfirmasi Masyarakat",
+    {
+      x: margin + 14,
+      y: currentY - 34,
+      size: 9,
+      font: fontRegular,
+      color: mutedColor,
+    },
+  );
 
   const exportDateStr = new Intl.DateTimeFormat("id-ID", {
     dateStyle: "medium",
@@ -145,10 +155,12 @@ export async function generateDatabasePdf(options: DatabasePdfOptions): Promise<
   // 2. METADATA FILTER & RINGKASAN
   const filterParts: string[] = [];
   if (cari) filterParts.push(`Pencarian: "${cleanText(cari)}"`);
-  if (negara && negara !== "Semua Negara") filterParts.push(`Negara: ${cleanText(negara)}`);
+  if (negara && negara !== "Semua Negara")
+    filterParts.push(`Negara: ${cleanText(negara)}`);
   if (jenis) filterParts.push(`Kategori: ${cleanText(jenis)}`);
 
-  const filterSummary = filterParts.length > 0 ? filterParts.join(" | ") : "Semua Filter";
+  const filterSummary =
+    filterParts.length > 0 ? filterParts.join(" | ") : "Semua Filter";
   const countSummary = `Menampilkan ${entries.length} dari ${totalFiltered ?? entries.length} entri`;
 
   page.drawRectangle({
@@ -182,7 +194,12 @@ export async function generateDatabasePdf(options: DatabasePdfOptions): Promise<
   // 3. DISCLAIMER RESMI (FR-LOK-09, FR-LOK-10)
   const disclaimerText =
     "Penting: Data ini dikompilasi oleh CekLoker sebagai instrumen transparansi dan edukasi pencegahan tindak penipuan rekrutmen / TPPO. Bukan merupakan putusan hukum resmi pengadilan. Verifikasi mandiri disarankan melalui kanal resmi Kemnaker RI dan BP2MI.";
-  const disclaimerLines = wrapText(disclaimerText, contentWidth - 20, fontOblique, 7.5);
+  const disclaimerLines = wrapText(
+    disclaimerText,
+    contentWidth - 20,
+    fontOblique,
+    7.5,
+  );
   const disclaimerHeight = disclaimerLines.length * 11 + 10;
 
   page.drawRectangle({
@@ -229,8 +246,16 @@ export async function generateDatabasePdf(options: DatabasePdfOptions): Promise<
 
       const titleText = `${cleanText(item.pos)} - ${cleanText(item.org)}`;
       const titleLines = wrapText(titleText, contentWidth - 120, fontBold, 10);
-      const flagsText = item.flags.length > 0 ? cleanText(item.flags.join(" • ")) : "Tanpa catatan bendera";
-      const flagsLines = wrapText(`Indikasi: ${flagsText}`, contentWidth - 24, fontRegular, 8);
+      const flagsText =
+        item.flags.length > 0
+          ? cleanText(item.flags.join(" • "))
+          : "Tanpa catatan bendera";
+      const flagsLines = wrapText(
+        `Indikasi: ${flagsText}`,
+        contentWidth - 24,
+        fontRegular,
+        8,
+      );
 
       const cardHeight = 44 + titleLines.length * 13 + flagsLines.length * 11;
       checkSpace(cardHeight + 10);
@@ -294,7 +319,7 @@ export async function generateDatabasePdf(options: DatabasePdfOptions): Promise<
 
       // Meta Line: ID, Tanggal, Negara, Laporan
       const metaStr = `ID: ${cleanText(item.id)}  |  Verifikasi: ${cleanText(item.date)}  |  Negara: ${cleanText(
-        item.country || "-"
+        item.country || "-",
       )}  |  Dilaporkan: ${item.reports} kali`;
 
       page.drawText(metaStr, {
@@ -334,13 +359,16 @@ export async function generateDatabasePdf(options: DatabasePdfOptions): Promise<
       color: lineBorder,
     });
 
-    p.drawText("CekLoker.id — Platform Perlindungan & Verifikasi Lowongan Kerja Indonesia", {
-      x: margin,
-      y: 20,
-      size: 7.5,
-      font: fontRegular,
-      color: mutedColor,
-    });
+    p.drawText(
+      "CekLoker.id — Platform Perlindungan & Verifikasi Lowongan Kerja Indonesia",
+      {
+        x: margin,
+        y: 20,
+        size: 7.5,
+        font: fontRegular,
+        color: mutedColor,
+      },
+    );
 
     const pageStr = `Halaman ${index + 1} dari ${totalPages}`;
     const pageStrWidth = fontRegular.widthOfTextAtSize(pageStr, 7.5);
@@ -356,9 +384,13 @@ export async function generateDatabasePdf(options: DatabasePdfOptions): Promise<
   return await pdfDoc.save();
 }
 
-export async function downloadDatabasePdf(options: DatabasePdfOptions): Promise<void> {
+export async function downloadDatabasePdf(
+  options: DatabasePdfOptions,
+): Promise<void> {
   const pdfBytes = await generateDatabasePdf(options);
-  const blob = new Blob([pdfBytes], { type: "application/pdf" });
+  const blob = new Blob([pdfBytes as unknown as BlobPart], {
+    type: "application/pdf",
+  });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
