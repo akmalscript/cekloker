@@ -17,7 +17,6 @@ import {
   LogIn,
   UserPlus,
   KeyRound,
-  ShieldCheck,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -247,17 +246,7 @@ export default function CekLokerPage() {
 
               {/* Status Kuota Tamu / Mode Demo Juri */}
               <div className="mt-8 flex justify-center short:mt-6">
-                {isDemoMode ? (
-                  <div
-                    id="demo-pill"
-                    className="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-emerald-50 px-4 py-2 text-left text-[14px] font-semibold text-emerald-900 shadow-xs"
-                  >
-                    <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" aria-hidden="true" />
-                    <span>
-                      Mode Demo Juri Aktif &bull; <span className="font-bold">Akses AI Terbuka</span>
-                    </span>
-                  </div>
-                ) : (
+                {isDemoMode ? null : (
                   <button
                     type="button"
                     onClick={() => setShowDemoModal(true)}
