@@ -18,6 +18,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
 
   const isDashboardActive = pathname === "/admin";
   const isLaporanActive = pathname.startsWith("/admin/laporan");
+  const isDatabaseActive = pathname.startsWith("/admin/database-loker");
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80">
@@ -85,12 +86,16 @@ export function AdminHeader({ user }: AdminHeaderProps) {
           </Link>
 
           <Link
-            href="/database-loker"
-            target="_blank"
-            className="inline-flex h-10 items-center gap-1.5 rounded-ctl px-3.5 text-[14px] font-medium text-muted transition-colors hover:bg-navy-tint hover:text-navy"
+            href="/admin/database-loker"
+            className={`inline-flex h-10 items-center gap-1.5 rounded-ctl px-3.5 text-[14px] font-semibold transition-colors ${
+              isDatabaseActive
+                ? "bg-navy-tint text-navy"
+                : "text-muted hover:bg-navy-tint hover:text-navy"
+            }`}
+            aria-current={isDatabaseActive ? "page" : undefined}
           >
             <Database className="h-4 w-4" aria-hidden="true" />
-            <span>Database Publik</span>
+            <span>Database Loker</span>
           </Link>
         </nav>
 
