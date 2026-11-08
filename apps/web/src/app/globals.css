@@ -82,7 +82,7 @@ html :is(h1, h2, h3) {
   line-height: 1.15;
   color: var(--ck-ink);
 }
-:focus-visible { outline: 2px solid var(--ck-navy); outline-offset: 2px; border-radius: 6px; }
+:focus-visible:not(input, textarea, select) { outline: 2px solid var(--ck-navy); outline-offset: 2px; border-radius: 6px; }
 .on-navy :focus-visible { outline-color: #fff; }
 ::selection { background: var(--ck-navy-soft); }
 
@@ -147,9 +147,9 @@ html :is(h1, h2, h3) {
   }
   .input::placeholder { color: #64748B; opacity: 1; }
   .input:hover { border-color: #475569; }
-  .input:focus, .input:focus-visible { border-color: var(--ck-navy); outline: none; box-shadow: 0 0 0 3px var(--ck-navy-soft); }
+  .input:focus, .input:focus-visible { border-color: var(--ck-navy); outline: none !important; box-shadow: 0 0 0 3px var(--ck-navy-soft); }
   .input[aria-invalid="true"] { border-color: var(--ck-bahaya-ink); }
-  .input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px var(--ck-bahaya-line); }
+  .input[aria-invalid="true"]:focus, .input[aria-invalid="true"]:focus-visible { border-color: var(--ck-bahaya-ink); outline: none !important; box-shadow: 0 0 0 3px var(--ck-bahaya-line); }
 }
 
 .field-label { display: block; font-size: 15px; font-weight: 600; color: var(--ck-ink); }
