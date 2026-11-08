@@ -18,6 +18,9 @@ import {
   AlertCircle,
   ShieldCheck,
   TriangleAlert,
+  Ban,
+  Archive,
+  CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/Navbar";
@@ -469,6 +472,79 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
 
   const RiskBannerIcon = riskInfo.icon;
 
+  const recommendationSteps =
+    result.risk_level === "bahaya"
+      ? [
+          {
+            title: "Hentikan komunikasi",
+            desc: "Jangan mentransfer uang atau menyerahkan dokumen asli (paspor/ijazah) kepada perekrut ini.",
+            border: "border-red-500",
+            textColor: "text-red-500",
+            icon: Ban,
+          },
+          {
+            title: "Laporkan",
+            desc: "Gunakan kanal pengaduan resmi Satgas TPPO Polri atau BP2MI jika diminta berangkat dengan visa turis.",
+            border: "border-blue-600",
+            textColor: "text-blue-600",
+            icon: Flag,
+          },
+          {
+            title: "Simpan bukti",
+            desc: "Amankan tangkapan layar percakapan dan bukti pembayaran untuk proses hukum.",
+            border: "border-emerald-600",
+            textColor: "text-emerald-600",
+            icon: Archive,
+          },
+        ]
+      : result.risk_level === "waspada"
+      ? [
+          {
+            title: "Verifikasi langsung",
+            desc: "Hubungi kontak resmi perusahaan untuk memastikan nama perekrut benar-benar terdaftar.",
+            border: "border-amber-500",
+            textColor: "text-amber-600",
+            icon: Building2,
+          },
+          {
+            title: "Tolak pungutan liar",
+            desc: "Rekrutmen resmi tidak membebankan biaya tiket/pelatihan di muka tanpa rincian perjanjian kerja resmi.",
+            border: "border-red-500",
+            textColor: "text-red-500",
+            icon: Ban,
+          },
+          {
+            title: "Simpan bukti",
+            desc: "Amankan tangkapan layar percakapan dan berkas penawaran untuk verifikasi lebih lanjut.",
+            border: "border-emerald-600",
+            textColor: "text-emerald-600",
+            icon: Archive,
+          },
+        ]
+      : [
+          {
+            title: "Tetap cermat",
+            desc: "Pastikan Anda menandatangani Perjanjian Kerja (PK) yang disahkan oleh instansi resmi.",
+            border: "border-blue-600",
+            textColor: "text-blue-600",
+            icon: ShieldCheck,
+          },
+          {
+            title: "Kroscek visa & izin",
+            desc: "Pastikan jenis visa yang diterbitkan adalah visa kerja resmi (bukan visa wisata/kunjungan).",
+            border: "border-emerald-600",
+            textColor: "text-emerald-600",
+            icon: CheckCircle2,
+          },
+          {
+            title: "Simpan kontak darurat",
+            desc: "Catat nomor call center ketenagakerjaan atau perwakilan resmi sebelum memulai pekerjaan.",
+            border: "border-amber-500",
+            textColor: "text-amber-600",
+            icon: Archive,
+          },
+        ];
+
   return (
     <>
       <Navbar />
@@ -782,66 +858,43 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
               />
 
               {/* Rekomendasi Tindakan Keamanan */}
-              <div className="card p-5 bg-white space-y-4">
-                <h3 className="font-bold text-base text-ink flex items-center gap-2">
-                  <ShieldAlert className="h-5 w-5 text-navy" />
-                  <span>Rekomendasi Tindakan Keamanan</span>
+              <div className="card p-6 sm:p-8 bg-white shadow-card rounded-2xl border border-line space-y-6">
+                <h3 className="font-bold text-base sm:text-lg text-ink text-center">
+                  Rekomendasi Tindakan Keamanan
                 </h3>
 
-                <ul className="space-y-2 text-sm text-slate-700">
-                  {result.risk_level === "bahaya" ? (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-bahaya shrink-0 mt-2" />
-                        <span>
-                          <strong>Hentikan komunikasi:</strong> Jangan mentransfer uang atau menyerahkan dokumen asli (paspor/ijazah) kepada perekrut ini.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-bahaya shrink-0 mt-2" />
-                        <span>
-                          <strong>Laporkan:</strong> Gunakan kanal pengaduan resmi Satgas TPPO Polri atau BP2MI jika diminta berangkat dengan visa turis.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-bahaya shrink-0 mt-2" />
-                        <span>
-                          <strong>Simpan bukti:</strong> Amankan tangkapan layar percakapan dan bukti pembayaran untuk proses hukum.
-                        </span>
-                      </li>
-                    </>
-                  ) : result.risk_level === "waspada" ? (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-waspada shrink-0 mt-2" />
-                        <span>
-                          <strong>Verifikasi langsung:</strong> Hubungi kontak resmi perusahaan untuk memastikan nama perekrut benar-benar terdaftar.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-waspada shrink-0 mt-2" />
-                        <span>
-                          <strong>Tolak pungutan liar:</strong> Rekrutmen resmi tidak membebankan biaya tiket/pelatihan di muka tanpa rincian perjanjian kerja resmi.
-                        </span>
-                      </li>
-                    </>
-                  ) : (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-aman shrink-0 mt-2" />
-                        <span>
-                          <strong>Tetap cermat:</strong> Pastikan Anda menandatangani Perjanjian Kerja (PK) yang disahkan oleh instansi ketenagakerjaan resmi.
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="h-2 w-2 rounded-full bg-aman shrink-0 mt-2" />
-                        <span>
-                          <strong>Kroscek visa:</strong> Pastikan jenis visa yang diterbitkan adalah visa kerja resmi (bukan visa wisata/kunjungan).
-                        </span>
-                      </li>
-                    </>
-                  )}
-                </ul>
+                <div className="relative">
+                  {/* Garis Putus-Putus Penghubung (Desktop) */}
+                  <div
+                    className="hidden md:block absolute top-7 left-12 right-12 border-t-2 border-dashed border-slate-200 z-0"
+                    aria-hidden="true"
+                  />
+
+                  {/* 3 Langkah Horizontal */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 relative z-10">
+                    {recommendationSteps.map((step, idx) => {
+                      const StepIcon = step.icon;
+                      return (
+                        <div key={idx} className="flex flex-col items-center text-center">
+                          <div
+                            className={cn(
+                              "h-14 w-14 rounded-full bg-white border-2 flex items-center justify-center shadow-xs transition-transform hover:scale-105",
+                              step.border
+                            )}
+                          >
+                            <StepIcon className={cn("h-6 w-6 stroke-[2]", step.textColor)} />
+                          </div>
+                          <h4 className="mt-3.5 font-bold text-sm sm:text-base text-ink">
+                            {step.title}
+                          </h4>
+                          <p className="mt-1 text-xs sm:text-sm text-slate-600 leading-relaxed max-w-xs">
+                            {step.desc}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
