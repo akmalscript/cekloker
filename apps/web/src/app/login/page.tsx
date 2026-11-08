@@ -4,7 +4,22 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { ArrowLeft, ArrowRight, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, CircleAlert } from "lucide-react";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function validateEmail(val: string): string {
+  const v = val.trim();
+  if (!v) return "Email wajib diisi.";
+  if (!EMAIL_RE.test(v)) return "Format email belum benar. Contoh: nama@email.com";
+  return "";
+}
+
+function validatePassword(val: string): string {
+  if (!val) return "Password wajib diisi.";
+  if (val.length < 8) return "Password minimal 8 karakter.";
+  return "";
+}
 
 function LoginForm() {
   const router = useRouter();
@@ -16,20 +31,34 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
+  const [attempted, setAttempted] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setAttempted(true);
+    setServerError(null);
 
-    const emailTrim = email.trim();
-    if (!emailTrim) {
-      setError("Email wajib diisi.");
+    const errEmail = validateEmail(email);
+    const errPw = validatePassword(password);
+
+    const newErrors = {
+      email: errEmail,
+      password: errPw,
+    };
+    setErrors(newErrors);
+
+    if (errEmail) {
+      document.getElementById("email")?.focus();
       return;
     }
 
-    if (!password) {
-      setError("Password wajib diisi.");
+    if (errPw) {
+      document.getElementById("password")?.focus();
       return;
     }
 
@@ -38,12 +67,12 @@ function LoginForm() {
     try {
       const res = await signIn("credentials", {
         redirect: false,
-        email: emailTrim,
+        email: email.trim(),
         password,
       });
 
       if (res?.error) {
-        setError("Email atau password tidak sesuai. Silakan periksa kembali.");
+        setServerError("Email atau password tidak sesuai. Silakan periksa kembali.");
         setLoading(false);
         return;
       }
@@ -59,7 +88,7 @@ function LoginForm() {
       router.refresh();
     } catch (err) {
       console.error("Login error:", err);
-      setError("Terjadi kesalahan saat masuk. Silakan coba lagi.");
+      setServerError("Terjadi kesalahan saat masuk. Silakan coba lagi.");
       setLoading(false);
     }
   };
@@ -131,7 +160,8 @@ function LoginForm() {
                 onClick={() => {
                   setEmail("admin@cekloker.id");
                   setPassword("admin123");
-                  setError(null);
+                  setErrors({});
+                  setServerError(null);
                 }}
                 className="font-bold text-navy underline hover:text-navy/80"
               >
@@ -143,10 +173,10 @@ function LoginForm() {
             </p>
           </div>
 
-          {error && (
+          {serverError && (
             <div className="alert alert-error mt-6" role="alert">
-              <AlertCircle className="h-5 w-5 shrink-0 text-bahaya" aria-hidden="true" />
-              <p className="text-sm font-semibold">{error}</p>
+              <CircleAlert className="h-5 w-5 shrink-0 text-bahaya" aria-hidden="true" />
+              <p className="text-sm font-semibold">{serverError}</p>
             </div>
           )}
 
@@ -165,13 +195,31 @@ function LoginForm() {
                 name="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setEmail(val);
+                  if (attempted || errors.email) {
+                    setErrors((prev) => ({ ...prev, email: validateEmail(val) }));
+                  }
+                }}
+                onBlur={() => {
+                  if (attempted || email) {
+                    setErrors((prev) => ({ ...prev, email: validateEmail(email) }));
+                  }
+                }}
                 className="input mt-2 short:mt-1 short:h-10"
                 autoComplete="email"
                 inputMode="email"
                 placeholder="nama@email.com"
-                required
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? "email-error" : undefined}
               />
+              {errors.email && (
+                <p id="email-error" className="field-error" role="alert">
+                  <CircleAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{errors.email}</span>
+                </p>
+              )}
             </div>
 
             <div>
@@ -184,11 +232,23 @@ function LoginForm() {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setPassword(val);
+                    if (attempted || errors.password) {
+                      setErrors((prev) => ({ ...prev, password: validatePassword(val) }));
+                    }
+                  }}
+                  onBlur={() => {
+                    if (attempted || password) {
+                      setErrors((prev) => ({ ...prev, password: validatePassword(password) }));
+                    }
+                  }}
                   className="input !pr-14 short:h-10"
                   autoComplete="current-password"
                   placeholder="Minimal 8 karakter"
-                  required
+                  aria-invalid={Boolean(errors.password)}
+                  aria-describedby={errors.password ? "password-error" : undefined}
                 />
                 <button
                   type="button"
@@ -205,6 +265,12 @@ function LoginForm() {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p id="password-error" className="field-error" role="alert">
+                  <CircleAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{errors.password}</span>
+                </p>
+              )}
               <div className="mt-2 flex justify-end short:mt-1">
                 <Link
                   href="/lupa-password"
