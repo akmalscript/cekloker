@@ -65,7 +65,7 @@ export function PosterAnnotator({
       </div>
 
       {/* Interactive Poster Area */}
-      <div className="relative overflow-auto p-4 flex items-center justify-center min-h-[420px] bg-slate-950/50">
+      <div className="relative overflow-auto p-4 flex items-center justify-center min-h-[480px] bg-slate-950/50">
         <div
           className="relative inline-block transition-transform duration-200 origin-center select-none"
           style={{ transform: `scale(${zoom})` }}
@@ -74,7 +74,7 @@ export function PosterAnnotator({
           <img
             src={imageSrc}
             alt={imageAlt}
-            className="max-h-[600px] w-auto rounded object-contain shadow-2xl block"
+            className="max-h-[680px] w-auto rounded object-contain shadow-2xl block"
           />
 
           {/* Bounding Box Overlays */}

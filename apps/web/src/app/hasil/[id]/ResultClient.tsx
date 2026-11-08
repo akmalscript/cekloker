@@ -631,8 +631,8 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
 
           {/* Grid Layout 2 Kolom: Kiri Poster Anotasi, Kanan Informasi & Temuan */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Kolom Kiri: Visual Poster & Anotasi Bounding Box (5/12) */}
-            <div className="lg:col-span-5 sticky top-20">
+            {/* Kolom Kiri: Visual Poster & Anotasi Bounding Box (6/12) */}
+            <div className="lg:col-span-6 sticky top-20">
               <PosterAnnotator
                 imageSrc={image}
                 imageAlt={result.extracted?.position ?? "Poster lowongan"}
@@ -642,8 +642,8 @@ export default function ResultClient({ id: rawId }: ResultClientProps) {
               />
             </div>
 
-            {/* Kolom Kanan: Rincian Red Flags & Verifikasi Resmi (7/12) */}
-            <div className="lg:col-span-7 space-y-6">
+            {/* Kolom Kanan: Rincian Red Flags & Verifikasi Resmi (6/12) */}
+            <div className="lg:col-span-6 space-y-6">
               {/* Informasi Lowongan Diekstrak */}
               <div className="card p-5 bg-white space-y-4">
                 <h3 className="font-bold text-base text-ink flex items-center gap-2">
