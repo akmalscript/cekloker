@@ -63,7 +63,7 @@ export default function PasswordSuccessPage() {
             <p className="text-ink">Password berhasil diubah</p>
           </div>
 
-          <Link href="/login" className="btn btn-primary mt-6 w-full short:mt-3 short:min-h-[40px]">
+          <Link href="/masuk" className="btn btn-primary mt-6 w-full short:mt-3 short:min-h-[40px]">
             Masuk
           </Link>
         </div>

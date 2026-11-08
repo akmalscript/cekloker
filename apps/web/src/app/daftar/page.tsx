@@ -119,7 +119,7 @@ export default function RegisterPage() {
       });
 
       if (loginRes?.error) {
-        router.push("/login");
+        router.push("/masuk");
       } else {
         router.push("/riwayat");
         router.refresh();
@@ -420,7 +420,7 @@ export default function RegisterPage() {
         <p className="mt-6 text-center text-[15px] text-muted short:mt-3 short:text-sm">
           Sudah punya akun?{" "}
           <Link
-            href="/login"
+            href="/masuk"
             className="rounded font-bold text-navy underline-offset-4 hover:underline"
           >
             Masuk

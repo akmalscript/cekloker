@@ -113,10 +113,10 @@ export function Navbar() {
             </div>
           ) : (
             <>
-              <Link href="/login" className="btn btn-primary btn-sm hidden md:inline-flex">
+              <Link href="/masuk" className="btn btn-primary btn-sm hidden md:inline-flex">
                 Masuk
               </Link>
-              <Link href="/daftar-akun" className="btn btn-secondary btn-sm hidden md:inline-flex">
+              <Link href="/daftar" className="btn btn-secondary btn-sm hidden md:inline-flex">
                 Daftar
               </Link>
             </>
@@ -228,14 +228,14 @@ export function Navbar() {
               ) : (
                 <>
                   <Link
-                    href="/login"
+                    href="/masuk"
                     className="btn btn-primary w-full"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Masuk
                   </Link>
                   <Link
-                    href="/daftar-akun"
+                    href="/daftar"
                     className="btn btn-secondary w-full"
                     onClick={() => setMobileMenuOpen(false)}
                   >

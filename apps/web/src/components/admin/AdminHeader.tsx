@@ -105,7 +105,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
 
           <button
             type="button"
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={() => signOut({ callbackUrl: "/masuk" })}
             className="inline-flex items-center gap-1.5 rounded-ctl px-3 py-1.5 text-[13px] font-semibold text-muted hover:bg-red-50 hover:text-bahaya transition-colors"
             title="Keluar dari sesi admin"
           >

@@ -326,7 +326,7 @@ function LoginForm() {
           <p className="text-[15px] text-muted short:text-sm">
             Belum punya akun?{" "}
             <Link
-              href="/daftar-akun"
+              href="/daftar"
               className="rounded font-bold text-navy underline-offset-4 hover:underline"
             >
               Daftar
