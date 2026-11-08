@@ -232,11 +232,11 @@ export default function CekLokerPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Link href="/login" className="btn btn-secondary btn-sm">
+                    <Link href="/masuk" className="btn btn-secondary btn-sm">
                       <LogIn className="h-4 w-4" />
                       <span>Masuk</span>
                     </Link>
-                    <Link href="/daftar-akun" className="btn btn-primary btn-sm">
+                    <Link href="/daftar" className="btn btn-primary btn-sm">
                       <UserPlus className="h-4 w-4" />
                       <span>Daftar</span>
                     </Link>

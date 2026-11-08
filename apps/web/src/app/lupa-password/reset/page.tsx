@@ -72,7 +72,7 @@ function ResetContent() {
 
       {/* Kembali (pojok kiri atas) */}
       <header className="px-4 pt-4 sm:absolute sm:left-0 sm:top-0 sm:px-6 sm:pt-6 short:pt-4">
-        <Link href="/login" className="btn btn-ghost btn-sm !px-3">
+        <Link href="/masuk" className="btn btn-ghost btn-sm !px-3">
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Kembali
         </Link>

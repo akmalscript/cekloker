@@ -17,7 +17,7 @@ export default function AdminLayout({
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/login?callbackUrl=/admin");
+      router.push("/masuk?callbackUrl=/admin");
     }
   }, [status, router]);
 
@@ -71,7 +71,7 @@ export default function AdminLayout({
               <Home className="h-4 w-4" aria-hidden="true" />
               <span>Kembali ke Beranda</span>
             </Link>
-            <Link href="/login" className="btn btn-secondary w-full">
+            <Link href="/masuk" className="btn btn-secondary w-full">
               <span>Masuk dengan Akun Admin</span>
             </Link>
           </div>

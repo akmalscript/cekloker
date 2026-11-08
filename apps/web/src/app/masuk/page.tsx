@@ -1,10 +1,26 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { ArrowLeft, ArrowRight, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, CircleAlert } from "lucide-react";
+import { GoogleIcon } from "@/components/ui/GoogleIcon";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function validateEmail(val: string): string {
+  const v = val.trim();
+  if (!v) return "Email wajib diisi.";
+  if (!EMAIL_RE.test(v)) return "Format email belum benar. Contoh: nama@email.com";
+  return "";
+}
+
+function validatePassword(val: string): string {
+  if (!val) return "Password wajib diisi.";
+  if (val.length < 8) return "Password minimal 8 karakter.";
+  return "";
+}
 
 function LoginForm() {
   const router = useRouter();
@@ -16,20 +32,47 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+  }>({});
+  const [attempted, setAttempted] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  const oauthError = searchParams.get("error");
+  useEffect(() => {
+    if (oauthError) {
+      if (oauthError === "OAuthAccountNotLinked") {
+        setServerError("Email sudah terdaftar dengan kata sandi. Silakan masuk menggunakan form kata sandi.");
+      } else if (oauthError === "OAuthSignin" || oauthError === "OAuthCallback") {
+        setServerError("Gagal masuk dengan Google. Pastikan akun Google Anda aktif dan konfigurasi OAuth valid.");
+      } else {
+        setServerError(`Terjadi kendala autentikasi Google (${oauthError}).`);
+      }
+    }
+  }, [oauthError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setAttempted(true);
+    setServerError(null);
 
-    const emailTrim = email.trim();
-    if (!emailTrim) {
-      setError("Email wajib diisi.");
+    const errEmail = validateEmail(email);
+    const errPw = validatePassword(password);
+
+    const newErrors = {
+      email: errEmail,
+      password: errPw,
+    };
+    setErrors(newErrors);
+
+    if (errEmail) {
+      document.getElementById("email")?.focus();
       return;
     }
 
-    if (!password) {
-      setError("Password wajib diisi.");
+    if (errPw) {
+      document.getElementById("password")?.focus();
       return;
     }
 
@@ -38,12 +81,12 @@ function LoginForm() {
     try {
       const res = await signIn("credentials", {
         redirect: false,
-        email: emailTrim,
+        email: email.trim(),
         password,
       });
 
       if (res?.error) {
-        setError("Email atau password tidak sesuai. Silakan periksa kembali.");
+        setServerError("Email atau password tidak sesuai. Silakan periksa kembali.");
         setLoading(false);
         return;
       }
@@ -59,14 +102,21 @@ function LoginForm() {
       router.refresh();
     } catch (err) {
       console.error("Login error:", err);
-      setError("Terjadi kesalahan saat masuk. Silakan coba lagi.");
+      setServerError("Terjadi kesalahan saat masuk. Silakan coba lagi.");
       setLoading(false);
     }
   };
 
-  const handleGoogleSignIn = () => {
-    setGoogleLoading(true);
-    signIn("google", { callbackUrl });
+  const handleGoogleSignIn = async () => {
+    try {
+      setGoogleLoading(true);
+      setServerError(null);
+      await signIn("google", { callbackUrl });
+    } catch (err) {
+      console.error("Google sign in error:", err);
+      setServerError("Gagal menghubungkan ke akun Google. Silakan coba lagi.");
+      setGoogleLoading(false);
+    }
   };
 
   return (
@@ -122,31 +172,10 @@ function LoginForm() {
             Simpan riwayat pemeriksaan dan bantu laporkan loker palsu.
           </p>
 
-          {/* Akun Demo Pengujian */}
-          <div className="mt-6 rounded-card border border-navy-soft bg-navy-tint/60 p-3.5 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-navy">Akun Demo (Tanpa DB):</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail("admin@cekloker.id");
-                  setPassword("admin123");
-                  setError(null);
-                }}
-                className="font-bold text-navy underline hover:text-navy/80"
-              >
-                Gunakan Admin
-              </button>
-            </div>
-            <p className="mt-1 text-muted">
-              Email: <strong className="text-ink">admin@cekloker.id</strong> • Sandi: <strong className="text-ink">admin123</strong>
-            </p>
-          </div>
-
-          {error && (
+          {serverError && (
             <div className="alert alert-error mt-6" role="alert">
-              <AlertCircle className="h-5 w-5 shrink-0 text-bahaya" aria-hidden="true" />
-              <p className="text-sm font-semibold">{error}</p>
+              <CircleAlert className="h-5 w-5 shrink-0 text-bahaya" aria-hidden="true" />
+              <p className="text-sm font-semibold">{serverError}</p>
             </div>
           )}
 
@@ -165,13 +194,31 @@ function LoginForm() {
                 name="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setEmail(val);
+                  if (attempted || errors.email) {
+                    setErrors((prev) => ({ ...prev, email: validateEmail(val) }));
+                  }
+                }}
+                onBlur={() => {
+                  if (attempted || email) {
+                    setErrors((prev) => ({ ...prev, email: validateEmail(email) }));
+                  }
+                }}
                 className="input mt-2 short:mt-1 short:h-10"
                 autoComplete="email"
                 inputMode="email"
                 placeholder="nama@email.com"
-                required
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? "email-error" : undefined}
               />
+              {errors.email && (
+                <p id="email-error" className="field-error" role="alert">
+                  <CircleAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{errors.email}</span>
+                </p>
+              )}
             </div>
 
             <div>
@@ -184,11 +231,23 @@ function LoginForm() {
                   name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setPassword(val);
+                    if (attempted || errors.password) {
+                      setErrors((prev) => ({ ...prev, password: validatePassword(val) }));
+                    }
+                  }}
+                  onBlur={() => {
+                    if (attempted || password) {
+                      setErrors((prev) => ({ ...prev, password: validatePassword(password) }));
+                    }
+                  }}
                   className="input !pr-14 short:h-10"
                   autoComplete="current-password"
                   placeholder="Minimal 8 karakter"
-                  required
+                  aria-invalid={Boolean(errors.password)}
+                  aria-describedby={errors.password ? "password-error" : undefined}
                 />
                 <button
                   type="button"
@@ -205,6 +264,12 @@ function LoginForm() {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p id="password-error" className="field-error" role="alert">
+                  <CircleAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{errors.password}</span>
+                </p>
+              )}
               <div className="mt-2 flex justify-end short:mt-1">
                 <Link
                   href="/lupa-password"
@@ -238,47 +303,30 @@ function LoginForm() {
             className="btn btn-secondary w-full !text-ink short:min-h-[40px]"
           >
             {googleLoading ? (
-              <span className="spinner border-navy" aria-hidden="true" />
+              <span className="spinner spinner-navy" aria-hidden="true" />
             ) : (
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.25"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
-                <path d="M20 12a8 8 0 1 1-2.34-5.66" />
-                <path d="M20 12h-7" />
-              </svg>
+              <GoogleIcon />
             )}
             <span>Masuk dengan Google</span>
           </button>
         </div>
 
         {/* Jalur tamu */}
-        <div className="mt-6 grid w-full max-w-[420px] grid-cols-1 items-center gap-x-4 sm:grid-cols-[minmax(0,1fr)_auto] rounded-card border border-navy-soft bg-navy-tint px-5 py-4 short:mt-3 short:py-2">
-          <p className="order-1 font-bold leading-snug text-ink sm:order-none">
-            Belum mau daftar?
-          </p>
+        <div className="mt-6 w-full max-w-[420px] rounded-card border border-navy-soft bg-navy-tint p-3 short:mt-3 short:p-2">
           <Link
             href="/cekloker"
-            className="btn btn-ghost btn-sm order-3 -ml-3 mt-2 justify-self-start !px-3 hover:!bg-navy-soft sm:order-none sm:row-span-2 sm:-mr-2 sm:ml-0 sm:mt-0"
+            className="btn btn-ghost w-full hover:!bg-navy-soft short:min-h-[40px]"
           >
             Cek tanpa login
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
-          <p className="order-2 text-[13px] leading-snug text-muted sm:order-none">
-            Tamu bisa cek 3 kali per hari
-          </p>
         </div>
 
         <div className="mt-6 w-full max-w-[420px] text-center short:mt-3 short:max-w-[520px]">
           <p className="text-[15px] text-muted short:text-sm">
             Belum punya akun?{" "}
             <Link
-              href="/daftar-akun"
+              href="/daftar"
               className="rounded font-bold text-navy underline-offset-4 hover:underline"
             >
               Daftar

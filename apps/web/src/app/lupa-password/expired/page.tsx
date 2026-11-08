@@ -10,7 +10,7 @@ export default function ExpiredTokenPage() {
 
       {/* Kembali ke halaman masuk (pojok kiri atas) */}
       <header className="px-4 pt-4 sm:absolute sm:left-0 sm:top-0 sm:px-6 sm:pt-6">
-        <Link href="/login" className="btn btn-ghost btn-sm !px-3">
+        <Link href="/masuk" className="btn btn-ghost btn-sm !px-3">
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Kembali ke Masuk
         </Link>
@@ -66,7 +66,7 @@ export default function ExpiredTokenPage() {
         <p className="mt-6 text-center text-[15px] text-muted">
           Sudah ingat password?{" "}
           <Link
-            href="/login"
+            href="/masuk"
             className="rounded font-bold text-navy underline-offset-4 hover:underline"
           >
             Masuk

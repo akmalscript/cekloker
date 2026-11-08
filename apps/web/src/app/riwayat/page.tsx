@@ -73,7 +73,7 @@ export default function RiwayatPage() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/login?callbackUrl=/riwayat");
+      router.push("/masuk?callbackUrl=/riwayat");
     }
   }, [status, router]);
 
