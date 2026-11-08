@@ -9,6 +9,12 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session, status } = useSession();
 
+  const isAdmin = Boolean(
+    session?.user?.role === "ADMIN" ||
+      session?.user?.role === "MODERATOR" ||
+      session?.user?.email?.startsWith("admin@")
+  );
+
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
       <nav
@@ -61,20 +67,10 @@ export function Navbar() {
             <Link href="/#faq" className="nav-link !px-2 text-sm lg:!px-3 lg:text-[15px]">
               FAQ
             </Link>
-            {session?.user && (
+            {session?.user && !isAdmin && (
               <Link href="/riwayat" className="nav-link inline-flex items-center gap-1.5 !px-2 text-sm font-bold text-navy lg:!px-3 lg:text-[15px]">
                 <History className="h-4 w-4" aria-hidden="true" />
                 Riwayat
-              </Link>
-            )}
-            {Boolean(
-              session?.user?.role === "ADMIN" ||
-                session?.user?.role === "MODERATOR" ||
-                session?.user?.email?.startsWith("admin@")
-            ) && (
-              <Link href="/admin" className="nav-link inline-flex items-center gap-1.5 !px-2 text-sm font-bold text-navy lg:!px-3 lg:text-[15px]">
-                <Shield className="h-4 w-4" aria-hidden="true" />
-                Admin
               </Link>
             )}
           </div>
@@ -86,19 +82,33 @@ export function Navbar() {
           {status === "loading" ? (
             <div className="hidden h-9 w-20 animate-pulse rounded-ctl bg-navy-tint md:block" />
           ) : session?.user ? (
-            <div className="hidden items-center gap-3 md:flex">
-              <span className="flex items-center gap-1.5 text-sm font-semibold text-ink">
-                <User className="h-4 w-4 text-muted" aria-hidden="true" />
-                {session.user.name || session.user.email?.split("@")[0]}
-              </span>
+            <div className="hidden items-center gap-2 md:flex">
+              {isAdmin ? (
+                <Link
+                  href="/admin"
+                  className="nav-link inline-flex items-center gap-1.5 !px-2 text-sm font-bold text-navy lg:!px-3 lg:text-[15px]"
+                >
+                  <Shield className="h-4 w-4" aria-hidden="true" />
+                  <span>Admin</span>
+                </Link>
+              ) : (
+                <span className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+                  <User className="h-4 w-4 text-muted" aria-hidden="true" />
+                  {session.user.name || session.user.email?.split("@")[0]}
+                </span>
+              )}
               <button
                 type="button"
                 onClick={() => signOut({ callbackUrl: "/" })}
-                className="btn btn-ghost btn-sm !px-2.5 text-muted hover:text-navy"
+                className={
+                  isAdmin
+                    ? "btn btn-ghost btn-sm !px-2.5 !text-bahaya hover:!bg-bahaya-tint hover:!text-bahaya-ink"
+                    : "btn btn-ghost btn-sm !px-2.5 text-muted hover:text-navy"
+                }
                 title="Keluar dari akun"
               >
-                <LogOut className="h-4 w-4" aria-hidden="true" />
-                <span className="text-xs">Keluar</span>
+                <LogOut className={`h-4 w-4 ${isAdmin ? "text-bahaya" : ""}`} aria-hidden="true" />
+                <span className={`text-xs ${isAdmin ? "font-semibold text-bahaya" : ""}`}>Keluar</span>
               </button>
             </div>
           ) : (
@@ -172,7 +182,7 @@ export function Navbar() {
             >
               FAQ
             </Link>
-            {session?.user && (
+            {session?.user && !isAdmin && (
               <Link
                 href="/riwayat"
                 className="nav-link w-full py-2 font-bold text-navy"
@@ -181,35 +191,38 @@ export function Navbar() {
                 Riwayat Pemeriksaan
               </Link>
             )}
-            {Boolean(
-              session?.user?.role === "ADMIN" ||
-                session?.user?.role === "MODERATOR" ||
-                session?.user?.email?.startsWith("admin@")
-            ) && (
+            {isAdmin && (
               <Link
                 href="/admin"
-                className="nav-link w-full py-2 font-bold text-navy"
+                className="nav-link inline-flex items-center gap-2 w-full py-2 font-bold text-navy"
                 onClick={() => setMobileMenuOpen(false)}
               >
+                <Shield className="h-4 w-4" aria-hidden="true" />
                 Panel Administrasi
               </Link>
             )}
             <div className="mt-2 flex flex-col gap-2 border-t border-line pt-3">
               {session?.user ? (
                 <>
-                  <div className="px-3 py-1 text-sm text-muted">
-                    Masuk sebagai <strong>{session.user.name || session.user.email}</strong>
-                  </div>
+                  {!isAdmin && (
+                    <div className="px-3 py-1 text-sm text-muted">
+                      Masuk sebagai <strong>{session.user.name || session.user.email}</strong>
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={() => {
                       setMobileMenuOpen(false);
                       signOut({ callbackUrl: "/" });
                     }}
-                    className="btn btn-secondary w-full"
+                    className={
+                      isAdmin
+                        ? "btn btn-secondary w-full !text-bahaya !border-bahaya-line hover:!bg-bahaya-tint hover:!text-bahaya-ink"
+                        : "btn btn-secondary w-full"
+                    }
                   >
-                    <LogOut className="h-4 w-4" aria-hidden="true" />
-                    Keluar
+                    <LogOut className={`h-4 w-4 ${isAdmin ? "text-bahaya" : ""}`} aria-hidden="true" />
+                    <span className={isAdmin ? "text-bahaya font-semibold" : ""}>Keluar</span>
                   </button>
                 </>
               ) : (
