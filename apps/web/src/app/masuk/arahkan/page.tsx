@@ -1,10 +1,10 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 
-export const dynamic = "force-dynamic";
-
 // Tujuan setelah login tanpa callbackUrl eksplisit: admin ke /admin, lainnya ke /riwayat.
-export default async function ArahkanSetelahMasuk() {
+// Dengan cacheComponents, akses sesi (cookies) harus berada di dalam Suspense.
+async function Pengarah() {
   const session = await auth();
 
   if (!session?.user) {
@@ -17,5 +17,13 @@ export default async function ArahkanSetelahMasuk() {
     role === "MODERATOR" ||
     Boolean(session.user.email?.startsWith("admin@"));
 
-  redirect(isAdmin ? "/admin" : "/riwayat");
+  return redirect(isAdmin ? "/admin" : "/riwayat");
+}
+
+export default function ArahkanSetelahMasuk() {
+  return (
+    <Suspense fallback={null}>
+      <Pengarah />
+    </Suspense>
+  );
 }
