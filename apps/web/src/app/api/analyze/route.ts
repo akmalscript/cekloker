@@ -16,7 +16,6 @@ const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
   "image/png",
   "image/webp",
-  "application/pdf",
 ]);
 
 // Pesan untuk pengguna saat layanan AI menolak input (HTTP 422, error_code di kontrak)
@@ -68,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     if (files.length === 0 && !teks.trim()) {
       return NextResponse.json(
-        { error: "Kirim minimal satu gambar/dokumen atau teks lowongan." },
+        { error: "Kirim minimal satu gambar atau teks lowongan." },
         { status: 400 },
       );
     }
@@ -102,7 +101,7 @@ export async function POST(request: NextRequest) {
       if (!ALLOWED_MIME_TYPES.has(file.type.toLowerCase())) {
         return NextResponse.json(
           {
-            error: `Format berkas ${file.name} tidak didukung. Format yang diizinkan adalah JPG, PNG, WEBP, atau PDF.`,
+            error: `Format berkas ${file.name} tidak didukung. Format yang diizinkan adalah JPG, PNG, atau WEBP.`,
           },
           { status: 400 },
         );
@@ -131,28 +130,18 @@ export async function POST(request: NextRequest) {
       const arrayBuf = await file.arrayBuffer();
       const rawBuf = Buffer.from(arrayBuf);
 
-      if (file.type.startsWith("image/")) {
-        const { processedBuffer, originalPhash, mimeType } =
-          await processImageForAI(rawBuf, file.type);
-        processedFiles.push({
-          buffer: processedBuffer,
-          name: sanitizedName,
-          type: mimeType,
-          phash: originalPhash,
-        });
-        phashes.push(originalPhash);
+      const { processedBuffer, originalPhash, mimeType } =
+        await processImageForAI(rawBuf, file.type);
+      processedFiles.push({
+        buffer: processedBuffer,
+        name: sanitizedName,
+        type: mimeType,
+        phash: originalPhash,
+      });
+      phashes.push(originalPhash);
 
-        if (!previewDataUrl) {
-          previewDataUrl = `data:${mimeType};base64,${processedBuffer.toString("base64")}`;
-        }
-      } else {
-        // PDF dsb
-        processedFiles.push({
-          buffer: rawBuf,
-          name: sanitizedName,
-          type: file.type,
-          phash: "0000000000000000",
-        });
+      if (!previewDataUrl) {
+        previewDataUrl = `data:${mimeType};base64,${processedBuffer.toString("base64")}`;
       }
     }
 
