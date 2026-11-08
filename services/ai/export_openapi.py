@@ -54,7 +54,7 @@ def generate_openapi():
                                         "files": {
                                             "type": "array",
                                             "items": {"type": "string", "format": "binary"},
-                                            "description": "Maksimal 5 berkas (JPG/PNG/WEBP/PDF)"
+                                            "description": "Maksimal 3 berkas gambar (JPG/PNG/WEBP)"
                                         },
                                         "teks": {
                                             "type": "string",

@@ -13,7 +13,6 @@ import {
   EyeOff,
   ArrowRight,
   Trash2,
-  FileText,
   Image as ImageIcon,
   LogIn,
   UserPlus,
@@ -30,7 +29,6 @@ const ALLOWED_TYPES = [
   "image/jpeg",
   "image/png",
   "image/webp",
-  "application/pdf",
 ];
 
 export default function CekLokerPage() {
@@ -80,7 +78,7 @@ export default function CekLokerPage() {
       const file = newFiles[i];
 
       if (!ALLOWED_TYPES.includes(file.type)) {
-        setError(`Format berkas "${file.name}" tidak didukung (gunakan JPG, PNG, WEBP, atau PDF).`);
+        setError(`Format berkas "${file.name}" tidak didukung (gunakan JPG, PNG, atau WEBP).`);
         return;
       }
 
@@ -135,7 +133,7 @@ export default function CekLokerPage() {
     }
 
     if (files.length === 0 && !teks.trim()) {
-      setError("Silakan masukkan minimal satu berkas gambar/dokumen atau teks lowongan.");
+      setError("Silakan masukkan minimal satu berkas gambar atau teks lowongan.");
       return;
     }
 
@@ -330,7 +328,7 @@ export default function CekLokerPage() {
               {/* Area Unggah Berkas */}
               <div className="mt-8" role="group" aria-labelledby="upload-label">
                 <p id="upload-label" className="text-[13px] font-medium italic text-muted">
-                  Silakan input gambar, dokumen, atau teks
+                  Silakan input gambar atau teks
                 </p>
 
                 <div
@@ -372,8 +370,8 @@ export default function CekLokerPage() {
                     className="hidden"
                     multiple
                     disabled={isQuotaExhausted}
-                    accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf"
-                    aria-label="Pilih file gambar atau dokumen"
+                    accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                    aria-label="Pilih file gambar"
                     onChange={(e) => {
                       if (e.target.files && e.target.files.length > 0) {
                         validateAndAddFiles(e.target.files);
@@ -383,7 +381,7 @@ export default function CekLokerPage() {
                 </div>
 
                 <p id="upload-hint" className="mt-4 text-center text-[13px] leading-snug text-muted">
-                  JPG, JPEG, PNG, WEBP, PDF. Maks. 3 file, 10 MB per file, total 25 MB.
+                  JPG, JPEG, PNG, WEBP. Maks. 3 file, 10 MB per file, total 25 MB.
                 </p>
 
                 {/* Daftar Berkas Terpilih */}
@@ -395,11 +393,7 @@ export default function CekLokerPage() {
                         className="flex items-center justify-between rounded-lg border border-line bg-canvas p-3"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          {file.type === "application/pdf" ? (
-                            <FileText className="h-5 w-5 text-navy shrink-0" />
-                          ) : (
-                            <ImageIcon className="h-5 w-5 text-navy shrink-0" />
-                          )}
+                          <ImageIcon className="h-5 w-5 text-navy shrink-0" />
                           <div className="truncate text-sm font-semibold text-ink">
                             <span>{file.name}</span>
                             <span className="ml-2 text-xs font-normal text-muted">

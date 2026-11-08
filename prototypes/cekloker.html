@@ -382,17 +382,17 @@
 
           <!-- Unggah -->
           <div class="mt-8" role="group" aria-labelledby="upload-label">
-            <p id="upload-label" class="text-[13px] font-medium italic text-muted">Silakan input gambar/dokumen/teks</p>
+            <p id="upload-label" class="text-[13px] font-medium italic text-muted">Silakan input gambar/teks</p>
 
             <div id="dropzone" class="dropzone mt-4 flex flex-col items-center rounded-card border-2 border-dashed border-field bg-white px-4 py-10 text-center sm:px-6 sm:py-12">
               <span class="grid h-12 w-12 place-items-center rounded-full bg-navy-tint text-navy" aria-hidden="true"><i data-lucide="cloud-upload" class="h-6 w-6"></i></span>
               <p class="mt-4 font-semibold text-ink">Tarik file ke sini atau pilih file</p>
-              <p class="mt-1 max-w-[240px] text-sm leading-snug text-muted sm:max-w-none">Gambar atau dokumen (opsional jika teks diisi)</p>
+              <p class="mt-1 max-w-[240px] text-sm leading-snug text-muted sm:max-w-none">Gambar poster atau tangkapan layar (opsional jika teks diisi)</p>
               <button id="pick-btn" type="button" class="btn btn-secondary btn-sm mt-4 !border-2 !border-navy" aria-describedby="upload-hint">Pilih File</button>
-              <input id="file-input" type="file" class="hidden" multiple accept=".jpg,.jpeg,.png,.webp,.pdf,image/jpeg,image/png,image/webp,application/pdf" aria-label="Pilih file gambar atau dokumen">
+              <input id="file-input" type="file" class="hidden" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" aria-label="Pilih file gambar">
             </div>
 
-            <p id="upload-hint" class="mt-4 text-center text-[13px] leading-snug text-muted">JPG, JPEG, PNG, WEBP, PDF. Maks. 5 file, 10 MB per file, total 25 MB. PDF maks. 10 halaman.</p>
+            <p id="upload-hint" class="mt-4 text-center text-[13px] leading-snug text-muted">JPG, JPEG, PNG, WEBP. Maks. 3 file, 10 MB per file, total 25 MB.</p>
             <p id="upload-error" class="field-error hidden" role="alert"><i data-lucide="circle-alert" aria-hidden="true"></i><span></span></p>
 
             <ul id="file-list" class="mt-4 hidden space-y-2" aria-label="File yang akan diperiksa"></ul>
@@ -475,17 +475,17 @@
     })();
 
     // ---------- Konstanta & state ----------
-    const MAX_FILES = 5;
+    const MAX_FILES = 3;
     const MAX_FILE = 10 * 1024 * 1024;      // 10 MB per file
     const MAX_TOTAL = 25 * 1024 * 1024;     // 25 MB total
     const MAX_TEXT = 10000;
     const QUOTA_MAX = 3;
-    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
-    const ALLOWED_EXT = /\.(jpe?g|png|webp|pdf)$/i;
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    const ALLOWED_EXT = /\.(jpe?g|png|webp)$/i;
     const nf = new Intl.NumberFormat('id-ID');
 
     // Satu file contoh agar tampilan awal sama dengan desain Figma. Hapus baris ini untuk memulai dari daftar kosong.
-    let files = [{ name: 'Lowongan_Digital_Marketer.pdf', size: Math.round(1.2 * 1024 * 1024), type: 'application/pdf' }];
+    let files = [{ name: 'Lowongan_Digital_Marketer.png', size: Math.round(1.2 * 1024 * 1024), type: 'image/png' }];
     let quota = QUOTA_MAX;
 
     const form = document.getElementById('form-periksa');
@@ -524,12 +524,10 @@
     // ---------- Daftar file ----------
     function renderFiles() {
       const items = files.map(f => {
-        const isPdf = f.type === 'application/pdf';
-
         const li = el('li', 'flex items-center gap-4 rounded-card border border-line bg-canvas px-4 py-2');
         const thumb = el('span', 'grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-white text-navy');
         thumb.setAttribute('aria-hidden', 'true');
-        thumb.append(icon(isPdf ? 'file-text' : 'image', 'h-5 w-5'));
+        thumb.append(icon('image', 'h-5 w-5'));
 
         const info = el('div', 'min-w-0 flex-1');
         info.append(el('p', 'truncate text-[14px] font-bold leading-snug text-ink', f.name));
@@ -574,7 +572,7 @@
       let added = 0;
       Array.from(list).forEach(f => {
         if (!(ALLOWED_TYPES.includes(f.type) || ALLOWED_EXT.test(f.name))) {
-          errors.add('"' + f.name + '" bukan format yang didukung. Pakai JPG, PNG, WEBP, atau PDF.');
+          errors.add('"' + f.name + '" bukan format yang didukung. Pakai JPG, PNG, atau WEBP.');
           return;
         }
         if (f.size > MAX_FILE) { errors.add('"' + f.name + '" lebih dari 10 MB.'); return; }
@@ -582,7 +580,7 @@
         if (files.length >= MAX_FILES) { errors.add('Maksimal ' + MAX_FILES + ' file.'); return; }
         const total = files.reduce((s, x) => s + x.size, 0) + f.size;
         if (total > MAX_TOTAL) { errors.add('Total ukuran file tidak boleh lebih dari 25 MB.'); return; }
-        files.push({ name: f.name, size: f.size, type: f.type || (/\.pdf$/i.test(f.name) ? 'application/pdf' : 'image/*'), file: f });
+        files.push({ name: f.name, size: f.size, type: f.type || 'image/*', file: f });
         added++;
       });
       renderFiles();

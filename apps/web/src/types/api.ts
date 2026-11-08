@@ -235,7 +235,7 @@ export interface operations {
         requestBody: {
             content: {
                 "multipart/form-data": {
-                    /** @description Maksimal 5 berkas (JPG/PNG/WEBP/PDF) */
+                    /** @description Maksimal 3 berkas gambar (JPG/PNG/WEBP) */
                     files?: string[];
                     /** @description Teks lowongan atau percakapan (opsional) */
                     teks?: string;

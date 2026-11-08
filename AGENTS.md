@@ -177,7 +177,7 @@ Jangan salin atau hardcode kontrak di sini — selalu mengacu ke:
 
 ### Endpoint
 
-`POST /analyze` — menerima `files` (JPG/PNG/WEBP/PDF, maks 5 file, maks 10 MB/file, total maks 25 MB, PDF maks 10 halaman) dan `teks` (opsional, maks 10.000 karakter) sesuai validasi antarmuka di `prototypes/cekloker.html`.
+`POST /analyze` — menerima `files` (JPG/PNG/WEBP, maks 3 berkas, maks 10 MB/file, total maks 25 MB) dan `teks` (opsional, maks 10.000 karakter) sesuai validasi antarmuka di `prototypes/cekloker.html`.
 
 Kalau input tidak bisa dianalisis (bukan lowongan, OCR kosong, gambar buram): kembalikan **HTTP 422** dengan `AnalysisError` yang berisi `error_code` (`no_text_found` / `not_a_job_posting` / `low_quality_image`). UI yang menerjemahkan kode ini ke pesan ramah — jangan kembalikan hasil palsu.
 
