@@ -21,7 +21,7 @@ const FAQS: FaqItem[] = [
     id: "faq-2",
     question: "Apakah data saya aman?",
     answer:
-      "Data sensitif seperti NIK, nomor rekening, dan alamat disamarkan (blur) otomatis di sisi server sebelum diproses oleh model kecerdasan buatan.",
+      "NIK dan nomor rekening yang terbaca pada gambar atau teks disamarkan (blur) otomatis di sisi server sebelum diproses oleh model kecerdasan buatan. Hindari mengunggah foto KTP, KK, paspor, atau ijazah.",
   },
   {
     id: "faq-3",

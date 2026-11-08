@@ -522,8 +522,9 @@ export default function CekLokerPage() {
               <div className="alert alert-info mt-6" role="note">
                 <EyeOff className="mt-0.5 h-5 w-5 shrink-0 text-navy" aria-hidden="true" />
                 <p className="text-sm">
-                  Data sensitif seperti NIK, nomor rekening, foto KTP/KK/paspor, ijazah, dan alamat
-                  lengkap disamarkan (blur) otomatis di sisi server sebelum diproses oleh AI.
+                  NIK dan nomor rekening yang terbaca pada gambar atau teks disamarkan (blur) otomatis
+                  di sisi server sebelum diproses oleh AI. Hindari mengunggah foto KTP, KK, paspor,
+                  atau ijazah.
                 </p>
               </div>
 
